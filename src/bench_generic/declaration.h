@@ -1,0 +1,8 @@
+#ifndef BENCH_GENERIC_DECLARATION_H
+#define BENCH_GENERIC_DECLARATION_H
+
+#include "compiler/compiler_directives.h"
+
+#define BENCH_DECL_ATTRIBUTES TOOLS_NOINLINE
+
+#endif  // BENCH_GENERIC_DECLARATION_H

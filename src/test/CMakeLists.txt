@@ -4,6 +4,7 @@ add_executable(tests)
 target_sources(tests PRIVATE
                algorithm/memoized_function.t.cc
                algorithm/unroll.t.cc
+               bench_generic/input_generators.t.cpp
                catch_main.cc)
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -O2

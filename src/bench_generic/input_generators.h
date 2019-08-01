@@ -1,0 +1,77 @@
+#ifndef BENCH_GENERIC_INPUT_GENERATORS_H
+#define BENCH_GENERIC_INPUT_GENERATORS_H
+
+#include <algorithm>
+#include <cstddef>
+#include <random>
+#include <set>
+#include <utility>
+#include <vector>
+
+#include <algorithm/memoized_function.h>
+
+namespace bench {
+
+template <typename>
+struct int_to_t;
+
+template <>
+struct int_to_t<int> {
+  int operator()(int x) const { return x; }
+};
+
+namespace detail {
+
+template <typename T, typename Src>
+auto generate_unique_sorted_vector(size_t size, Src src) {
+  const int_to_t<T> to_t;
+  std::set<T> values;
+  while (values.size() < size) {
+    values.insert(to_t(src()));
+  }
+  return std::vector<T>(values.begin(), values.end());
+}
+
+template <typename T, typename Src>
+auto generator_sorted_vector(size_t size, Src src) {
+  const int_to_t<T> to_t;
+
+  std::vector<T> res(size);
+  std::generate(res.begin(), res.end(), [&] { return to_t(src()); });
+  std::sort(res.begin(), res.end());
+
+  return res;
+}
+
+std::mt19937& static_generator() {
+  static std::mt19937 g;
+  return g;
+}
+
+auto uniform_generator(size_t size) {
+  return [ud = std::uniform_int_distribution<>{
+              1, static_cast<int>(size) * 20}]() mutable {
+    return ud(static_generator());
+  };
+}
+
+}  // namespace detail
+
+template <typename T>
+std::pair<std::vector<T>, std::vector<T> > two_sorted_vectors(size_t x_size,
+                                                              size_t y_size) {
+  using namespace detail;
+
+  static auto gen =
+      tools::memoized_function([](std::pair<size_t, size_t> sizes) {
+        return std::make_pair(generator_sorted_vector<T>(sizes.first),
+                              generator_sorted_vector<T>(sizes.second),
+                              uniform_generator(sizes.first + sizes.second));
+      });
+
+  return gen({x_size, y_size});
+}
+
+}  // namespace bench
+
+#endif  // BENCH_GENERIC_INPUT_GENERATORS_H
