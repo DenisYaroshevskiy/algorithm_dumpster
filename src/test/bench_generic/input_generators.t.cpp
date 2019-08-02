@@ -8,11 +8,11 @@ namespace bench {
 namespace detail {
 namespace {
 
-TEST_CASE("bench.input_generators.generator_sorted_vector", "[bench]") {
+TEST_CASE("bench.input_generators.generate_sorted_vector", "[bench]") {
   std::array inputs = {0, 5, 2, 2, 1};
   auto src = [&, pos = 0]() mutable { return inputs[pos++]; };
 
-  auto res = generator_sorted_vector<int>(inputs.size(), src);
+  auto res = generate_sorted_vector<int>(inputs.size(), src);
   REQUIRE(res == std::vector{0, 1, 2, 2, 5});
 }
 

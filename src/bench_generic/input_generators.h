@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include <algorithm/memoized_function.h>
+#include "algorithm/memoized_function.h"
 
 namespace bench {
 
@@ -33,7 +33,7 @@ auto generate_unique_sorted_vector(size_t size, Src src) {
 }
 
 template <typename T, typename Src>
-auto generator_sorted_vector(size_t size, Src src) {
+auto generate_sorted_vector(size_t size, Src src) {
   const int_to_t<T> to_t;
 
   std::vector<T> res(size);
@@ -48,7 +48,7 @@ std::mt19937& static_generator() {
   return g;
 }
 
-auto uniform_generator(size_t size) {
+auto uniform_src(size_t size) {
   return [ud = std::uniform_int_distribution<>{
               1, static_cast<int>(size) * 20}]() mutable {
     return ud(static_generator());
@@ -58,15 +58,15 @@ auto uniform_generator(size_t size) {
 }  // namespace detail
 
 template <typename T>
-std::pair<std::vector<T>, std::vector<T> > two_sorted_vectors(size_t x_size,
-                                                              size_t y_size) {
+std::pair<std::vector<T>, std::vector<T>> two_sorted_vectors(size_t x_size,
+                                                             size_t y_size) {
   using namespace detail;
 
-  static auto gen =
-      tools::memoized_function([](std::pair<size_t, size_t> sizes) {
-        return std::make_pair(generator_sorted_vector<T>(sizes.first),
-                              generator_sorted_vector<T>(sizes.second),
-                              uniform_generator(sizes.first + sizes.second));
+  static auto gen = tools::memoized_function<std::pair<size_t, size_t>>(
+      [](std::pair<size_t, size_t> sizes) {
+        auto src = uniform_src(sizes.first + sizes.second);
+        return std::make_pair(generate_sorted_vector<T>(sizes.first, src),
+                              generate_sorted_vector<T>(sizes.second, src));
       });
 
   return gen({x_size, y_size});

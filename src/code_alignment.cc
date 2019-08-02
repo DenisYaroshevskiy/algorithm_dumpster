@@ -1,65 +1,43 @@
-#include <set>
-#include <vector>
-#include <random>
+#include "algorithm/unroll.h"
+#include "bench_generic/input_generators.h"
+#include "bench_generic/merge.h"
 
 #include <benchmark/benchmark.h>
 
 // http://quick-bench.com/GJ2brewZxr0auF9CntT2wE-TLO4
 
-namespace {
-
-constexpr std::size_t kProblemSize = 1000u;
-
-const std::vector<std::int64_t>& ints_test() {
-  static const auto res = [] () -> std::vector<std::int64_t> {
-    std::mt19937 g;
-    std::uniform_int_distribution<std::int64_t> dis(
-        1, static_cast<std::int64_t>(kProblemSize) * 10);
-
-    std::set<std::int64_t> unique_sorted_ints;
-    while (unique_sorted_ints.size() < kProblemSize)
-      unique_sorted_ints.insert(dis(g));
-
-    return {unique_sorted_ints.begin(), unique_sorted_ints.end()};
-  }();
-
-  return res;
-}
-
-}  // namespace
+#ifdef NOOP_COUNT
+static constexpr size_t noop_count = NOOP_COUNT;
+#else
+static constexpr size_t noop_count = 0;
+#endif  // NOOP_COUNT
 
 void do_nothing() {
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-  asm volatile ("nop");
-
-  asm volatile ("nop");
+  tools::unroll<noop_count>([] { asm volatile("nop"); });
 }
 
-void benchmark_lb(benchmark::State& state) {
-  do_nothing();
+struct alg {
+  template <typename I, typename Cmp>
+  I operator()(I f1, I l1, I f2, I l2, I o, Cmp cmp) {
+    return std::merge(f1, l1, f2, l2, o, cmp);
+  }
+};
 
-  auto input = ints_test();
-  auto looking_for = *(input.begin() + 300);
+void test_benchmark(benchmark::State& state) {
+  static constexpr size_t x_size = 1300;
+  static constexpr size_t y_size = 700;
 
-  for (auto _ : state)
-    benchmark::DoNotOptimize(std::lower_bound(input.begin(), input.end(), looking_for));
+  auto [x_vec, y_vec] = bench::two_sorted_vectors<int>(x_size, y_size);
+  std::vector<int> o_vec(x_size + y_size);
+
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(std::merge(
+        x_vec.begin(), x_vec.end(), y_vec.begin(), y_vec.end(), o_vec.begin()));
+  }
 }
 
-BENCHMARK(benchmark_lb);
+#ifndef USE_ARG
+BENCHMARK(test_benchmark);
+#else
+BENCHMARK(test_benchmark)->Arg(noop_count);
+#endif
