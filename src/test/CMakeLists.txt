@@ -3,6 +3,7 @@
 add_executable(tests)
 target_sources(tests PRIVATE
                algorithm/memoized_function.t.cc
+               algorithm/to_factoriadic_representation.t.cc
                algorithm/unroll.t.cc
                bench_generic/input_generators.t.cpp
                catch_main.cc)
