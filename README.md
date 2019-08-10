@@ -26,6 +26,12 @@ Zero is always present (0!) - this allows to do the algorithm better.<br/>
 
 Representation comes out left is smallest digit.
 
+### factorial
+
+`factorial`
+
+Computes a factorial of an input number.
+
 ### find_nth
 
 find_nth_if_guarantied

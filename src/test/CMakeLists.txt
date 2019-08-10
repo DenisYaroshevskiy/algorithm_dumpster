@@ -4,6 +4,7 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                algorithm/factoriadic_representation.t.cc
+               algorithm/factorial.t.cc
                algorithm/find_nth.t.cc
                algorithm/make_vector_of_iterators.t.cc
                algorithm/memoized_function.t.cc

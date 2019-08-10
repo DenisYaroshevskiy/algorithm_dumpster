@@ -58,6 +58,17 @@ auto uniform_src(size_t size) {
 }  // namespace detail
 
 template <typename T>
+std::vector<T> sorted_vector(size_t size) {
+  using namespace detail;
+
+  static auto gen = tools::memoized_function<size_t>([](size_t size) {
+    return generate_sorted_vector<T>(size, uniform_src(size));
+  });
+
+  return gen(size);
+}
+
+template <typename T>
 std::pair<std::vector<T>, std::vector<T>> two_sorted_vectors(size_t x_size,
                                                              size_t y_size) {
   using namespace detail;

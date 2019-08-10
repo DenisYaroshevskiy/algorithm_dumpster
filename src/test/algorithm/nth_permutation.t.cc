@@ -7,6 +7,8 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include "algorithm/factorial.h"
+
 #include "test/catch.h"
 
 namespace tools {
@@ -47,16 +49,8 @@ TEST_CASE("algorithm.nth_permutation.special_cases", "[algorithm]") {
     std::iota(sorted.begin(), sorted.end(), 0);
     std::reverse_copy(sorted.begin(), sorted.end(), expected.begin());
 
-    big_int last_permuation_number = [] {
-      big_int res{1};
-
-      for (int i = 2; i <= static_cast<int>(size); ++i) {
-        res *= i;
-      }
-
-      res -= 1;
-      return res;
-    }();
+    big_int last_permuation_number =
+        factorial<big_int>(static_cast<int>(size)) - 1;
 
     nth_permutation(sorted.begin(), sorted.end(), actual.begin(),
                     std::move(last_permuation_number));

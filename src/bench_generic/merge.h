@@ -4,9 +4,10 @@
 #include <functional>
 #include <vector>
 
-#include "benchmark/benchmark.h"
+#include <benchmark/benchmark.h>
 
 #include "bench_generic/declaration.h"
+#include "bench_generic/input_generators.h"
 
 namespace bench {
 
