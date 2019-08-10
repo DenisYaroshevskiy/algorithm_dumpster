@@ -9,7 +9,7 @@
 #include "algorithm/find_nth.h"
 #include "algorithm/make_vector_of_iterators.h"
 
-namespace tools {
+namespace algo {
 
 template <typename I, typename O, typename N>
 // requires ForwardIterator<I> && OutputIterator<0> && Number<N>
@@ -37,6 +37,6 @@ O nth_permutation(I f, I l, O o, N n) {
   return o;
 }
 
-}  // namespace tools
+}  // namespace algo
 
 #endif  // ALGORITHM_NTH_PERMUTATION_H

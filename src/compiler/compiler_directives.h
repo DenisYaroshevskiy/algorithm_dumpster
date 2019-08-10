@@ -1,6 +1,6 @@
 #ifndef COMPILER_COMPILER_DIRECTIVES_H
 #define COMPILER_COMPILER_DIRECTIVES_H
 
-#define TOOLS_NOINLINE __attribute__((noinline))
+#define ALGO_NOINLINE __attribute__((noinline))
 
 #endif  // COMPILER_COMPILER_DIRECTIVES_H

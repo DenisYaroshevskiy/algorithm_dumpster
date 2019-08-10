@@ -4,7 +4,7 @@
 #include <iterator>
 #include <type_traits>
 
-namespace tools {
+namespace algo {
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;
@@ -25,6 +25,6 @@ template <typename I>
 constexpr bool RandomAccessIterator =
     std::is_base_of_v<std::random_access_iterator_tag, IteratorCategory<I>>;
 
-}  // namespace tools
+}  // namespace algo
 
 #endif  // ALGORITHM_TYPE_FUNCTIONS_H

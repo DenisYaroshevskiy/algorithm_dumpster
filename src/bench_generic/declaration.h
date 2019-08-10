@@ -3,6 +3,6 @@
 
 #include "compiler/compiler_directives.h"
 
-#define BENCH_DECL_ATTRIBUTES TOOLS_NOINLINE
+#define BENCH_DECL_ATTRIBUTES ALGO_NOINLINE
 
 #endif  // BENCH_GENERIC_DECLARATION_H

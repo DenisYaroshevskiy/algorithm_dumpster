@@ -7,10 +7,11 @@
 
 #include "algorithm/type_functions.h"
 
-namespace tools {
+namespace algo {
 
 template <typename ResultN = std::ptrdiff_t, typename DigitType = ResultN,
           typename N = ResultN>
+// require Integral<ResultN> && Integral<DigitType> && Integral<N>
 constexpr ResultN compute_factoriadic_representation_length(N n) {
   ResultN res{1};
 
@@ -23,6 +24,7 @@ constexpr ResultN compute_factoriadic_representation_length(N n) {
 }
 
 template <typename N, typename I>
+// require Integral<N> && InputIterator<I>
 constexpr N from_factoriadic_representation(I f, I l) {
   if (f == l) {
     return N{0};
@@ -45,6 +47,7 @@ constexpr N from_factoriadic_representation(I f, I l) {
 }
 
 template <typename N, typename I>
+// require Integral<N> && OutpuIterator<O>
 constexpr I to_factoriadic_representation(N n, I o) {
   ValueType<I> digit{1};
 
@@ -57,6 +60,6 @@ constexpr I to_factoriadic_representation(N n, I o) {
   return o;
 }
 
-}  // namespace tools
+}  // namespace algo
 
 #endif  // ALGORITHM_FACTORIADIC_REPRESENTATION_H

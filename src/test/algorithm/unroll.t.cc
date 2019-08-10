@@ -2,7 +2,7 @@
 
 #include "test/catch.h"
 
-namespace tools {
+namespace algo {
 namespace {
 
 template <size_t N>
@@ -19,4 +19,4 @@ TEST_CASE("algorithm.unroll", "[algorithm]") {
 }
 
 }  // namespace
-}  // namespace tools
+}  // namespace algo

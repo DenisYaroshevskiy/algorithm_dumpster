@@ -109,7 +109,7 @@ function visualizeBenchmarksPloty(id, element, settings, benchmarks) {
     };
 
     if (settings.useLog) {
-        layout.xaxis = { type : 'log'};
+        layout.xaxis = { type: 'log' };
     }
 
     traces.then(

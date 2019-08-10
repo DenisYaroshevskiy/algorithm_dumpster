@@ -7,9 +7,10 @@
 
 #include "algorithm/type_functions.h"
 
-namespace tools {
+namespace algo {
 
 template <typename I>
+// require ForwardIterator<I>
 std::vector<I> make_vector_of_iterators(I f, I l) {
   std::vector<I> res;
   if constexpr (RandomAccessIterator<I>) {
@@ -24,6 +25,6 @@ std::vector<I> make_vector_of_iterators(I f, I l) {
   return res;
 }
 
-}  // namespace tools
+}  // namespace algo
 
 #endif  // ALGORITHM_MAKE_VECTOR_OF_ITERATORS_H

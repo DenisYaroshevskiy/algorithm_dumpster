@@ -8,7 +8,7 @@
 
 #include "test/catch.h"
 
-namespace tools {
+namespace algo {
 namespace {
 
 using big_int = boost::multiprecision::cpp_int;
@@ -86,10 +86,9 @@ TEST_CASE("algorithm.to_factoriadic_representation.cpp_int", "[algorithm]") {
       return res;
     };
 
-    for (int i = 100; i < 200; ++i)
-      test_factoriadic_runtime(factorial(i));
+    for (int i = 100; i < 200; ++i) test_factoriadic_runtime(factorial(i));
   }
 }
 
 }  // namespace
-}  // namespace tools
+}  // namespace algo

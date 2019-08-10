@@ -5,7 +5,7 @@
 
 #include "test/catch.h"
 
-namespace tools {
+namespace algo {
 namespace {
 
 TEST_CASE("algorithm.make_vector_of_iterators", "[algorithm]") {
@@ -43,4 +43,4 @@ TEST_CASE("algorithm.make_vector_of_iterators", "[algorithm]") {
 }
 
 }  // namespace
-}  // namespace tools
+}  // namespace algo

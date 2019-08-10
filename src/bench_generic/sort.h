@@ -34,11 +34,11 @@ void sort_int_vec(benchmark::State& state) {
 
   using big_int = boost::multiprecision::cpp_int;
   const big_int selected_permutation =
-      (tools::factorial<big_int>(static_cast<int>(size)) - 1) * percentage / 100;
+      (algo::factorial<big_int>(static_cast<int>(size)) - 1) * percentage / 100;
 
   std::vector<int> vec(size);
-  tools::nth_permutation(sorted_vec.begin(), sorted_vec.end(), vec.begin(),
-                         selected_permutation);
+  algo::nth_permutation(sorted_vec.begin(), sorted_vec.end(), vec.begin(),
+                        selected_permutation);
 
   sort_common<Alg>(state, vec, std::less<>{});
 }

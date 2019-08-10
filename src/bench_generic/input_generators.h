@@ -61,7 +61,7 @@ template <typename T>
 std::vector<T> sorted_vector(size_t size) {
   using namespace detail;
 
-  static auto gen = tools::memoized_function<size_t>([](size_t size) {
+  static auto gen = algo::memoized_function<size_t>([](size_t size) {
     return generate_sorted_vector<T>(size, uniform_src(size));
   });
 
@@ -73,7 +73,7 @@ std::pair<std::vector<T>, std::vector<T>> two_sorted_vectors(size_t x_size,
                                                              size_t y_size) {
   using namespace detail;
 
-  static auto gen = tools::memoized_function<std::pair<size_t, size_t>>(
+  static auto gen = algo::memoized_function<std::pair<size_t, size_t>>(
       [](std::pair<size_t, size_t> sizes) {
         auto src = uniform_src(sizes.first + sizes.second);
         return std::make_pair(generate_sorted_vector<T>(sizes.first, src),

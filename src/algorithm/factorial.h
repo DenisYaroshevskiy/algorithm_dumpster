@@ -1,9 +1,10 @@
 #ifndef ALGORITHM_FACTORIAL_H
 #define ALGORITHM_FACTORIAL_H
 
-namespace tools {
+namespace algo {
 
 template <typename ResultN, typename N>
+// require Integral<ResultN> && Integral<N>
 constexpr ResultN factorial(N n) {
   ResultN res{1};
 
@@ -14,6 +15,6 @@ constexpr ResultN factorial(N n) {
   return res;
 }
 
-}  // namespace tools
+}  // namespace algo
 
 #endif  // ALGORITHM_FACTORIAL_H

@@ -2,7 +2,7 @@
 
 #include "test/catch.h"
 
-namespace tools {
+namespace algo {
 namespace {
 
 TEST_CASE("algorithm.memoized_function", "[algorithm]") {
@@ -16,4 +16,4 @@ TEST_CASE("algorithm.memoized_function", "[algorithm]") {
 }
 
 }  // namespace
-}  // namespace tools
+}  // namespace algo

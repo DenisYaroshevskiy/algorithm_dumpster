@@ -13,7 +13,7 @@ static constexpr size_t noop_count = 0;
 #endif  // NOOP_COUNT
 
 void do_nothing() {
-  tools::unroll<noop_count>([] { asm volatile("nop"); });
+  algo::unroll<noop_count>([] { asm volatile("nop"); });
 }
 
 struct alg {

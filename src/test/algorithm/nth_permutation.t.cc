@@ -11,7 +11,7 @@
 
 #include "test/catch.h"
 
-namespace tools {
+namespace algo {
 namespace {
 
 using big_int = boost::multiprecision::cpp_int;
@@ -59,4 +59,4 @@ TEST_CASE("algorithm.nth_permutation.special_cases", "[algorithm]") {
 }
 
 }  // namespace
-}  // namespace tools
+}  // namespace algo

@@ -4,9 +4,10 @@
 #include <map>
 #include <type_traits>
 
-namespace tools {
+namespace algo {
 
 template <typename T, typename Op>
+// require TotallyOrdered<T> && UnaryFunction<Op, T>
 auto memoized_function(Op op) {
   using result_type = decltype(op(std::declval<T>()));
   return [cache = std::map<T, result_type>{}, op](const T& x) mutable {
@@ -16,6 +17,6 @@ auto memoized_function(Op op) {
   };
 }
 
-}  // namespace tools
+}  // namespace algo
 
 #endif  // ALGORITHM_MEMOIZED_FUNCTION_H

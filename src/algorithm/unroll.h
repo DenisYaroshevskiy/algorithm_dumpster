@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace tools {
+namespace algo {
 namespace detail {
 
 template <typename Op, size_t... from0_to_n>
@@ -15,10 +15,11 @@ constexpr void unroll_impl(Op op, std::index_sequence<from0_to_n...>) {
 }  // namespace detail
 
 template <size_t N, typename Op>
+// require Callable<Op>
 constexpr void unroll(Op op) {
   detail::unroll_impl(op, std::make_index_sequence<N>{});
 }
 
-}  // namespace tools
+}  // namespace algo
 
 #endif  // ALGORITHM_UNROLL_H
