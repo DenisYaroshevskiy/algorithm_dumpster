@@ -5,9 +5,9 @@
 #include <utility>
 #include <vector>
 
-#include "find_nth.h"
-#include "make_vector_of_iterators.h"
-#include "factoriadic_representation.h"
+#include "algorithm/factoriadic_representation.h"
+#include "algorithm/find_nth.h"
+#include "algorithm/make_vector_of_iterators.h"
 
 namespace tools {
 
@@ -26,8 +26,8 @@ O nth_permutation(I f, I l, O o, N n) {
   for (DifferenceType<I> pos : factoriadic_n) {
     // TODO: we can potentially reduce the number of searches by updating
     //       the left boundary.
-    // TODO: Using 'colony' data structure could reduce the cost of the algorithm:
-    //       https://youtu.be/wBER1R8YyGY
+    // TODO: Using 'colony' data structure could reduce the cost of the
+    //       algorithm: https://youtu.be/wBER1R8YyGY
     auto marker_it = find_nth_if_guarantied(markers.begin(), pos,
                                             [&](I x) { return x != l; });
     *o++ = **marker_it;

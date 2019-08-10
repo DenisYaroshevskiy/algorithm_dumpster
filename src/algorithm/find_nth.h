@@ -1,7 +1,7 @@
 #ifndef ALGORITHM_FIND_NTH_H
 #define ALGORITHM_FIND_NTH_H
 
-#include "type_functions.h"
+#include "algorithm/type_functions.h"
 
 namespace tools {
 

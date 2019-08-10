@@ -7,8 +7,8 @@ Collection of mostly stl-like algorithms and some general purpose data-structure
 
 ### factoriadic_representation
 
-`from_factoriadic_representation`
 `compute_factoriadic_representation_length`
+`from_factoriadic_representation`
 `to_factoriadic_representation`
 
 [Wikipedia](https://en.wikipedia.org/wiki/Factorial_number_system)

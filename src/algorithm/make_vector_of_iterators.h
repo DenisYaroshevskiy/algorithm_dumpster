@@ -5,7 +5,7 @@
 #include <numeric>
 #include <vector>
 
-#include "type_functions.h"
+#include "algorithm/type_functions.h"
 
 namespace tools {
 

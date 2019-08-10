@@ -5,30 +5,9 @@
 #include <numeric>
 #include <utility>
 
-#include "type_functions.h"
+#include "algorithm/type_functions.h"
 
 namespace tools {
-
-template <typename N, typename I>
-constexpr N from_factoriadic_representation(I f, I l) {
-  if (f == l) {
-    return N{0};
-  }
-
-  ValueType<I> next_multiple{1};
-  N factorial{1};
-
-  // std::accumulate is still not constexpr in my standard library
-  N sum{0};
-  ++f;
-  while (f != l) {
-    factorial *= next_multiple++;
-    sum += factorial * *f;
-    ++f;
-  }
-
-  return sum;
-}
 
 template <typename ResultN = std::ptrdiff_t, typename DigitType = ResultN,
           typename N = ResultN>
@@ -41,6 +20,28 @@ constexpr ResultN compute_factoriadic_representation_length(N n) {
   }
 
   return res;
+}
+
+template <typename N, typename I>
+constexpr N from_factoriadic_representation(I f, I l) {
+  if (f == l) {
+    return N{0};
+  }
+
+  ValueType<I> next_multiple{1};
+  N factorial{1};
+
+  ++f;  // skipping 0
+
+  // std::accumulate is still not constexpr in my standard library
+  N sum{0};
+  while (f != l) {
+    factorial *= next_multiple++;
+    sum += factorial * *f;
+    ++f;
+  }
+
+  return sum;
 }
 
 template <typename N, typename I>
