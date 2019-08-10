@@ -2,9 +2,8 @@
 #define ALGORITHM_FACTORIADIC_REPRESENTATION_H
 
 #include <cstddef>
-
 #include <numeric>
-#include <iostream>
+#include <utility>
 
 #include "type_functions.h"
 
