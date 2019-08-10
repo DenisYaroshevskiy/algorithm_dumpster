@@ -8,34 +8,30 @@
 #include "type_functions.h"
 
 namespace tools {
-namespace detail {
-
-template <typename DigitType, typename N, typename Op>
-constexpr void do_to_factoriadic_representation(N n, Op op) {
-  DigitType digit(1);
-
-  do {
-    op(DigitType(n % digit));
-    n /= digit;
-    ++digit;
-  } while (n);
-}
-
-}  // namespace detail
 
 template <typename ResultN = std::ptrdiff_t, typename DigitType = ResultN,
           typename N = ResultN>
 constexpr ResultN compute_factoriadic_representation_length(N n) {
-  ResultN r{0};
-  detail::do_to_factoriadic_representation<DigitType>(
-      std::move(n), [&](const DigitType&) { ++r; });
-  return r;
+  ResultN res{1};
+
+  for (DigitType digit{2}; n; ++digit) {
+    ++res;
+    n /= digit;
+  }
+
+  return res;
 }
 
 template <typename N, typename I>
 constexpr I to_factoriadic_representation(N n, I o) {
-  detail::do_to_factoriadic_representation<ValueType<I>>(
-      std::move(n), [&](ValueType<I> x) { *o++ = std::move(x); });
+  ValueType<I> digit{1};
+
+  do {
+    *o++ = static_cast<ValueType<I>>(n % digit);
+    n /= digit;
+    ++digit;
+  } while (n);
+
   return o;
 }
 
