@@ -1,0 +1,29 @@
+#ifndef ALGORITHM_MAKE_VECTOR_OF_ITERATORS_H
+#define ALGORITHM_MAKE_VECTOR_OF_ITERATORS_H
+
+#include <algorithm>
+#include <numeric>
+#include <vector>
+
+#include "type_functions.h"
+
+namespace tools {
+
+template <typename I>
+std::vector<I> make_vector_of_iterators(I f, I l) {
+  std::vector<I> res;
+  if constexpr (RandomAccessIterator<I>) {
+    res.resize(std::distance(f, l));
+    std::iota(res.begin(), res.end(), f);
+  } else {
+    while (f != l) {
+      res.push_back(f);
+      ++f;
+    }
+  }
+  return res;
+}
+
+}  // namespace tools
+
+#endif  // ALGORITHM_MAKE_VECTOR_OF_ITERATORS_H

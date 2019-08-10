@@ -5,10 +5,49 @@ that I do for personal projects.
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
 
+### find_nth
+
+find_nth_if_guarantied
+
+Similar to std::find/find_if but returns nth_entry instead of the first one.
+_guarantied variations don't check for boundaries.
+
+Indexing is from 0 - find 0th returns the first encouted element.
+
+### make_vector_of_iterators
+
+For a range returns a vector with iterators for each element.
+Had a choice to use this or pointers, decided for iterators - since they can<br/>
+support more relaxed iterator concepts from C++20.
+
 ### memoized_function
 
 A wrapper around a callable, that stores outputs for previously computed inputs.
 Not terribly efficient - currently uses std::map to implement storage.
+
+### nth_permutation
+
+[Medium blog](https://medium.com/@aiswaryamathur/find-the-n-th-permutation-of-an-ordered-string-using-factorial-number-system-9c81e34ab0c8)
+
+[Wikipedia](https://en.wikipedia.org/wiki/Factorial_number_system)
+
+Gives nth lexicographical permutation of the sequence, assuming that the original sequence <br/>
+is sorted. (doesn't rely on the original order in any way).<br/>
+
+Permuntations are counted from 0.
+
+NOTE: One has to always start from the first sequence, this **DOES NOT MAKE SENCE**:
+```
+nth_permutation(f, l, o, n);
+nth_permutation(f, l, o, n);
+```
+
+NOTE: Since permutation number might be really big for even small range can be huge,<br/>
+consider using big number library.
+
+NOTE: algorithm can potentially be done in place but it's hard and unneccary.
+
+Allocates O(distance(f, l)) memory.
 
 ### to_factoriadic_representation
 
@@ -18,10 +57,12 @@ Converts a number to it's factoriadic representation.<br/>
 Go left to to right with increasing digits.<br/>
 Zero is always present (0!) - this allows to do the algorithm better.<br/>
 
+```
 0 => { 0 }<br/>
 1 => { 0 1 }<br/>
 2 => { 0 0 1 }<br/>
 3 => { 0 1 1 }<br/>
+```
 
 `compute_factoriadic_representation_length` - does the algorithm but returns
                                               the resulting lenght instead of values.

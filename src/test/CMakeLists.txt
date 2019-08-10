@@ -2,8 +2,12 @@
 
 add_executable(tests)
 target_sources(tests PRIVATE
+               algorithm/find_nth.t.cc
+               algorithm/make_vector_of_iterators.t.cc
                algorithm/memoized_function.t.cc
+               algorithm/nth_permutation.t.cc
                algorithm/to_factoriadic_representation.t.cc
+               algorithm/type_functions.t.cc
                algorithm/unroll.t.cc
                bench_generic/input_generators.t.cpp
                catch_main.cc)
