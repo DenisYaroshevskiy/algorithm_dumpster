@@ -5,6 +5,27 @@ that I do for personal projects.
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
 
+### factoriadic_representation
+
+`from_factoriadic_representation`
+`compute_factoriadic_representation_length`
+`to_factoriadic_representation`
+
+[Wikipedia](https://en.wikipedia.org/wiki/Factorial_number_system)
+
+Converts a number to it's factoriadic representation.<br/>
+Go left to to right with increasing digits.<br/>
+Zero is always present (0!) - this allows to do the algorithm better.<br/>
+
+```
+0 => { 0 }<br/>
+1 => { 0 1 }<br/>
+2 => { 0 0 1 }<br/>
+3 => { 0 1 1 }<br/>
+```
+
+Representation comes out left is smallest digit.
+
 ### find_nth
 
 find_nth_if_guarantied
@@ -48,27 +69,6 @@ consider using big number library.
 NOTE: algorithm can potentially be done in place but it's hard and unneccary.
 
 Allocates O(distance(f, l)) memory.
-
-### to_factoriadic_representation
-
-[Wikipedia](https://en.wikipedia.org/wiki/Factorial_number_system)
-
-Converts a number to it's factoriadic representation.<br/>
-Go left to to right with increasing digits.<br/>
-Zero is always present (0!) - this allows to do the algorithm better.<br/>
-
-```
-0 => { 0 }<br/>
-1 => { 0 1 }<br/>
-2 => { 0 0 1 }<br/>
-3 => { 0 1 1 }<br/>
-```
-
-`compute_factoriadic_representation_length` - does the algorithm but returns
-                                              the resulting lenght instead of values.
-`to_factoriadic_representation` - does the conversion
-
-Representation comes out left is smallest digit.
 
 ### unroll
 

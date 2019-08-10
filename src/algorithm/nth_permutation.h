@@ -6,7 +6,7 @@
 
 #include "find_nth.h"
 #include "make_vector_of_iterators.h"
-#include "to_factoriadic_representation.h"
+#include "factoriadic_representation.h"
 
 namespace tools {
 
