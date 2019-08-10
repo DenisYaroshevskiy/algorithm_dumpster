@@ -1,4 +1,4 @@
-#include "algorithm/nth_permutation.h"
+#include "algo/nth_permutation.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -7,7 +7,7 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include "algorithm/factorial.h"
+#include "algo/factorial.h"
 
 #include "test/catch.h"
 

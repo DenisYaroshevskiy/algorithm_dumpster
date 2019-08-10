@@ -1,7 +1,7 @@
 This is where I'm going to store all of the little bits of code
 that I do for personal projects.
 
-## Algorithm
+## Algo
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
 
@@ -104,7 +104,7 @@ _NOTE_: I don't know how to CMAKE - dependencies are found in installed folders.
 `BENCH_DECL_ATTRIBUTES`
 
 Still in the hopes to find some magic attibutes that would help with the code alignment.
-For now - just noinline, to help when looking at assembly
+For now - just noinline, to help when looking at assembly.
 
 ### input_generators
 

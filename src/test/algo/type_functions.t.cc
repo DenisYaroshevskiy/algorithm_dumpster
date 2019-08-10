@@ -1,4 +1,4 @@
-#include "algorithm/type_functions.h"
+#include "algo/type_functions.h"
 
 #include <list>
 

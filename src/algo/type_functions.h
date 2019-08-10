@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_TYPE_FUNCTIONS_H
-#define ALGORITHM_TYPE_FUNCTIONS_H
+#ifndef ALGO_TYPE_FUNCTIONS_H
+#define ALGO_TYPE_FUNCTIONS_H
 
 #include <iterator>
 #include <type_traits>
@@ -27,4 +27,4 @@ constexpr bool RandomAccessIterator =
 
 }  // namespace algo
 
-#endif  // ALGORITHM_TYPE_FUNCTIONS_H
+#endif  // ALGO_TYPE_FUNCTIONS_H

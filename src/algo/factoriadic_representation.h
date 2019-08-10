@@ -1,11 +1,11 @@
-#ifndef ALGORITHM_FACTORIADIC_REPRESENTATION_H
-#define ALGORITHM_FACTORIADIC_REPRESENTATION_H
+#ifndef ALGO_FACTORIADIC_REPRESENTATION_H
+#define ALGO_FACTORIADIC_REPRESENTATION_H
 
 #include <cstddef>
 #include <numeric>
 #include <utility>
 
-#include "algorithm/type_functions.h"
+#include "algo/type_functions.h"
 
 namespace algo {
 
@@ -62,4 +62,4 @@ constexpr I to_factoriadic_representation(N n, I o) {
 
 }  // namespace algo
 
-#endif  // ALGORITHM_FACTORIADIC_REPRESENTATION_H
+#endif  // ALGO_FACTORIADIC_REPRESENTATION_H

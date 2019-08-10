@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include "algorithm/memoized_function.h"
+#include "algo/memoized_function.h"
 
 namespace bench {
 

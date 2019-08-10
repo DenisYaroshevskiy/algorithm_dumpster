@@ -1,13 +1,13 @@
-#ifndef ALGORITHM_NTH_PERMUTATION_H
-#define ALGORITHM_NTH_PERMUTATION_H
+#ifndef ALGO_NTH_PERMUTATION_H
+#define ALGO_NTH_PERMUTATION_H
 
 #include <cassert>
 #include <utility>
 #include <vector>
 
-#include "algorithm/factoriadic_representation.h"
-#include "algorithm/find_nth.h"
-#include "algorithm/make_vector_of_iterators.h"
+#include "algo/factoriadic_representation.h"
+#include "algo/find_nth.h"
+#include "algo/make_vector_of_iterators.h"
 
 namespace algo {
 
@@ -39,4 +39,4 @@ O nth_permutation(I f, I l, O o, N n) {
 
 }  // namespace algo
 
-#endif  // ALGORITHM_NTH_PERMUTATION_H
+#endif  // ALGO_NTH_PERMUTATION_H

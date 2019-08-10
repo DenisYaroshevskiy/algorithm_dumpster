@@ -9,8 +9,8 @@
 #include <benchmark/benchmark.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include "algorithm/factorial.h"
-#include "algorithm/nth_permutation.h"
+#include "algo/factorial.h"
+#include "algo/nth_permutation.h"
 #include "bench_generic/declaration.h"
 #include "bench_generic/input_generators.h"
 

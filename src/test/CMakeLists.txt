@@ -3,14 +3,14 @@
 add_executable(tests)
 
 target_sources(tests PRIVATE
-               algorithm/factoriadic_representation.t.cc
-               algorithm/factorial.t.cc
-               algorithm/find_nth.t.cc
-               algorithm/make_vector_of_iterators.t.cc
-               algorithm/memoized_function.t.cc
-               algorithm/nth_permutation.t.cc
-               algorithm/type_functions.t.cc
-               algorithm/unroll.t.cc
+               algo/factoriadic_representation.t.cc
+               algo/factorial.t.cc
+               algo/find_nth.t.cc
+               algo/make_vector_of_iterators.t.cc
+               algo/memoized_function.t.cc
+               algo/nth_permutation.t.cc
+               algo/type_functions.t.cc
+               algo/unroll.t.cc
                bench_generic/input_generators.t.cpp
                catch_main.cc)
 target_compile_options(tests PRIVATE

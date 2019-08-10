@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_UNROLL_H
-#define ALGORITHM_UNROLL_H
+#ifndef ALGO_UNROLL_H
+#define ALGO_UNROLL_H
 
 #include <cstddef>
 #include <utility>
@@ -22,4 +22,4 @@ constexpr void unroll(Op op) {
 
 }  // namespace algo
 
-#endif  // ALGORITHM_UNROLL_H
+#endif  // ALGO_UNROLL_H

@@ -1,4 +1,4 @@
-#include "algorithm/factorial.h"
+#include "algo/factorial.h"
 
 #include "test/catch.h"
 

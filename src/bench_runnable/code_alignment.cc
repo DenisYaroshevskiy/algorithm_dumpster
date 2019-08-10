@@ -1,4 +1,4 @@
-#include "algorithm/unroll.h"
+#include "algo/unroll.h"
 #include "bench_generic/input_generators.h"
 #include "bench_generic/merge.h"
 

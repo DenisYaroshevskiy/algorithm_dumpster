@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_FACTORIAL_H
-#define ALGORITHM_FACTORIAL_H
+#ifndef ALGO_FACTORIAL_H
+#define ALGO_FACTORIAL_H
 
 namespace algo {
 
@@ -17,4 +17,4 @@ constexpr ResultN factorial(N n) {
 
 }  // namespace algo
 
-#endif  // ALGORITHM_FACTORIAL_H
+#endif  // ALGO_FACTORIAL_H

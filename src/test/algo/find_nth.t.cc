@@ -1,4 +1,4 @@
-#include "algorithm/find_nth.h"
+#include "algo/find_nth.h"
 
 #include <array>
 

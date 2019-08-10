@@ -1,11 +1,11 @@
-#ifndef ALGORITHM_MAKE_VECTOR_OF_ITERATORS_H
-#define ALGORITHM_MAKE_VECTOR_OF_ITERATORS_H
+#ifndef ALGO_MAKE_VECTOR_OF_ITERATORS_H
+#define ALGO_MAKE_VECTOR_OF_ITERATORS_H
 
 #include <algorithm>
 #include <numeric>
 #include <vector>
 
-#include "algorithm/type_functions.h"
+#include "algo/type_functions.h"
 
 namespace algo {
 
@@ -27,4 +27,4 @@ std::vector<I> make_vector_of_iterators(I f, I l) {
 
 }  // namespace algo
 
-#endif  // ALGORITHM_MAKE_VECTOR_OF_ITERATORS_H
+#endif  // ALGO_MAKE_VECTOR_OF_ITERATORS_H

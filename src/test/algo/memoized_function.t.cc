@@ -1,4 +1,4 @@
-#include "algorithm/memoized_function.h"
+#include "algo/memoized_function.h"
 
 #include "test/catch.h"
 

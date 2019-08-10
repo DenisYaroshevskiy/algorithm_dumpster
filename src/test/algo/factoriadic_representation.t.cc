@@ -1,4 +1,4 @@
-#include "algorithm/factoriadic_representation.h"
+#include "algo/factoriadic_representation.h"
 
 #include <algorithm>
 #include <array>

@@ -1,4 +1,4 @@
-#include "algorithm/make_vector_of_iterators.h"
+#include "algo/make_vector_of_iterators.h"
 
 #include <list>
 #include <vector>

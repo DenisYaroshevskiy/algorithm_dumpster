@@ -1,7 +1,7 @@
-#ifndef ALGORITHM_FIND_NTH_H
-#define ALGORITHM_FIND_NTH_H
+#ifndef ALGO_FIND_NTH_H
+#define ALGO_FIND_NTH_H
 
-#include "algorithm/type_functions.h"
+#include "algo/type_functions.h"
 
 namespace algo {
 
@@ -29,4 +29,4 @@ I find_nth_guarantied(I f, N n, const V& v) {
 
 }  // namespace algo
 
-#endif  // ALGORITHM_FIND_NTH_H
+#endif  // ALGO_FIND_NTH_H
