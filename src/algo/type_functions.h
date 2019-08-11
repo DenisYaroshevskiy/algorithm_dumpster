@@ -21,6 +21,21 @@
 #include <type_traits>
 
 namespace algo {
+namespace detail {
+
+template <typename I>
+struct is_move_iterator : std::false_type {};
+
+template <typename I>
+struct is_move_iterator<std::move_iterator<I>> : std::true_type {};
+
+template <typename I>
+struct is_reverse_iterator : std::false_type {};
+
+template <typename I>
+struct is_reverse_iterator<std::reverse_iterator<I>> : std::true_type{};
+
+}  // namespace detail
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;
@@ -40,6 +55,12 @@ using IteratorCategory = typename std::iterator_traits<I>::iterator_category;
 template <typename I>
 constexpr bool RandomAccessIterator =
     std::is_base_of_v<std::random_access_iterator_tag, IteratorCategory<I>>;
+
+template <typename I>
+constexpr bool MoveIterator = detail::is_move_iterator<I>::value;
+
+template <typename I>
+constexpr bool ReverseIterator = detail::is_reverse_iterator<I>::value;
 
 }  // namespace algo
 

@@ -16,6 +16,21 @@ Feel free to contact me if you have an issue with how I handled your work <br/>
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
 
+### copy
+
+`copy`<br/>
+`copy_backward`
+
+Same as std::copy/std::copy_backward but covers more optimizations.<br/>
+Tried to upstream it but failed: https://reviews.llvm.org/D38653
+
+Small presentation:<br/>
+https://docs.google.com/presentation/d/1JcpsUq2s-cK_3A4sco23YRrsSKMV4EoeD8s4u8f_q0w/edit?usp=sharing
+
+For now non-constexpr, requires extra work.<br/>
+Implement necessary bits for libc++ here: https://reviews.llvm.org/D63063<br/>
+(not accepted as of yet)
+
 ### factoriadic_representation
 
 `compute_factoriadic_representation_length`<br/>

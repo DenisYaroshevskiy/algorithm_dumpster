@@ -19,6 +19,7 @@
 add_executable(tests)
 
 target_sources(tests PRIVATE
+               algo/copy.t.cc
                algo/factoriadic_representation.t.cc
                algo/factorial.t.cc
                algo/find_nth.t.cc
