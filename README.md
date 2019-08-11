@@ -1,6 +1,17 @@
 This is where I'm going to store all of the little bits of code
 that I do for personal projects.
 
+## License and usage
+
+Everything is under Apache-2 - as far as I understand it:
+"you can use it as long as you don't claim it's yours".
+
+I use a ton of things from other people - I tried to live links in the README:<br/>
+"this is where I took it", which I hope is good enough.
+
+Feel free to contact me if you have an issue with how I handled your work <br/>
+(or if you have other reasons).
+
 ## Algo
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
