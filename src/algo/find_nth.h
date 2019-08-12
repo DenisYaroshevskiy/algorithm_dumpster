@@ -22,22 +22,20 @@
 namespace algo {
 
 template <typename I, typename N, typename P>
-// require ForwardIterator<I> && Integral<N> && UnaryPredicate<ValueType<I>>
+// require InputIterator<I> && Integral<N> && UnaryPredicate<ValueType<I>>
 I find_nth_if_guarantied(I f, N n, P p) {
-  I res = f;
-
-  while (n >= 0) {
+  while (true) {
     while (!p(*f)) ++f;
-    res = f;
+    if (!n) return f;
     ++f;
     --n;
   }
 
-  return res;
+  return f;
 }
 
 template <typename I, typename N, typename V>
-// require ForwardIterator<I> && Integral<N> &&
+// require InputIterator<I> && Integral<N> &&
 //         EqualityComarable<ValueType<I>, V>
 I find_nth_guarantied(I f, N n, const V& v) {
   return find_nth_if_guarantied(f, n, [&](Reference<I> x) { return x == v; });
