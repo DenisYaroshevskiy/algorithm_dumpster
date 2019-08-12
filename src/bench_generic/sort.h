@@ -20,8 +20,6 @@
 #include <functional>
 #include <vector>
 
-#include <iostream>
-
 #include <benchmark/benchmark.h>
 #include <boost/multiprecision/cpp_int.hpp>
 

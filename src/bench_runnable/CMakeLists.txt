@@ -41,3 +41,7 @@ add_benchmark(code_alignment_almost '')
 # Sort
 add_benchmark(sort STD_SORT)
 add_benchmark(sort STD_STABLE_SORT)
+
+# Copy with reverse iterators
+add_benchmark(copy_reverse_iterators STD_COPY)
+add_benchmark(copy_reverse_iterators ALGO_COPY)

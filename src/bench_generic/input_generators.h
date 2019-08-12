@@ -49,13 +49,19 @@ auto generate_unique_sorted_vector(size_t size, Src src) {
 }
 
 template <typename T, typename Src>
-auto generate_sorted_vector(size_t size, Src src) {
+auto generate_random_vector(size_t size, Src src) {
   const int_to_t<T> to_t;
 
   std::vector<T> res(size);
   std::generate(res.begin(), res.end(), [&] { return to_t(src()); });
-  std::sort(res.begin(), res.end());
 
+  return res;
+}
+
+template <typename T, typename Src>
+auto generate_sorted_vector(size_t size, Src src) {
+  auto res = generate_random_vector<T>(size, src);
+  std::sort(res.begin(), res.end());
   return res;
 }
 
@@ -72,6 +78,17 @@ auto uniform_src(size_t size) {
 }
 
 }  // namespace detail
+
+template <typename T>
+std::vector<T> random_vector(size_t size) {
+  using namespace detail;
+
+  static auto gen = algo::memoized_function<size_t>([](size_t size) {
+    return generate_random_vector<T>(size, uniform_src(size));
+  });
+
+  return gen(size);
+}
 
 template <typename T>
 std::vector<T> sorted_vector(size_t size) {
