@@ -29,7 +29,7 @@ namespace bench {
 
 template <typename Alg, typename InR, typename OutR>
 BENCH_DECL_ATTRIBUTES void copy_revere_iterators_common(benchmark::State& state,
-                                                        const InR& in,
+                                                        InR& in, // Non const, because this bug: https://bugs.llvm.org/show_bug.cgi?id=40575
                                                         OutR& out) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(Alg{}(in.rbegin(), in.rend(), out.rbegin()));

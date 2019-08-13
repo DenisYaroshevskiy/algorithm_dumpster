@@ -31,6 +31,13 @@ For now non-constexpr, requires extra work.<br/>
 Implement necessary bits for libc++ here: https://reviews.llvm.org/D63063<br/>
 (not accepted as of yet)
 
+There was also a bug, that std::copy optimization didn't work at all<br/>
+https://bugs.llvm.org/show_bug.cgi?id=40575<br/>
+In the sandard library version I use it's not yet in.
+
+_NOTE_: I have seen cases where this is a good win, however - my microbenchmark of just copy_reverse_iterators doesn't show it.<br/>
+Will update when I migrate propper benchmark in this repo.
+
 ### factoriadic_representation
 
 `compute_factoriadic_representation_length`<br/>
@@ -139,6 +146,17 @@ For now - just noinline, to help when looking at assembly.
 `two_sorted_vectors`
 
 Utils to generate data for benchmarks.
+
+### copy
+
+`copy_revere_iterators_common`
+`copy_reverse_iterators_int_vec`
+
+Speed of copying with reverse iterators. On just this loop, superiority of memmove is not showing. <br/>
+For example with gcc: http://quick-bench.com/vpLxYCWfverSzlWxFjwuXxELD8Q <br/>
+
+Last time I tried this was very visible for merge/flat_set benchmark - <br/>
+if still a thing - will show there.
 
 ### merge
 
