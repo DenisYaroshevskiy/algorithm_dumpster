@@ -48,7 +48,7 @@ Will update when I migrate propper benchmark in this repo.
 
 Converts a number to it's factoriadic representation.<br/>
 Go left to to right with increasing digits.<br/>
-Zero is always present (0!) - this allows to do the algorithm better.<br/>
+Zero is always present (0!) - this allows to do related algorithms better.<br/>
 
 ```
 0 => { 0 }
@@ -94,12 +94,15 @@ Not terribly efficient - currently uses std::map to implement storage.
 
 `nth_permutation`
 
-[Medium blog](https://medium.com/@aiswaryamathur/find-the-n-th-permutation-of-an-ordered-string-using-factorial-number-system-9c81e34ab0c8)
+[Aiswarya Prakasan's blog](https://medium.com/@aiswaryamathur/find-the-n-th-permutation-of-an-ordered-string-using-factorial-number-system-9c81e34ab0c8)
 
 [Wikipedia](https://en.wikipedia.org/wiki/Factorial_number_system)
 
-Gives nth lexicographical permutation of the sequence, assuming that the original sequence <br/>
-is sorted. (doesn't rely on the original order in any way).<br/>
+Gives nth lexicographical permutation of the sequence, assuming that <br/>
+the original sequence is sorted.<br/>
+The algorithm itself doesn't rely on comparisons, an can be used<br/>
+o go through all of the permutations with some step starting from any permutation.<br/>
+(Do not know a good usecase for this yet).
 
 Permuntations are counted from 0.
 
