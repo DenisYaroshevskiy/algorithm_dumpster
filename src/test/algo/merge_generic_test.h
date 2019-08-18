@@ -29,7 +29,7 @@ namespace algo {
 namespace detail {
 
 struct merge_generic_test_impl {
-  static constexpr size_t kTestSize = 200;
+  static constexpr size_t kTestSize = 100;
 
   template <typename R, typename Merger>
   static void run_plain_test(const R& xc, const R& yc, Merger merger) {

@@ -16,6 +16,8 @@ Feel free to contact me if you have an issue with how I handled your work <br/>
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
 
+### binary_search
+
 ### comparisons
 
 `less_by_first`
@@ -50,6 +52,17 @@ In the sandard library version I use it's not yet in.
 
 _NOTE_: I have seen cases where this is a good win, however - my microbenchmark of just copy_reverse_iterators doesn't show it.<br/>
 Will update when I migrate propper benchmark in this repo.
+
+### half_positive
+
+`half_positive`
+
+Dividing by two is faster for unsigned numbers. <br/>
+If I know that the number is positive I can cast to the unsigned.
+I have measured - code generated for right shift gave me slower results + <br/>
+I'm not too sure that's legal.
+
+libc++ commit: https://reviews.llvm.org/D53994
 
 ### factoriadic_representation
 
