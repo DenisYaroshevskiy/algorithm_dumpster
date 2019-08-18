@@ -19,12 +19,15 @@
 add_executable(tests)
 
 target_sources(tests PRIVATE
+               algo/comparisons.t.cc
+               algo/container_cast.t.cc
                algo/copy.t.cc
                algo/factoriadic_representation.t.cc
                algo/factorial.t.cc
                algo/find_nth.t.cc
                algo/make_vector_of_iterators.t.cc
                algo/memoized_function.t.cc
+               algo/merge.t.cc
                algo/nth_permutation.t.cc
                algo/type_functions.t.cc
                algo/unroll.t.cc

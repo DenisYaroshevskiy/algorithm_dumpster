@@ -16,6 +16,19 @@ Feel free to contact me if you have an issue with how I handled your work <br/>
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
 
+### comparisons
+
+`less_by_first`
+
+Collection of general purpose comparator functors.
+
+### container cast
+
+`container_cast`
+
+A function that converts data from one container to another.
+Like: `container_cast<std::list>(v)`. Will move values from an rvalue container.
+
 ### copy
 
 `copy`<br/>
@@ -90,6 +103,17 @@ support more relaxed iterator concepts from C++20.
 A wrapper around a callable, that stores outputs for previously computed inputs.
 Not terribly efficient - currently uses std::map to implement storage.
 
+### merge
+
+`merge`<br/>
+`merge_expensive_cmp`
+
+Variations on std::merge - tried to contribute the `merge` one:<br/>
+https://reviews.llvm.org/D63063
+
+`merge_expensive_cmp` only useful if you inline the comparison and it's big.<br/>
+The reason for it's existance is that `merge` unrolls + 1 extra invocation of the comparator.
+
 ### nth_permutation
 
 `nth_permutation`
@@ -152,7 +176,7 @@ Utils to generate data for benchmarks.
 
 ### copy
 
-`copy_revere_iterators_common`
+`copy_revere_iterators_common`<br/>
 `copy_reverse_iterators_int_vec`
 
 Speed of copying with reverse iterators. On just this loop, superiority of memmove is not showing. <br/>
@@ -174,6 +198,30 @@ Benchmarking merge like algorithms.
 `sort_int_vec`
 
 Benchmarking sort like algorithms.
+
+## Test
+
+Tests for everything. Has a few general purpose test utilities though.
+
+### merge_generic_test
+
+Generic tests for merge variations on the merge algorithm.
+
+_TODO_: write a test for input iterators.
+
+### stability_test_util
+
+`copy_container_of_stable_unique`<br/>
+`make_container_of_stable_unique`<br/>
+`stable_unique`
+
+`stable_unique` - is a move only type, consisting of zeroed_int for the value + an int<br/>
+tag to indicate the origin.<br/>
+`make_container_of_stable_unique` - converts vector of integers + tag to a given container.
+
+### zeroed_int
+
+A struct with one int, that zeroes out on a move.
 
 ## Scripts
 
