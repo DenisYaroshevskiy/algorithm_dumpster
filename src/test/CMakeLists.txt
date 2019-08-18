@@ -19,6 +19,7 @@
 add_executable(tests)
 
 target_sources(tests PRIVATE
+               algo/binary_search.t.cc
                algo/comparisons.t.cc
                algo/container_cast.t.cc
                algo/copy.t.cc

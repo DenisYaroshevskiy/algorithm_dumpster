@@ -17,14 +17,16 @@
 #ifndef ALGO_BINARY_SEARCH_H
 #define ALGO_BINARY_SEARCH_H
 
-#include <type_functions.h>
+#include "algo/half_positive.h"
+#include "algo/type_functions.h"
 
 namespace algo {
 
 template <typename I, typename P>
-I partition_point_n(I f, DifferenceType<I> n, P p) {
+// require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
+constexpr I partition_point_n(I f, DifferenceType<I> n, P p) {
   while (n) {
-    DifferenceType<I> n2 = detail::half_positive(n);
+    DifferenceType<I> n2 = half_positive(n);
     I m = std::next(f, n2);
     if (p(*m)) {
       f = ++m;
@@ -34,6 +36,36 @@ I partition_point_n(I f, DifferenceType<I> n, P p) {
     }
   }
   return f;
+}
+
+template <typename I, typename P>
+// require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
+constexpr I partition_point(I f, I l, P p) {
+  return algo::partition_point_n(f, std::distance(f, l), p);
+}
+
+template <typename I, typename V, typename Comp>
+// require ForwardIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
+constexpr I lower_bound_n(I f, DifferenceType<I> n, const V& v, Comp comp) {
+  return algo::partition_point_n(f, n, [&](Reference<I> x) { return comp(x, v); } );
+}
+
+template <typename I, typename V>
+// require ForwardIterator<I> && TotallyOrdered<ValueType<I>, V>
+constexpr I lower_bound_n(I f, DifferenceType<I> n, const V& v) {
+  return algo::lower_bound_n(f, n, v, std::less<>{});
+}
+
+template <typename I, typename V, typename Comp>
+// require ForwardIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
+constexpr I lower_bound(I f, I l, const V& v, Comp comp) {
+  return algo::partition_point(f, l, [&](Reference<I> x) { return comp(x, v); } );
+}
+
+template <typename I, typename V>
+// require ForwardIterator<I> && TotallyOrdered<ValueType<I>, V>
+constexpr I lower_bound(I f, I l, const V& v) {
+  return algo::lower_bound(f, l, v, std::less<>{});
 }
 
 }  // namespace algo

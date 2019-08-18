@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef TEST_MERGE_GENERIC_TEST_H
+#define TEST_MERGE_GENERIC_TEST_H
+
 #include <algorithm>
 #include <cstddef>
 #include <list>
@@ -141,3 +144,5 @@ void merge_test(Merger merger) {
 }
 
 }  // namespace algo
+
+#endif  // TEST_MERGE_GENERIC_TEST_H

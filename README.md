@@ -18,6 +18,26 @@ Collection of mostly stl-like algorithms and some general purpose data-structure
 
 ### binary_search
 
+`partition_point_n`<br/>
+`partition_point`<br/>
+`lower_bound_n`<br/>
+`lower_bound`
+
+_TODO_: `upper_bound`/`equal_range`/`_counting`
+
+Implementation of standard binary search algorithms.<br/>
+The n versions based on Efficient Programming With Components:<br/>
+https://youtu.be/MHHLKuvfBwQ
+
+The n versions are a bit weird - they do not return the distance from the beginning
+or to the end, which means that they have questionable usability unless one knows<br/>
+both `n` and `last`.
+
+_TODO_: couting versions that return the distance to the end by doing
+extra work. This can be more efficient then just computing the distance.
+
+Optimization with `half_positive` was upstreamed to libc++: https://reviews.llvm.org/D53994
+
 ### comparisons
 
 `less_by_first`
@@ -215,6 +235,12 @@ Benchmarking sort like algorithms.
 ## Test
 
 Tests for everything. Has a few general purpose test utilities though.
+
+### binary_search_generic_test
+
+Generic tests for binary searches.
+
+_TODO_: constexpr tests.
 
 ### merge_generic_test
 
