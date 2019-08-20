@@ -36,12 +36,7 @@ struct std_stable_sort {
   }
 };
 
-#if defined(STD_SORT)
-using alg = std_sort;
-#elif defined(STD_STABLE_SORT)
-using alg = std_stable_sort;
-#endif
-
-BENCHMARK_TEMPLATE(sort_int_vec, 1000, alg)->Apply(set_every_5th_percent);
+BENCHMARK_TEMPLATE(sort_int_vec, SELECTED_ALGORITHM)
+    ->Apply(set_every_5th_percent<SELECTED_NUMBER>);
 
 }  // namespace bench

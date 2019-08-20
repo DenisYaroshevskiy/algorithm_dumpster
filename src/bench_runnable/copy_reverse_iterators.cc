@@ -37,12 +37,7 @@ struct std_copy {
   }
 };
 
-#if defined(STD_COPY)
-using alg = std_copy;
-#elif defined(ALGO_COPY)
-using alg = algo_copy;
-#endif
-
-BENCHMARK_TEMPLATE(copy_reverse_iterators_int_vec, 1000, alg);
+BENCHMARK_TEMPLATE(copy_reverse_iterators_int_vec, SELECTED_NUMBER,
+                   SELECTED_ALGORITHM);
 
 }  // namespace bench

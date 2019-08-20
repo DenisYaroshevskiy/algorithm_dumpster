@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
-#ifndef BENCH_SET_PARAMETERS_H
-#define BENCH_SET_PARAMETERS_H
+#include "bench_generic/lower_bound.h"
 
-#include <benchmark/benchmark.h>
+#include <algorithm>
+#include <utility>
+
+#include "algo/binary_search.h"
+#include "bench_generic/set_parameters.h"
 
 namespace bench {
 
-template <size_t total_size>
-inline void set_every_5th_percent(benchmark::internal::Benchmark* bench) {
-  for (int i = 0; i <= 100; i += 5) {
-    bench->Args({static_cast<int>(total_size), i});
+struct std_lower_bound {
+  template <typename... Args>
+  auto operator()(Args&&... args) const {
+    return std::lower_bound(std::forward<Args>(args)...);
   }
-}
+};
+
+struct algo_lower_bound {
+  template <typename... Args>
+  auto operator()(Args&&... args) const {
+    return algo::lower_bound(std::forward<Args>(args)...);
+  }
+};
+
+BENCHMARK_TEMPLATE(lower_bound_vec, SELECTED_ALGORITHM, SELECTED_TYPE)
+    ->Apply(set_every_5th_percent<SELECTED_NUMBER>);
 
 }  // namespace bench
-
-#endif  // BENCH_SET_PARAMETERS_H

@@ -79,8 +79,7 @@ Will update when I migrate propper benchmark in this repo.
 
 Dividing by two is faster for unsigned numbers. <br/>
 If I know that the number is positive I can cast to the unsigned.
-I have measured - code generated for right shift gave me slower results + <br/>
-I'm not too sure that's legal.
+I have measured - code generated for right shift gave me slower results + I'm not too sure that's legal.
 
 libc++ commit: https://reviews.llvm.org/D53994
 
@@ -117,7 +116,7 @@ Computes a factorial of an input number.
 `find_nth_if_guarantied`
 
 Similar to std::find/find_if but returns nth_entry instead of the first one.
-_guarantied variations don't check for boundaries.
+`_guarantied` variations don't check for boundaries.
 
 Indexing is from 0 - find 0th returns the first encouted element.
 
@@ -217,6 +216,13 @@ For example with gcc: http://quick-bench.com/vpLxYCWfverSzlWxFjwuXxELD8Q <br/>
 
 Last time I tried this was very visible for merge/flat_set benchmark - <br/>
 if still a thing - will show there.
+
+### lower_bound
+
+`lower_bound_common`<br/>
+`lower_bound_vec`
+
+Benchmarking lower_bound like algotihmms.
 
 ### merge
 
