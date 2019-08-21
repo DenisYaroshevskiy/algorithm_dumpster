@@ -12,6 +12,11 @@ I use a ton of things from other people - I tried to live links in the README:<b
 Feel free to contact me if you have an issue with how I handled your work <br/>
 (or if you have other reasons).
 
+## Benchmarking results
+
+Visualized benchmarking results can be found at:<br/>
+https://denisyaroshevskiy.github.io/algorithm_dumpster/
+
 ## Algo
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.

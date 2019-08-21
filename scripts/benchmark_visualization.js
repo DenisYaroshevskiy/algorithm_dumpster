@@ -38,7 +38,6 @@ function transformGoogleBenchmarkOutput(loadedJson) {
 }
 
 function loadGoogleBenchmarkResults(file) {
-    file = 'computed_jsons/' + file + '.json';
     return fetch(file).then(
         (resp) => {
             return resp.json();
@@ -80,105 +79,112 @@ function divideByX(bench) {
     return bench;
 }
 
-function visualizeBenchmarks(id, element, settings, benchmarks) {
-    google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart);
+function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
+    console.log('transformGoogleBenchmarkData: ', loadedJson);
 
-    let loaded = benchmarks.map(loadBenchmark);
-    if (settings.shouldDivideByX) {
-        loaded = loaded.map((b) => b.then(divideByX));
-    }
-
-    function drawChart() {
-        Promise.all(loaded).then(
-            (benchmarks) => {
-                const data = transformBenchmarksToDataTable(benchmarks);
-                drawBenchmarksChart(id, element, data);
-            }
-        );
-    }
-}
-
-function visualizeBenchmarksPloty(id, element, settings, benchmarks) {
-    let loaded = benchmarks.map(loadBenchmark);
-    if (settings.shouldDivideByX) {
-        loaded = loaded.map((b) => b.then(divideByX));
-    }
-
-    let traces = Promise.all(loaded).then(
-        (benchmarks) => {
-            return benchmarks.map((b) => {
-                return {
-                    name: b.name,
-                    x: b.xs,
-                    y: b.times,
-                    type: 'scatter'
-                }
-            });
-        }
-    )
-
-    let layout = {
-        title: id,
-        width: 800,
-        height: 600
+    let result = {
+        x: [],
+        y: []
     };
 
-    if (settings.useLog) {
-        layout.xaxis = { type: 'log' };
-    }
+    loadedJson.benchmarks.forEach((measurement) => {
+        let parts = measurement.name.split('/');
+        let x = parts[1];
 
-    traces.then(
-        (traces) => {
-            Plotly.newPlot(element, traces, layout);
+        let percentage = undefined;
+        if (benchmarkDescription.general.percentage_position !== undefined) {
+            percentage = Number(parts[benchmarkDescription.general.percentage_position + 1]);
         }
-    )
-}
 
-function visualizeAllSetsBenchmarks(id, element, settings, hasBaseline = false) {
-    const names = ['absl', 'boost', 'srt', 'std', 'std_unordered'].map(
-        (container) => {
-            let res = id + '_' + container;
-            if (hasBaseline) { res += ':' + id + '_baseline_' + container; }
-            return res;
+        let size = undefined;
+        if (benchmarkDescription.general.size_position !== undefined) {
+            size = Number(parts[benchmarkDescription.general.size_position + 1]);
         }
-    );
-    visualizeBenchmarksPloty(id, element, settings, names);
-}
 
-function visualizeBenchmarksNoStd(id, element, settings, hasBaseline = false) {
-    const names = ['absl', 'boost', 'srt'].map(
-        (container) => {
-            let res = id + '_' + container;
-            if (hasBaseline) { res += ':' + id + '_baseline_' + container; }
-            return res;
+        if (benchmarkDescription.general.convert_size_times_percentage_to_x) {
+            console.assert(size !== undefined);
+            console.assert(percentage !== undefined);
+
+            x = size * percentage / 100;
         }
-    );
-    visualizeBenchmarksPloty(id + '_no_std', element, settings, names);
+
+        result.x.push(x);
+        result.y.push(measurement.real_time);
+    });
+
+    return result;
 }
 
-function addNewChartDropDown(section) {
-    let dropDown = document.createElement("section");
-    let dropDownChart = document.createElement("div");
-    dropDownChart.className = "benchmarkChart";
-    dropDown.appendChild(dropDownChart);
-    section.appendChild(dropDown);
-    return dropDownChart;
+function drawWithPlotly(element, benchmarkDescription, loadedData) {
+    console.log(loadedData);
+    let traces = loadedData.map((loaded) => {
+        return {
+            name: loaded.name,
+            x: loaded.x,
+            y: loaded.y,
+            marker: { size: 8 },
+            line: {
+                color: loaded.color,
+                dash: loaded.dash,
+                size: 3
+            },
+            type: 'scatter'
+        };
+    });
+
+
+    let layout = {
+        title: benchmarkDescription.general.title,
+        width: 800,
+        height: 600,
+        yaxis: {
+            rangemode: 'tozero',
+            autorange: true
+        }
+    };
+
+    Plotly.newPlot(element, traces, layout);
 }
 
-function addBencharkCharts(id, settings) {
-    let section = document.getElementById(id);
-    visualizeAllSetsBenchmarks(id, addNewChartDropDown(section), settings);
-    visualizeBenchmarksNoStd(id, addNewChartDropDown(section), settings);
+async function loadMeasurements(beenchmarkDescription, algorithmSettings) {
+    let rawDataPromises = beenchmarkDescription.measurements.map(async (m) => {
+        return fetch(m.url).then(
+            async (raw) => {
+                raw = await raw.json();
+                console.log('loadMeasurements: ', raw);
+                let xs_and_ys = transformGoogleBenchmarkData(beenchmarkDescription, raw);
+                return {
+                    name: m.name,
+                    x: xs_and_ys.x,
+                    y: xs_and_ys.y,
+                    color: algorithmSettings[m.name].color,
+                    dash: algorithmSettings[m.name].dash,
+                };
+            }
+        )
+    });
+
+    let rawData = await Promise.all(rawDataPromises);
+
+    // TODO: transform the data: baseline, scaling by element.
+
+    return rawData;
 }
 
-function addBencharkChartsOnlyNoStd(id, settings) {
-    let section = document.getElementById(id);
-    visualizeBenchmarksNoStd(id, addNewChartDropDown(section), settings);
+async function visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings) {
+    let element = document.getElementById(elementID);
+    let loaded = await loadMeasurements(benchmarkDescription, algorithmSettings);
+    console.log(loaded);
+    drawWithPlotly(element, benchmarkDescription, loaded);
 }
 
-function addBencharkChartsWithBaseline(id, settings) {
-    let section = document.getElementById(id);
-    visualizeAllSetsBenchmarks(id, addNewChartDropDown(section), settings);
-    visualizeBenchmarksNoStd(id, addNewChartDropDown(section), settings);
+async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
+    let benchmarkDescription = await fetch(jsonBenchmarkDescription);
+    benchmarkDescription = await benchmarkDescription.json();
+    console.log(benchmarkDescription.general.algorithm_settings_url);
+
+    let allAlgorithmSettings = await fetch(benchmarkDescription.general.algorithm_settings_url);
+    allAlgorithmSettings = await allAlgorithmSettings.json();
+    let algorithmSettings = allAlgorithmSettings[benchmarkDescription.general.algorithm_settings_section];
+    visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings);
 }
