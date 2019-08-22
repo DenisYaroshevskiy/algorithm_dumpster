@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <random>
 #include <set>
 #include <utility>
@@ -28,12 +29,24 @@
 
 namespace bench {
 
+using std_int64_t = std::int64_t;
+
 template <typename>
 struct int_to_t;
 
 template <>
 struct int_to_t<int> {
   int operator()(int x) const { return x; }
+};
+
+template <>
+struct int_to_t<double> {
+  double operator()(int x) const { return 1.0 / x; }
+};
+
+template <>
+struct int_to_t<std_int64_t> {
+  std_int64_t operator()(int x) const { return x; }
 };
 
 namespace detail {

@@ -51,3 +51,9 @@ add_benchmark(copy_reverse_iterators algo_copy int 1000)
 # Lower bound
 add_benchmark(lower_bound std_lower_bound int 1000)
 add_benchmark(lower_bound algo_lower_bound int 1000)
+
+add_benchmark(lower_bound std_lower_bound double 1000)
+add_benchmark(lower_bound algo_lower_bound double 1000)
+
+add_benchmark(lower_bound std_lower_bound std_int64_t 1000)
+add_benchmark(lower_bound algo_lower_bound std_int64_t 1000)

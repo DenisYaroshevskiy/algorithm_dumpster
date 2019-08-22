@@ -80,8 +80,6 @@ function divideByX(bench) {
 }
 
 function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
-    console.log('transformGoogleBenchmarkData: ', loadedJson);
-
     let result = {
         x: [],
         y: []
@@ -116,7 +114,11 @@ function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
 }
 
 function drawWithPlotly(element, benchmarkDescription, loadedData) {
+    console.log('drawWithPlotly, benchmarkDescription:');
+    console.log(benchmarkDescription);
+    console.log('drawWithPlotly, loadedData:');
     console.log(loadedData);
+
     let traces = loadedData.map((loaded) => {
         return {
             name: loaded.name,
@@ -151,7 +153,6 @@ async function loadMeasurements(beenchmarkDescription, algorithmSettings) {
         return fetch(m.url).then(
             async (raw) => {
                 raw = await raw.json();
-                console.log('loadMeasurements: ', raw);
                 let xs_and_ys = transformGoogleBenchmarkData(beenchmarkDescription, raw);
                 return {
                     name: m.name,
@@ -174,7 +175,6 @@ async function loadMeasurements(beenchmarkDescription, algorithmSettings) {
 async function visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings) {
     let element = document.getElementById(elementID);
     let loaded = await loadMeasurements(benchmarkDescription, algorithmSettings);
-    console.log(loaded);
     drawWithPlotly(element, benchmarkDescription, loaded);
 }
 
