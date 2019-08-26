@@ -21,6 +21,16 @@ https://denisyaroshevskiy.github.io/algorithm_dumpster/
 
 Collection of mostly stl-like algorithms and some general purpose data-structures.
 
+### advance_up_to
+
+`advance_up_to`
+
+Same as std::advance but also accepts 'l' to check for it.
+Returns both where it got and how much of 'n' was left.
+
+I don't know how this is suppose to work for negative advance.
+So it's undefined.
+
 ### binary_search
 
 `partition_point_n`<br/>
