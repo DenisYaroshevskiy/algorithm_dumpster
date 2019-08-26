@@ -32,13 +32,14 @@ target_sources(tests PRIVATE
                algo/make_vector_of_iterators.t.cc
                algo/memoized_function.t.cc
                algo/merge.t.cc
+               algo/merge_biased.t.cc
                algo/nth_permutation.t.cc
                algo/type_functions.t.cc
                algo/unroll.t.cc
                bench_generic/input_generators.t.cpp
                catch_main.cc)
 target_compile_options(tests PRIVATE
-                       -Werror -Wall -Wextra -Wpedantic -O2
+                       -Werror -Wall -Wextra -Wpedantic -O2 -g
                        -fsanitize=address -fno-omit-frame-pointer
                        --std=c++17)
 

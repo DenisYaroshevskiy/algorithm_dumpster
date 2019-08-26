@@ -60,17 +60,32 @@ Optimization with `half_positive` was upstreamed to libc++: https://reviews.llvm
 `partition_point_biased_expensive_pred`<br/>
 `lower_bound_biased_expensive_cmp` <br/>
 `partition_point_hinted` <br/>
-`lower_bound_hinted`
+`lower_bound_hinted` <br/>
+<br/>
+`point_closer_to_partition_point`<br/>
+`point_closer_to_upper_bound`
 
 _TODO_: `upper_bound`/`equal_range`/`_n`
+
+My blog post on the subject (the measurements can be outdated):<br/>
+https://medium.com/@denis.yaroshevskij/between-linear-and-binary-search-8d21877cfce5
+
+Or a video from the meetup:
+https://skillsmatter.com/skillscasts/12831-between-linear-and-binary-search
 
 My variations on the galloping (exponential) search. <br/>
 Non `_expensive` trade off to do more predicate invocations in order<br/>
 to remove boundary checks.<br/>
 `_hinted` variations instead of being biased to the first element, are
-biased to a `hint`. Requires `BidirectionalIterator`.
-
-_TODO_: link to the blog post.
+biased to a `hint`. Requires `BidirectionalIterator`. <br/>
+<br/>
+`point_closer_to` - returns element somewhere to the left of the partition point.
+Proved to be useful for merge algorithm.
+The input range has to be non-empty. <br/>
+Never returns the end. <br/>
+ForwardIterator support is questionable. <br/>
+In reality now just doesn't do the bigger jumps, if the middle if to the left of
+the partition point, don't loop - just return. Because this is a very rare case - ignoring it and just going back to the main merge was faster.
 
 ### comparisons
 
@@ -179,6 +194,18 @@ https://reviews.llvm.org/D63063
 
 `merge_expensive_cmp` only useful if you inline the comparison and it's big.<br/>
 The reason for it's existance is that `merge` unrolls + 1 extra invocation of the comparator.
+
+### merge_biased
+
+`merge_biased_first` <br/>
+
+_TODO_: `merge_biased_second`, migrate set unions.
+
+Variation on std::merge that falls back on binari-ish search when it suspects
+that there is a big a gap of elements from the range it's biased towards.
+
+Presentation from the meetup:
+https://docs.google.com/presentation/d/1675lZkaJ2FcH9wwdUPYptFGnV_A_TW4tAyObIHGBYgs/edit?usp=sharing
 
 ### nth_permutation
 

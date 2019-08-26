@@ -100,6 +100,14 @@ I partition_point_hinted(I f, I h, I l, P p) {
       .base();
 }
 
+template <typename I, typename P>
+constexpr I point_closer_to_partition_point(I f, I l, P p) {
+  DifferenceType<I> n2 = half_positive(std::distance(f, l));
+  I sent = std::next(f, n2);
+  if (p(*sent)) return sent;
+  return detail::partition_point_biased_no_checks(f, p);
+}
+
 template <typename I, typename V, typename Comp>
 // require ForwardIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
 constexpr I lower_bound_biased_expensive_cmp(I f, I l, const V& v, Comp comp) {
@@ -115,28 +123,41 @@ constexpr I lower_bound_biased_expensive_cmp(I f, I l, const V& v) {
 
 template <typename I, typename V, typename Comp>
 // require ForwardIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
-I lower_bound_biased(I f, I l, const V& v, Comp comp) {
+constexpr I lower_bound_biased(I f, I l, const V& v, Comp comp) {
   return partition_point_biased(f, l,
                                 [&](Reference<I> x) { return comp(x, v); });
 }
 
 template <typename I, typename V>
 // require ForwardIterator<I> && TotallyOrdered<ValueType<I>, V>
-I lower_bound_biased(I f, I l, const V& v) {
+constexpr I lower_bound_biased(I f, I l, const V& v) {
   return lower_bound_biased(f, l, v, std::less<>{});
 }
 
 template <typename I, typename V, typename Comp>
 // requires BidirectionalIterator<I> && WeakComarable<ValueType<I>, V>
-I lower_bound_hinted(I f, I h, I l, const V& v, Comp comp) {
+constexpr I lower_bound_hinted(I f, I h, I l, const V& v, Comp comp) {
   return partition_point_hinted(f, h, l,
                                 [&](Reference<I> x) { return comp(x, v); });
 }
 
 template <typename I, typename V>
 // requires BidirectionalIterator<I> && WeakComarable<ValueType<I>, V>
-I lower_bound_hinted(I f, I h, I l, const V& v) {
+constexpr I lower_bound_hinted(I f, I h, I l, const V& v) {
   return lower_bound_hinted(f, h, l, v, std::less<>{});
+}
+
+template <typename I, typename V, typename Comp>
+// require ForwardIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
+constexpr I point_closer_to_upper_bound(I f, I l, const V& v, Comp comp) {
+  return algo::point_closer_to_partition_point(
+      f, l, [&](Reference<I> x) { return !comp(v, x); });
+}
+
+template <typename I, typename V>
+// require ForwardIterator<I> && TotallyOrdered<ValueType<I>, V>
+constexpr I point_closer_to_upper_bound(I f, I l, const V& v) {
+  return algo::point_closer_to_upper_bound(f, l, v, std::less<>{});
 }
 
 }  // namespace algo

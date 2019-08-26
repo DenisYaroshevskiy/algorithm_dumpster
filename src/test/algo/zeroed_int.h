@@ -18,6 +18,7 @@
 #define TEST_ZEROED_INT_H
 
 #include <algorithm>
+#include <iostream>
 
 namespace algo {
 
@@ -57,6 +58,10 @@ struct zeroed_int {
 
   friend bool operator<=(const zeroed_int& x, const zeroed_int& y) {
     return !(y < x);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const zeroed_int& x) {
+    return out << x.body;
   }
 };
 
