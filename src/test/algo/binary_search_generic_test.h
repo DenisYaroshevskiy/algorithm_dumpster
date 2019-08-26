@@ -78,6 +78,14 @@ void test_lower_bound_n(Alg alg) {
       [](auto f, auto l, const auto& v) { return std::lower_bound(f, l, v); });
 }
 
+template <typename Alg>
+void test_lower_bound_hinted(Alg alg) {
+    detail::binary_search_generic_test_impl::test_any_binary_search(
+      [&](auto f, auto h, auto l, const auto& v) { return alg(f, h, l, v); },
+      [](auto f, auto l, const auto& v) { return std::lower_bound(f, l, v); }
+    );
+}
+
 }  // namespace algo
 
 #endif  // TEST_BINARY_SEARCH_GENERIC_TEST_H

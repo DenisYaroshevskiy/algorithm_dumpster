@@ -53,6 +53,25 @@ extra work. This can be more efficient then just computing the distance.
 
 Optimization with `half_positive` was upstreamed to libc++: https://reviews.llvm.org/D53994
 
+### binary_search_biased
+
+`partition_point_biased`<br/>
+`lower_bound_biased`<br/>
+`partition_point_biased_expensive_pred`<br/>
+`lower_bound_biased_expensive_cmp` <br/>
+`partition_point_hinted` <br/>
+`lower_bound_hinted`
+
+_TODO_: `upper_bound`/`equal_range`/`_n`
+
+My variations on the galloping (exponential) search. <br/>
+Non `_expensive` trade off to do more predicate invocations in order<br/>
+to remove boundary checks.<br/>
+`_hinted` variations instead of being biased to the first element, are
+biased to a `hint`. Requires `BidirectionalIterator`.
+
+_TODO_: link to the blog post.
+
 ### comparisons
 
 `less_by_first`
