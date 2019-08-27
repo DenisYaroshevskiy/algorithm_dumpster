@@ -153,13 +153,15 @@ async function loadMeasurements(beenchmarkDescription, algorithmSettings) {
         return fetch(m.url).then(
             async (raw) => {
                 raw = await raw.json();
-                let xs_and_ys = transformGoogleBenchmarkData(beenchmarkDescription, raw);
+                const xs_and_ys = transformGoogleBenchmarkData(beenchmarkDescription, raw);
+                const curSettings = algorithmSettings[m.name];
+                console.log(curSettings);
                 return {
-                    name: m.name,
+                    name: curSettings.display_name,
                     x: xs_and_ys.x,
                     y: xs_and_ys.y,
-                    color: algorithmSettings[m.name].color,
-                    dash: algorithmSettings[m.name].dash,
+                    color: curSettings.color,
+                    dash: curSettings.dash,
                 };
             }
         )
@@ -178,9 +180,29 @@ async function visualizeBecnhmark(elementID, benchmarkDescription, algorithmSett
     drawWithPlotly(element, benchmarkDescription, loaded);
 }
 
+function overrideWithDerived(base, derived) {
+    Object.keys(derived).forEach((key) => {
+        if (base[key]) {
+            overrideWithDerived(base[key], derived[key]);
+        } else {
+            base[key] = derived[key];
+        }
+    });
+    return base;
+}
+
+async function loadBenchmarkDescription(description) {
+    if (description['base']) {
+        const loaded = await fetch(description.base);
+        let base = await loadBenchmarkDescription(await loaded.json());
+        return overrideWithDerived(base, description);
+    }
+    return description;
+}
+
 async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
     let benchmarkDescription = await fetch(jsonBenchmarkDescription);
-    benchmarkDescription = await benchmarkDescription.json();
+    benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
     console.log(benchmarkDescription.general.algorithm_settings_url);
 
     let allAlgorithmSettings = await fetch(benchmarkDescription.general.algorithm_settings_url);

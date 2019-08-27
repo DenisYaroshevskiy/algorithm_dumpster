@@ -1,19 +1,15 @@
 {
+  "base" : "data/plots/lower_bound_base.json",
   "general": {
-    "algorithm_settings_section" : "lower_bound",
-    "algorithm_settings_url" : "data/plots/alogithm_settings.json",
-    "convert_size_times_percentage_to_x" : true,
-    "percentage_position": 1,
-    "size_position": 0,
     "title" : "lower bound, 1000 int"
   },
   "measurements": [
     {
-      "name": "algo::lower_bound",
+      "name": "algo_lower_bound",
       "url": "data/lower_bound_int_1000/algo_lower_bound_int_1000.json"
     },
     {
-      "name": "std::lower_bound",
+      "name": "std_lower_bound",
       "url": "data/lower_bound_int_1000/std_lower_bound_int_1000.json"
     }
   ]
