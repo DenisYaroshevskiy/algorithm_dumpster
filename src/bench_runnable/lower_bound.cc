@@ -20,8 +20,6 @@
 #include <algorithm>
 #include <utility>
 
-#include "algo/binary_search.h"
-#include "algo/binary_search_biased.h"
 #include "bench_generic/set_parameters.h"
 
 namespace bench {

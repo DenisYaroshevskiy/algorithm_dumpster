@@ -1,0 +1,28 @@
+{
+  "base": "data/plots/lower_bound_base.json",
+  "general": {
+    "title": "lower bound std int64 t 1000"
+  },
+  "measurements": [
+    {
+      "name": "algo_lower_bound_linear",
+      "url": "data/lower_bound_std_int64_t_1000/algo_lower_bound_linear.json"
+    },
+    {
+      "name": "algo_lower_bound_biased",
+      "url": "data/lower_bound_std_int64_t_1000/algo_lower_bound_biased.json"
+    },
+    {
+      "name": "algo_lower_bound",
+      "url": "data/lower_bound_std_int64_t_1000/algo_lower_bound.json"
+    },
+    {
+      "name": "algo_lower_bound_biased_expensive_cmp",
+      "url": "data/lower_bound_std_int64_t_1000/algo_lower_bound_biased_expensive_cmp.json"
+    },
+    {
+      "name": "std_lower_bound",
+      "url": "data/lower_bound_std_int64_t_1000/std_lower_bound.json"
+    }
+  ]
+}

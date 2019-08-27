@@ -1,14 +1,29 @@
 {
   "lower_bound": {
+    "algo_lower_bound_linear": {
+      "display_name" : "algo::lower_bound_linear",
+      "color": "rgb(50, 50, 0)",
+      "dash": "dashdot"
+    },
+    "algo_lower_bound_biased": {
+      "display_name" : "algo::lower_bound_biased",
+      "color": "rgb(128, 0, 128)",
+      "dash": "dot"
+    },
     "algo_lower_bound": {
       "display_name" : "algo::lower_bound",
-      "color": "rgb(255, 100, 0)",
+      "color": "rgb(55, 128, 191)",
+      "dash": "dash"
+    },
+    "algo_lower_bound_biased_expensive_cmp": {
+      "display_name" : "algo::lower_bound_biased_expensive_cmp",
+      "color": "rgb(255, 0, 0)",
       "dash": "dash"
     },
     "std_lower_bound": {
       "display_name" : "std::lower_bound",
-      "color": "rgb(000, 100, 255)",
-      "dash": "dot"
+      "color": "rgb(000, 0, 255)",
+      "dash": "solid"
     }
   }
 }

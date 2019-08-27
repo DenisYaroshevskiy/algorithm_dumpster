@@ -18,7 +18,7 @@ function(add_benchmark source algo type number)
     set(compiler_options --std=c++17 -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native)
 
     set(benchmark_directory ${source}_${type}_${number})
-    set(name ${algo})
+    set(name ${algo}_${source}_${type}_${number})
     set(compiler_options ${compiler_options} -DSELECTED_ALGORITHM=${algo} -DSELECTED_TYPE=${type} -DSELECTED_NUMBER=${number})
 
     foreach(extra ${ARGN})
@@ -33,7 +33,9 @@ function(add_benchmark source algo type number)
                    )
     target_compile_options(${name} PRIVATE ${compiler_options})
     target_link_libraries(${name} benchmark)
-    set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${benchmark_directory})
+    set_target_properties(${name} PROPERTIES
+                          RUNTIME_OUTPUT_DIRECTORY ${benchmark_directory}
+                          OUTPUT_NAME ${algo})
 endfunction()
 
 # Code alignment
@@ -62,13 +64,5 @@ function(add_lower_bound_benchmarks name type size)
 endfunction()
 
 add_lower_bound_benchmarks(lower_bound int 1000)
-
-#add_benchmark(lower_bound algo_lower_bound int 100)
-#add_benchmark(lower_bound algo_lower_bound int 100)
-#add_benchmark(lower_bound std_lower_bound int 1000)
-
-#add_benchmark(lower_bound std_lower_bound double 1000)
-#add_benchmark(lower_bound algo_lower_bound double 1000)
-
-#add_benchmark(lower_bound std_lower_bound std_int64_t 1000)
-#add_benchmark(lower_bound algo_lower_bound std_int64_t 1000)
+add_lower_bound_benchmarks(lower_bound double 1000)
+add_lower_bound_benchmarks(lower_bound std_int64_t 1000)

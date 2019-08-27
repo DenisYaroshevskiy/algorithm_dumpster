@@ -1,0 +1,185 @@
+{
+  "context": {
+    "date": "2019-08-27 23:04:59",
+    "executable": "build/src/bench_runnable/lower_bound_std_int64_t_1000/algo_lower_bound_linear",
+    "num_cpus": 4,
+    "mhz_per_cpu": 1800,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 3145728000,
+        "num_sharing": 4
+      }
+    ],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/0",
+      "iterations": 979829510,
+      "real_time": 6.9525364162587699e-01,
+      "cpu_time": 6.9439529331995731e-01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/5",
+      "iterations": 31919745,
+      "real_time": 2.1807580010431529e+01,
+      "cpu_time": 2.1771665155846321e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/10",
+      "iterations": 14370087,
+      "real_time": 4.8958828850507423e+01,
+      "cpu_time": 4.8882932998248386e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/15",
+      "iterations": 10233170,
+      "real_time": 6.6590238899578125e+01,
+      "cpu_time": 6.6457998841023866e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/20",
+      "iterations": 8281867,
+      "real_time": 8.3689744353559576e+01,
+      "cpu_time": 8.3565094682153244e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/25",
+      "iterations": 6886104,
+      "real_time": 1.0125320093918320e+02,
+      "cpu_time": 1.0106600190760987e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/30",
+      "iterations": 5875145,
+      "real_time": 1.1876917505865697e+02,
+      "cpu_time": 1.1854345722531089e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/35",
+      "iterations": 5079973,
+      "real_time": 1.3577730728096449e+02,
+      "cpu_time": 1.3556587800761938e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/40",
+      "iterations": 4511443,
+      "real_time": 1.5331724239891776e+02,
+      "cpu_time": 1.5308383592566733e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/45",
+      "iterations": 4091749,
+      "real_time": 1.7065005722490139e+02,
+      "cpu_time": 1.7040805777676005e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/50",
+      "iterations": 3690601,
+      "real_time": 1.8815056165650361e+02,
+      "cpu_time": 1.8786750450671849e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/55",
+      "iterations": 3398157,
+      "real_time": 2.0546601937460611e+02,
+      "cpu_time": 2.0520682240402698e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/60",
+      "iterations": 3134895,
+      "real_time": 2.2387107478882660e+02,
+      "cpu_time": 2.2342215608497256e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/65",
+      "iterations": 2908197,
+      "real_time": 2.4028848664650226e+02,
+      "cpu_time": 2.3999852829777399e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/70",
+      "iterations": 2712106,
+      "real_time": 2.5770937382241470e+02,
+      "cpu_time": 2.5731147676381437e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/75",
+      "iterations": 2527541,
+      "real_time": 2.7522293525607944e+02,
+      "cpu_time": 2.7476270414604534e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/80",
+      "iterations": 2384034,
+      "real_time": 2.9304297170263271e+02,
+      "cpu_time": 2.9261411540271655e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/85",
+      "iterations": 2255387,
+      "real_time": 3.1014408658026838e+02,
+      "cpu_time": 3.0974019092953989e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/90",
+      "iterations": 2133971,
+      "real_time": 3.2808491914834707e+02,
+      "cpu_time": 3.2759864121864712e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/95",
+      "iterations": 2026507,
+      "real_time": 3.4517217063649099e+02,
+      "cpu_time": 3.4462599931803680e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/100",
+      "iterations": 1932714,
+      "real_time": 3.6268184221770713e+02,
+      "cpu_time": 3.6206495115159242e+02,
+      "time_unit": "ns"
+    }
+  ]
+}
