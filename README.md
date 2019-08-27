@@ -61,6 +61,8 @@ Optimization with `half_positive` was upstreamed to libc++: https://reviews.llvm
 `lower_bound_biased_expensive_cmp` <br/>
 `partition_point_hinted` <br/>
 `lower_bound_hinted` <br/>
+`partition_point_linear` <br/>
+`lower_bound_linear` <br/>
 <br/>
 `point_closer_to_partition_point`<br/>
 `point_closer_to_upper_bound`
@@ -78,6 +80,7 @@ Non `_expensive` trade off to do more predicate invocations in order<br/>
 to remove boundary checks.<br/>
 `_hinted` variations instead of being biased to the first element, are
 biased to a `hint`. Requires `BidirectionalIterator`. <br/>
+`_linear` variations use find_if to find the lower bound. By my measurements should not be useful, at least for random access.
 <br/>
 `point_closer_to` - returns element somewhere to the left of the partition point.
 Proved to be useful for merge algorithm.
@@ -331,7 +334,7 @@ A struct with one int, that zeroes out on a move.
 
 ## Scripts
 
-### benchmark_visualization
+### benchmark visualization
 
 To use the script insert this line into your html file.
 
@@ -347,3 +350,14 @@ It's adviasable to specify the commit otherwise you might run into issues with l
 
 More information on what's happening can be found here:
 https://stackoverflow.com/questions/17341122/link-and-execute-external-javascript-file-hosted-on-github
+
+### run benchmark folder
+
+I generate benchmarks for similar algorithms for the same input into a folder.
+
+This script gets that folder, runs all of the benchmarks in it and drops the output into
+a differenet folder.
+
+It also generates the json for benchmark visualisation.
+
+Inputs: folder with benchmarks, folder where to put the result and a path to the template.

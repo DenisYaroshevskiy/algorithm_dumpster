@@ -69,7 +69,7 @@ constexpr I partition_point_biased(I f, I l, P p, std::forward_iterator_tag) {
 }
 
 template <typename I, typename P>
-// requires ForwardIterator<I> && Predicate<P(ValueType<I>)>
+// require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
 constexpr I partition_point_biased(I f, I l, P p,
                                    std::random_access_iterator_tag) {
   DifferenceType<I> n = l - f;
@@ -84,7 +84,7 @@ constexpr I partition_point_biased(I f, I l, P p,
 }
 
 template <typename I, typename P>
-// requires ForwardIterator<I> && Predicate<P(ValueType<I>)>
+// require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
 constexpr I partition_point_biased(I f, I l, P p) {
   return partition_point_biased(f, l, p, IteratorCategory<I>{});
 }
@@ -100,12 +100,22 @@ I partition_point_hinted(I f, I h, I l, P p) {
       .base();
 }
 
+/*
+  READ THE DOCS FOR THIS ONE!
+*/
 template <typename I, typename P>
+// require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
 constexpr I point_closer_to_partition_point(I f, I l, P p) {
   DifferenceType<I> n2 = half_positive(std::distance(f, l));
   I sent = std::next(f, n2);
   if (p(*sent)) return sent;
   return detail::partition_point_biased_no_checks(f, p);
+}
+
+template <typename I, typename P>
+// require InputIterator<I> && UnaryPredicate<P, ValueType<I>>
+I partition_point_linear(I f, I l, P p) {
+  return std::find_if(f, l, [&](Reference<I> x) { return !p(x); });
 }
 
 template <typename I, typename V, typename Comp>
@@ -132,6 +142,19 @@ template <typename I, typename V>
 // require ForwardIterator<I> && TotallyOrdered<ValueType<I>, V>
 constexpr I lower_bound_biased(I f, I l, const V& v) {
   return lower_bound_biased(f, l, v, std::less<>{});
+}
+
+template <typename I, typename V, typename Comp>
+// require InputIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
+I lower_bound_linear(I f, I l, const V& v, Comp comp) {
+  return partition_point_linear(f, l,
+                                [&](Reference<I> x) { return comp(x, v); });
+}
+
+template <typename I, typename V>
+// require InputIterator<I> && TotallyOrdered<ValueType<I>, V>
+I lower_bound_linear(I f, I l, const V& v) {
+  return lower_bound_linear(f, l, v, std::less<>{});
 }
 
 template <typename I, typename V, typename Comp>

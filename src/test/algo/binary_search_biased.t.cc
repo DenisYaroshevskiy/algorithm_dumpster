@@ -30,15 +30,19 @@ TEST_CASE("algorithm.binary_search.lower_bound_biased_expensive_cmp",
   });
 }
 
-TEST_CASE("algorithm.binary_search.lower_bound_biased",
-          "[algorithm]") {
+TEST_CASE("algorithm.binary_search.lower_bound_biased", "[algorithm]") {
   test_lower_bound([](auto f, auto l, const auto& v) {
     return algo::lower_bound_biased(f, l, v);
   });
 }
 
-TEST_CASE("algorithm.binary_search.lower_bound_hinted",
-          "[algorithm]") {
+TEST_CASE("algorithm.binary_search.lower_bound_linear", "[algorithm]") {
+  test_lower_bound([](auto f, auto l, const auto& v) {
+    return algo::lower_bound_linear(f, l, v);
+  });
+}
+
+TEST_CASE("algorithm.binary_search.lower_bound_hinted", "[algorithm]") {
   test_lower_bound_hinted([](auto f, auto h, auto l, const auto& v) {
     return algo::lower_bound_hinted(f, h, l, v);
   });

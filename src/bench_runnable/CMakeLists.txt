@@ -17,7 +17,8 @@
 function(add_benchmark source algo type number)
     set(compiler_options --std=c++17 -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native)
 
-    set(name benchmark_${source}_${algo}_${type}_${number})
+    set(benchmark_directory ${source}_${type}_${number})
+    set(name ${algo})
     set(compiler_options ${compiler_options} -DSELECTED_ALGORITHM=${algo} -DSELECTED_TYPE=${type} -DSELECTED_NUMBER=${number})
 
     foreach(extra ${ARGN})
@@ -32,6 +33,7 @@ function(add_benchmark source algo type number)
                    )
     target_compile_options(${name} PRIVATE ${compiler_options})
     target_link_libraries(${name} benchmark)
+    set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${benchmark_directory})
 endfunction()
 
 # Code alignment
@@ -49,11 +51,24 @@ add_benchmark(copy_reverse_iterators std_copy int 1000)
 add_benchmark(copy_reverse_iterators algo_copy int 1000)
 
 # Lower bound
-add_benchmark(lower_bound std_lower_bound int 1000)
-add_benchmark(lower_bound algo_lower_bound int 1000)
+function(add_lower_bound_benchmarks name type size)
+  foreach(lb  algo_lower_bound
+              algo_lower_bound_biased
+              algo_lower_bound_biased_expensive_cmp
+              algo_lower_bound_linear
+              std_lower_bound)
+    add_benchmark(${name} ${lb} ${type} ${size})
+  endforeach()
+endfunction()
 
-add_benchmark(lower_bound std_lower_bound double 1000)
-add_benchmark(lower_bound algo_lower_bound double 1000)
+add_lower_bound_benchmarks(lower_bound int 1000)
 
-add_benchmark(lower_bound std_lower_bound std_int64_t 1000)
-add_benchmark(lower_bound algo_lower_bound std_int64_t 1000)
+#add_benchmark(lower_bound algo_lower_bound int 100)
+#add_benchmark(lower_bound algo_lower_bound int 100)
+#add_benchmark(lower_bound std_lower_bound int 1000)
+
+#add_benchmark(lower_bound std_lower_bound double 1000)
+#add_benchmark(lower_bound algo_lower_bound double 1000)
+
+#add_benchmark(lower_bound std_lower_bound std_int64_t 1000)
+#add_benchmark(lower_bound algo_lower_bound std_int64_t 1000)
