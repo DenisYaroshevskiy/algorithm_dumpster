@@ -284,9 +284,11 @@ if still a thing - will show there.
 ### lower_bound
 
 `lower_bound_common`<br/>
-`lower_bound_vec`
+`lower_bound_vec` <br/>
+`lower_bound_vec_first_5_percent`
 
-Benchmarking lower_bound like algotihmms.
+Benchmarking lower_bound like algotihmms.<br>
+`_first_5_percent` - benchmark for 'biased case' - results are close to the beginning.
 
 ### merge
 

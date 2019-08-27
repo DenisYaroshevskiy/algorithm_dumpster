@@ -66,3 +66,7 @@ endfunction()
 add_lower_bound_benchmarks(lower_bound int 1000)
 add_lower_bound_benchmarks(lower_bound double 1000)
 add_lower_bound_benchmarks(lower_bound std_int64_t 1000)
+
+add_lower_bound_benchmarks(lower_bound_first_5_percent int 1000)
+add_lower_bound_benchmarks(lower_bound_first_5_percent double 1000)
+add_lower_bound_benchmarks(lower_bound_first_5_percent std_int64_t 1000)

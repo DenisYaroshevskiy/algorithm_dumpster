@@ -1,0 +1,395 @@
+{
+  "context": {
+    "date": "2019-08-28 00:02:06",
+    "executable": "build/src/bench_runnable/lower_bound_first_5_percent_double_1000/algo_lower_bound_linear",
+    "num_cpus": 4,
+    "mhz_per_cpu": 1800,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 3145728000,
+        "num_sharing": 4
+      }
+    ],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/0",
+      "iterations": 646693089,
+      "real_time": 1.0425464775610491e+00,
+      "cpu_time": 1.0413100301432168e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/2",
+      "iterations": 666228859,
+      "real_time": 1.0470993857081401e+00,
+      "cpu_time": 1.0454410531621838e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/4",
+      "iterations": 377637393,
+      "real_time": 1.8963519748693105e+00,
+      "cpu_time": 1.8932076464154595e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/6",
+      "iterations": 241632608,
+      "real_time": 2.8005948228631894e+00,
+      "cpu_time": 2.7960837139993977e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/8",
+      "iterations": 191720417,
+      "real_time": 3.6725903115486416e+00,
+      "cpu_time": 3.6665943617262244e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/10",
+      "iterations": 175207182,
+      "real_time": 4.0842870356769376e+00,
+      "cpu_time": 4.0777152616951486e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/12",
+      "iterations": 159595812,
+      "real_time": 4.4942026172960317e+00,
+      "cpu_time": 4.4857568067011719e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/14",
+      "iterations": 144612562,
+      "real_time": 4.7622794000467641e+00,
+      "cpu_time": 4.7537640609672609e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/16",
+      "iterations": 127732565,
+      "real_time": 5.1702072216288579e+00,
+      "cpu_time": 5.1615498365667341e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/18",
+      "iterations": 118425282,
+      "real_time": 5.8890671165990200e+00,
+      "cpu_time": 5.8791838046879219e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/20",
+      "iterations": 106208654,
+      "real_time": 6.4757622293196180e+00,
+      "cpu_time": 6.4658007999988216e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/22",
+      "iterations": 102933608,
+      "real_time": 6.8071000775632040e+00,
+      "cpu_time": 6.7964099733101753e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/24",
+      "iterations": 90765281,
+      "real_time": 7.5668492118626984e+00,
+      "cpu_time": 7.5521498137597352e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/26",
+      "iterations": 89579361,
+      "real_time": 7.8999121014095603e+00,
+      "cpu_time": 7.8867943699665490e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/28",
+      "iterations": 83310522,
+      "real_time": 8.2822169329257349e+00,
+      "cpu_time": 8.2674430968035484e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/30",
+      "iterations": 72030541,
+      "real_time": 8.9702099280341798e+00,
+      "cpu_time": 8.9551597287045173e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/32",
+      "iterations": 73340667,
+      "real_time": 9.3928558080795952e+00,
+      "cpu_time": 9.3777849061558172e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/34",
+      "iterations": 72613355,
+      "real_time": 9.6374280598966831e+00,
+      "cpu_time": 9.6225825125419302e+00,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/36",
+      "iterations": 67179792,
+      "real_time": 1.0386969120108343e+01,
+      "cpu_time": 1.0371883854597195e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/38",
+      "iterations": 64224308,
+      "real_time": 1.0532345027369974e+01,
+      "cpu_time": 1.0514103164801698e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/40",
+      "iterations": 56712307,
+      "real_time": 1.2987207309340478e+01,
+      "cpu_time": 1.2965739517526691e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/42",
+      "iterations": 55987459,
+      "real_time": 1.2150378015895216e+01,
+      "cpu_time": 1.2127323013534168e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/44",
+      "iterations": 55006365,
+      "real_time": 1.2487318585765962e+01,
+      "cpu_time": 1.2467284467897445e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/46",
+      "iterations": 53004202,
+      "real_time": 1.2431128516944435e+01,
+      "cpu_time": 1.2411978205048769e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/48",
+      "iterations": 53725891,
+      "real_time": 1.3052174714044124e+01,
+      "cpu_time": 1.3029546592349655e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/50",
+      "iterations": 51609478,
+      "real_time": 1.3520571783332143e+01,
+      "cpu_time": 1.3500601575547881e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/52",
+      "iterations": 50320252,
+      "real_time": 1.3838581034930106e+01,
+      "cpu_time": 1.3816723334374441e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/54",
+      "iterations": 47725212,
+      "real_time": 1.4495722533409237e+01,
+      "cpu_time": 1.4468118025332284e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/56",
+      "iterations": 45961012,
+      "real_time": 1.4916405169675098e+01,
+      "cpu_time": 1.4892883559657092e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/58",
+      "iterations": 45198324,
+      "real_time": 1.5218108330753701e+01,
+      "cpu_time": 1.5196315686395831e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/60",
+      "iterations": 43207476,
+      "real_time": 1.5872465403916674e+01,
+      "cpu_time": 1.5846192913467130e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/62",
+      "iterations": 42269510,
+      "real_time": 1.6291535529980862e+01,
+      "cpu_time": 1.6265483086981678e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/64",
+      "iterations": 41997900,
+      "real_time": 1.6594861719268994e+01,
+      "cpu_time": 1.6568780819993396e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/66",
+      "iterations": 39327831,
+      "real_time": 1.7349817461331195e+01,
+      "cpu_time": 1.7319287198930525e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/68",
+      "iterations": 21792529,
+      "real_time": 3.2057973354077973e+01,
+      "cpu_time": 3.2002114119017499e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/70",
+      "iterations": 38853705,
+      "real_time": 1.8260473692286929e+01,
+      "cpu_time": 1.8232418246857065e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/72",
+      "iterations": 36756598,
+      "real_time": 1.8827311956337564e+01,
+      "cpu_time": 1.8801576794457461e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/74",
+      "iterations": 36632337,
+      "real_time": 1.8999640727249016e+01,
+      "cpu_time": 1.8969005444560992e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/76",
+      "iterations": 35396261,
+      "real_time": 1.9537368113530242e+01,
+      "cpu_time": 1.9501833823634634e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/78",
+      "iterations": 17068966,
+      "real_time": 4.1449380647919384e+01,
+      "cpu_time": 4.1339176608589163e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/80",
+      "iterations": 32960099,
+      "real_time": 2.0679229422219191e+01,
+      "cpu_time": 2.0642777802336113e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/82",
+      "iterations": 19421085,
+      "real_time": 3.5548362102358467e+01,
+      "cpu_time": 3.5485041129267444e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/84",
+      "iterations": 31762165,
+      "real_time": 2.1756394691598643e+01,
+      "cpu_time": 2.1712373825902262e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/86",
+      "iterations": 21242569,
+      "real_time": 3.2693370797125134e+01,
+      "cpu_time": 3.2655466483361757e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/88",
+      "iterations": 29393240,
+      "real_time": 2.2292188373916300e+01,
+      "cpu_time": 2.2243890091735487e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/90",
+      "iterations": 29985007,
+      "real_time": 2.3169000827635450e+01,
+      "cpu_time": 2.3131126832819938e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/92",
+      "iterations": 29950752,
+      "real_time": 2.3258112083481411e+01,
+      "cpu_time": 2.3225593801451204e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/94",
+      "iterations": 29137772,
+      "real_time": 2.3965964727868521e+01,
+      "cpu_time": 2.3930587417596520e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/96",
+      "iterations": 22761119,
+      "real_time": 2.8208869300298336e+01,
+      "cpu_time": 2.8155557729828764e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/98",
+      "iterations": 21145992,
+      "real_time": 3.0242697906985352e+01,
+      "cpu_time": 3.0194469003866384e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "lower_bound_vec_first_5_percent<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/100",
+      "iterations": 21852806,
+      "real_time": 3.0219429395020942e+01,
+      "cpu_time": 3.0170221618221422e+01,
+      "time_unit": "ns"
+    }
+  ]
+}

@@ -97,6 +97,9 @@ function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
         let size = undefined;
         if (benchmarkDescription.general.size_position !== undefined) {
             size = Number(parts[benchmarkDescription.general.size_position + 1]);
+            if (benchmarkDescription.general.slice_percentage) {
+                size = size * benchmarkDescription.general.slice_percentage / 100;
+            }
         }
 
         if (benchmarkDescription.general.convert_size_times_percentage_to_x) {
@@ -183,10 +186,12 @@ async function visualizeBecnhmark(elementID, benchmarkDescription, algorithmSett
 function overrideWithDerived(base, derived) {
     Object.keys(derived).forEach((key) => {
         if (base[key]) {
-            overrideWithDerived(base[key], derived[key]);
-        } else {
-            base[key] = derived[key];
+            if (typeof(base[key]) !== 'string' && typeof(base[key]) !== 'number') {
+              overrideWithDerived(base[key], derived[key]);
+              return;
+            }
         }
+        base[key] = derived[key];
     });
     return base;
 }

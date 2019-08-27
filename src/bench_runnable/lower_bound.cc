@@ -15,11 +15,8 @@
  */
 
 #include "bench_generic/lower_bound.h"
+
 #include "bench_generic/function_objects.h"
-
-#include <algorithm>
-#include <utility>
-
 #include "bench_generic/set_parameters.h"
 
 namespace bench {

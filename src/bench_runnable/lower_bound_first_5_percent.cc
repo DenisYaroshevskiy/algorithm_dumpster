@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 
-#ifndef BENCH_SET_PARAMETERS_H
-#define BENCH_SET_PARAMETERS_H
+#include "bench_generic/lower_bound.h"
 
-#include <benchmark/benchmark.h>
+#include "bench_generic/function_objects.h"
+#include "bench_generic/set_parameters.h"
 
 namespace bench {
 
-template <size_t total_size>
-inline void set_every_5th_percent(benchmark::internal::Benchmark* bench) {
-  for (int i = 0; i <= 100; i += 5) {
-    bench->Args({static_cast<int>(total_size), i});
-  }
-}
-
-template <size_t total_size>
-inline void set_every_2th_percent(benchmark::internal::Benchmark* bench) {
-  for (int i = 0; i <= 100; i += 2) {
-    bench->Args({static_cast<int>(total_size), i});
-  }
-}
+BENCHMARK_TEMPLATE(lower_bound_vec_first_5_percent, SELECTED_ALGORITHM,
+                   SELECTED_TYPE)
+    ->Apply(set_every_2th_percent<SELECTED_NUMBER>);
 
 }  // namespace bench
-
-#endif  // BENCH_SET_PARAMETERS_H

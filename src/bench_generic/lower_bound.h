@@ -43,6 +43,17 @@ void lower_bound_vec(benchmark::State& state) {
   lower_bound_common<Alg>(state, input, value, std::less<>{});
 }
 
+template <typename Alg, typename T>
+void lower_bound_vec_first_5_percent(benchmark::State& state) {
+  const size_t size = static_cast<size_t>(state.range(0));
+  const size_t percentage = static_cast<size_t>(state.range(1));
+
+  const auto input = sorted_vector<T>(size);
+  const T value = input[(size / 20 - 1) * percentage / 100];
+
+  lower_bound_common<Alg>(state, input, value, std::less<>{});
+}
+
 }  // namespace bench
 
 #endif  // BENCH_GENERIC_LOWER_BOUND_H
