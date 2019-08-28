@@ -49,6 +49,9 @@ I partition_point_biased_no_checks(I f, P p) {
 template <typename I, typename P>
 // require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
 constexpr I partition_point_biased_expensive_pred(I f, I l, P p) {
+  if (f == l || !p(*f)) return f;
+  ++f;
+
   DifferenceType<I> step = 1;
   while (true) {
     I test = f;
@@ -72,14 +75,18 @@ template <typename I, typename P>
 // require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
 constexpr I partition_point_biased(I f, I l, P p,
                                    std::random_access_iterator_tag) {
+  if (f == l || !p(*f)) return f;
+  ++f;
+
   DifferenceType<I> n = l - f;
-  while (f != l) {
+  while (n) {
     DifferenceType<I> n2 = half_positive(n);
     I sent = f + n2;
     if (!p(*sent)) return detail::partition_point_biased_no_checks(f, p);
     f = ++sent;
     n -= n2 + 1;
   }
+
   return f;
 }
 
