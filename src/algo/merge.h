@@ -23,57 +23,57 @@
 
 namespace algo {
 
-// clang-format off
-template <typename I1, typename I2, typename O, typename P>
-// require Mergeable<I1, I2, O, P>
-O merge_expensive_cmp(I1 f1, I1 l1, I2 f2, I2 l2, O o, P p) {
+template <typename I1, typename I2, typename O, typename R>
+// require Mergeable<I1, I2, O, R>
+O merge_expensive_cmp(I1 f1, I1 l1, I2 f2, I2 l2, O o, R r) {
   if (f1 == l1) goto copySecond;
   if (f2 == l2) goto copyFirst;
 
+  // clang-format off
   while (true) {
-    if (p(*f2, *f1)) {
+    if (r(*f2, *f1)) {
       *o = *f2; ++o; ++f2; if (f2 == l2) goto copyFirst;
     } else {
       *o = *f1; ++o; ++f1; if (f1 == l1) goto copySecond;
     }
   }
+  // clang-format on
 
 copySecond:
   return algo::copy(f2, l2, o);
 copyFirst:
   return algo::copy(f1, l1, o);
 }
-// clang-format on
 
 template <typename I1, typename I2, typename O>
 O merge_expensive_cmp(I1 f1, I1 l1, I2 f2, I2 l2, O o) {
   return algo::merge_expensive_cmp(f1, l1, f2, l2, o, std::less<>{});
 }
 
-// clang-format off
-template <typename I1, typename I2, typename O, typename P>
-// require Mergeable<I1, I2, O, P>
-O merge(I1 f1, I1 l1, I2 f2, I2 l2, O o, P p) {
+template <typename I1, typename I2, typename O, typename R>
+// require Mergeable<I1, I2, O, R>
+O merge(I1 f1, I1 l1, I2 f2, I2 l2, O o, R r) {
   if (f1 == l1) goto copySecond;
   if (f2 == l2) goto copyFirst;
 
-while(true) {
-    if (p(*f2, *f1)) goto takeSecond;
+  // clang-format off
+  while(true) {
+    if (r(*f2, *f1)) goto takeSecond;
     *o = *f1; ++o; ++f1; if (f1 == l1) goto copySecond;
     goto nextCheck;
   takeSecond:
     *o = *f2; ++o; ++f2;  if (f2 == l2) goto copyFirst;
   nextCheck:
-    if (p(*f2, *f1)) goto takeSecond;
+    if (r(*f2, *f1)) goto takeSecond;
     *o = *f1; ++o; ++f1; if (f1 == l1) goto copySecond;
   }
+  // clang-format on
 
 copySecond:
   return algo::copy(f2, l2, o);
 copyFirst:
   return algo::copy(f1, l1, o);
 }
-// clang-format on
 
 template <typename I1, typename I2, typename O>
 O merge(I1 f1, I1 l1, I2 f2, I2 l2, O o) {
