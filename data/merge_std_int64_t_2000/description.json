@@ -1,0 +1,24 @@
+{
+  "base": "data/plots/merge_base.json",
+  "general": {
+    "title": "merge std int64 t 2000"
+  },
+  "measurements": [
+    {
+      "name": "algo_merge",
+      "url": "data/merge_std_int64_t_2000/algo_merge.json"
+    },
+    {
+      "name": "algo_merge_expensive_cmp",
+      "url": "data/merge_std_int64_t_2000/algo_merge_expensive_cmp.json"
+    },
+    {
+      "name": "algo_merge_biased_first",
+      "url": "data/merge_std_int64_t_2000/algo_merge_biased_first.json"
+    },
+    {
+      "name": "std_merge",
+      "url": "data/merge_std_int64_t_2000/std_merge.json"
+    }
+  ]
+}

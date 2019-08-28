@@ -13,7 +13,7 @@
     "algo_lower_bound": {
       "display_name" : "algo::lower_bound",
       "color": "rgb(55, 128, 191)",
-      "dash": "dash"
+      "dash": "solid"
     },
     "algo_lower_bound_biased_expensive_cmp": {
       "display_name" : "algo::lower_bound_biased_expensive_cmp",
@@ -22,6 +22,33 @@
     },
     "std_lower_bound": {
       "display_name" : "std::lower_bound",
+      "color": "rgb(000, 0, 255)",
+      "dash": "solid"
+    }
+  },
+  "merge/set_union": {
+    "algo_merge": {
+      "display_name" : "algo::merge",
+      "color": "rgb(50, 50, 0)",
+      "dash": "solid"
+    },
+    "algo_merge_biased_first": {
+      "display_name" : "algo::merge_biased_first",
+      "color": "rgb(128, 0, 128)",
+      "dash": "dot"
+    },
+    "algo_merge_biased_second": {
+      "display_name" : "algo::merge_biased_second",
+      "color": "rgb(55, 128, 191)",
+      "dash": "dash"
+    },
+    "algo_merge_expensive_cmp": {
+      "display_name" : "algo::merge_expensive_cmp",
+      "color": "rgb(255, 0, 0)",
+      "dash": "dash"
+    },
+    "std_merge": {
+      "display_name" : "std::merge",
       "color": "rgb(000, 0, 255)",
       "dash": "solid"
     }

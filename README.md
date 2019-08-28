@@ -293,7 +293,7 @@ Benchmarking lower_bound like algotihmms.<br>
 ### merge
 
 `merge_common`<br/>
-`merge_int_vec`
+`merge_vec`
 
 Benchmarking merge like algorithms.
 

@@ -16,7 +16,7 @@
   <h2><a href="#lower_bounds">Lower bounds</a></h2>
 
   <a name="lower_bounds_whole_range"></a>
-  <h3><a href="#lower_bounds_whole_range">Lower bounds whole range</a></h3>
+  <h3><a href="#lower_bounds_whole_range">Lower bounds whole range, 1000 elements</a></h3>
 
   <div id='lower_bound_int_1000'></div>
   <script> visualizeBenchmarkFromJson('lower_bound_int_1000', 'data/lower_bound_int_1000/description.json') </script>
@@ -41,5 +41,19 @@
 
   <a name="merges"></a>
   <h2><a href="#merges">Merges</a></h2>
+
+  <a name="merge_whole_range"></a>
+  <h2><a href="#merge_whole_range">Merge whole range, 2000 elements</a></h2>
+
+  <div id='merge_int_2000'></div>
+  Clear case of a code alignment issue for std::merge.
+  <script> visualizeBenchmarkFromJson('merge_int_2000', 'data/merge_int_2000/description.json') </script>
+
+  <div id='merge_double_2000'></div>
+  <script> visualizeBenchmarkFromJson('merge_double_2000', 'data/merge_double_2000/description.json') </script>
+
+  <div id='merge_std_int64_t_2000'></div>
+  <script> visualizeBenchmarkFromJson('merge_std_int64_t_2000', 'data/merge_std_int64_t_2000/description.json') </script>
+
 
 </body>

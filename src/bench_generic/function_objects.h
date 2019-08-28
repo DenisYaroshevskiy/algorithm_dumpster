@@ -19,6 +19,8 @@
 
 #include "algo/binary_search.h"
 #include "algo/binary_search_biased.h"
+#include "algo/merge.h"
+#include "algo/merge_biased.h"
 
 namespace bench {
 
@@ -50,10 +52,38 @@ struct algo_lower_bound_linear {
   }
 };
 
+struct algo_merge {
+  template <typename... Args>
+  auto operator()(Args&&... args) const {
+    return algo::merge(std::forward<Args>(args)...);
+  }
+};
+
+struct algo_merge_expensive_cmp {
+  template <typename... Args>
+  auto operator()(Args&&... args) const {
+    return algo::merge_expensive_cmp(std::forward<Args>(args)...);
+  }
+};
+
+struct algo_merge_biased_first {
+  template <typename... Args>
+  auto operator()(Args&&... args) const {
+    return algo::merge_biased_first(std::forward<Args>(args)...);
+  }
+};
+
 struct std_lower_bound {
   template <typename... Args>
   auto operator()(Args&&... args) const {
     return std::lower_bound(std::forward<Args>(args)...);
+  }
+};
+
+struct std_merge {
+  template <typename... Args>
+  auto operator()(Args&&... args) {
+    return std::merge(std::forward<Args>(args)...);
   }
 };
 

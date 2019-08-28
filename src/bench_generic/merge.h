@@ -36,13 +36,16 @@ BENCH_DECL_ATTRIBUTES void merge_common(benchmark::State& state, RX&& rx,
   }
 }
 
-template <typename Alg>
-void merge_int_vec(benchmark::State& state) {
-  const size_t x_size = static_cast<size_t>(state.range(0));
-  const size_t y_size = static_cast<size_t>(state.range(1));
+template <typename Alg, typename T>
+void merge_vec(benchmark::State& state) {
+  const size_t size = static_cast<size_t>(state.range(0));
+  const size_t percentage = static_cast<size_t>(state.range(1));
 
-  auto [x_vec, y_vec] = two_sorted_vectors<int>(x_size, y_size);
-  std::vector<int> o_vec(x_size + y_size);
+  const size_t y_size = size * percentage / 100;
+  const size_t x_size = size - y_size;
+
+  auto [x_vec, y_vec] = two_sorted_vectors<T>(x_size, y_size);
+  std::vector<T> o_vec(x_size + y_size);
 
   merge_common<Alg>(state, x_vec, y_vec, o_vec, std::less<>{});
 }
