@@ -26,7 +26,7 @@
 namespace algo {
 
 template <typename I1, typename I2, typename O, typename R>
-// requiers ForwardInputMergeRequirements<I1, I2, O, R>
+// require Mergeable<I1, I2, O, R> && ForwardIterator<I1>
 O merge_biased_first(I1 f1, I1 l1, I2 f2, I2 l2, O o, R r) {
   if (f1 == l1) goto copySecond;
   if (f2 == l2) goto copyFirst;
@@ -61,6 +61,44 @@ copyFirst:
 template <typename I1, typename I2, typename O>
 O merge_biased_first(I1 f1, I1 l1, I2 f2, I2 l2, O o) {
   return merge_biased_first(f1, l1, f2, l2, o, std::less<>{});
+}
+
+template <typename I1, typename I2, typename O, typename R>
+// require Mergeable<I1, I2, O, R> && ForwardIterator<I1>
+O merge_biased_second(I1 f1, I1 l1, I2 f2, I2 l2, O o, R r) {
+  if (f1 == l1) goto copySecond;
+  if (f2 == l2) goto copyFirst;
+
+  while (true) {
+    // clang-format off
+    if (!r(*f2, *f1)) goto takeFirst;
+    *o = *f2; ++o; ++f2; if (f2 == l2) goto copyFirst;
+    goto nextCheck;
+  takeFirst:
+    *o = *f1; ++o; ++f1; if (f1 == l1) goto copySecond;
+  nextCheck:
+    if (!r(*f2, *f1)) goto takeFirst;
+    *o = *f2; ++o; ++f2; if (f2 == l2) goto copyFirst;
+    if (!r(*f2, *f1)) goto takeFirst;
+    *o = *f2; ++o; ++f2; if (f2 == l2) goto copyFirst;
+    if (!r(*f2, *f1)) goto takeFirst;
+    *o = *f2; ++o; ++f2; if (f2 == l2) goto copyFirst;
+    // clang-format on
+
+    I2 next_f2 = point_closer_to_lower_bound(f2, l2, *f1, r);
+    o = algo::copy(f2, next_f2, o);
+    f2 = next_f2;
+  }
+
+copySecond:
+  return algo::copy(f2, l2, o);
+copyFirst:
+  return algo::copy(f1, l1, o);
+}
+
+template <typename I1, typename I2, typename O>
+O merge_biased_second(I1 f1, I1 l1, I2 f2, I2 l2, O o) {
+  return merge_biased_second(f1, l1, f2, l2, o, std::less<>{});
 }
 
 }  // namespace algo

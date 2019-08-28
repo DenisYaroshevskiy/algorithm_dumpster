@@ -32,12 +32,9 @@ namespace algo {
 namespace detail {
 
 struct merge_generic_test_impl {
-  static constexpr size_t kTestSize = 100;
-
   template <typename R, typename Merger>
   static void run_plain_test(const R& xc, const R& yc, Merger merger) {
-    std::size_t res_size =
-        static_cast<std::size_t>(xc.size() + yc.size());
+    std::size_t res_size = static_cast<std::size_t>(xc.size() + yc.size());
 
     using T = typename R::value_type;
 
@@ -57,8 +54,10 @@ struct merge_generic_test_impl {
 
     using T = typename XC::value_type;
 
+    const size_t test_size = xc_copy.size() + yc_copy.size();
+
     std::vector<T> actual_output;
-    actual_output.reserve(kTestSize);
+    actual_output.reserve(test_size);
 
     merger(
         std::make_move_iterator(xc.begin()), std::make_move_iterator(xc.end()),
@@ -69,7 +68,7 @@ struct merge_generic_test_impl {
     yc = std::move(yc_copy);
 
     std::vector<T> expected_output;
-    expected_output.reserve(kTestSize);
+    expected_output.reserve(test_size);
 
     std::merge(
         std::make_move_iterator(xc.begin()), std::make_move_iterator(xc.end()),
@@ -77,19 +76,6 @@ struct merge_generic_test_impl {
         std::back_inserter(expected_output), less_by_first{});
 
     REQUIRE(expected_output == actual_output);
-  }
-
-  static const std::vector<int>& test_data() {
-    static std::vector<int> res = [] {
-      std::mt19937 g;
-      std::uniform_int_distribution<> dis(1, int(kTestSize) * 100);
-
-      std::vector<int> res(kTestSize);
-      std::generate(res.begin(), res.end(), [&]() mutable { return dis(g); });
-
-      return res;
-    }();
-    return res;
   }
 
   template <typename Merger>
@@ -101,12 +87,21 @@ struct merge_generic_test_impl {
   }
 
   template <typename Merger>
-  static void run(Merger merger) {
-    special_cases(merger);
+  static void bulk_case(Merger merger) {
+    static constexpr size_t kTestSize = 100;
 
-    const auto& test_ints = test_data();
+    std::vector<int> test_ints = [] {
+      std::mt19937 g;
+      std::uniform_int_distribution<> dis(1, int(kTestSize) * 10);
 
-    for (std::size_t total_size = 0; total_size <= kTestSize; ++total_size) {
+      std::vector<int> res(kTestSize);
+      std::generate(res.begin(), res.end(), [&]() mutable { return dis(g); });
+
+      return res;
+    }();
+
+    for (std::size_t total_size = 0; total_size <= test_ints.size();
+         ++total_size) {
       for (std::size_t x_size = 0; x_size <= total_size; ++x_size) {
         std::vector<int> x_ints{test_ints.begin(), test_ints.begin() + x_size};
         std::vector<int> y_ints{test_ints.begin() + x_size,
@@ -133,6 +128,41 @@ struct merge_generic_test_impl {
         run_merge_test(std::move(list_test_x), std::move(list_test_y), merger);
       }
     }
+  }
+
+  template <typename Merger>
+  static void gigantic_test(Merger merger) {
+    std::vector<stable_unique> vector_test_x;
+    std::vector<stable_unique> vector_test_y;
+    {
+      static constexpr size_t kTestSize = 1000'000;
+
+      std::mt19937 g;
+      std::uniform_int_distribution<> dis(1, int(kTestSize) * 20);
+
+      auto gen = [&]() mutable { return dis(g); };
+
+      std::vector<int> x_ints(kTestSize / 3);
+      std::vector<int> y_ints(kTestSize - x_ints.size());
+
+      std::generate(x_ints.begin(), x_ints.end(), gen);
+      std::generate(y_ints.begin(), y_ints.end(), gen);
+
+      std::sort(x_ints.begin(), x_ints.end());
+      std::sort(y_ints.begin(), y_ints.end());
+
+      vector_test_x = make_container_of_stable_unique<std::vector>(x_ints, 0);
+      vector_test_y = make_container_of_stable_unique<std::vector>(y_ints, 1);
+    }
+
+    run_merge_test(std::move(vector_test_x), std::move(vector_test_y), merger);
+  }
+
+  template <typename Merger>
+  static void run(Merger merger) {
+    special_cases(merger);
+    bulk_case(merger);
+    gigantic_test(merger);
   }
 };
 

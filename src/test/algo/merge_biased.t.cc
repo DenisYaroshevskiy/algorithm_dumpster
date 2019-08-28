@@ -27,5 +27,9 @@ TEST_CASE("algorithm.merge_biased_first", "[algorithm]") {
   merge_test([](auto... params) { algo::merge_biased_first(params...); });
 }
 
+TEST_CASE("algorithm.merge_biased_second", "[algorithm]") {
+  merge_test([](auto... params) { algo::merge_biased_second(params...); });
+}
+
 }  // namespace
 }  // namespace algo

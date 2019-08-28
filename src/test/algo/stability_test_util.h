@@ -18,6 +18,7 @@
 #define TEST_STABILITY_TEST_UTIL_H
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <utility>
 #include <vector>
@@ -27,6 +28,10 @@
 namespace algo {
 
 using stable_unique = std::pair<zeroed_int, int>;
+
+inline std::ostream& operator<<(std::ostream& out, const stable_unique& x) {
+  return out << '{' << x.first << ',' << x.second << '}';
+}
 
 template <typename C>
 auto copy_container_of_stable_unique(const C& c) {

@@ -179,6 +179,19 @@ constexpr I lower_bound_hinted(I f, I h, I l, const V& v) {
 
 template <typename I, typename V, typename Comp>
 // require ForwardIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
+constexpr I point_closer_to_lower_bound(I f, I l, const V& v, Comp comp) {
+  return algo::point_closer_to_partition_point(
+      f, l, [&](Reference<I> x) { return comp(x, v); });
+}
+
+template <typename I, typename V>
+// require ForwardIterator<I> && TotallyOrdered<ValueType<I>, V>
+constexpr I point_closer_to_lower_bound(I f, I l, const V& v) {
+  return algo::point_closer_to_lower_bound(f, l, v, std::less<>{});
+}
+
+template <typename I, typename V, typename Comp>
+// require ForwardIterator<I> && StrictWeakOrdering<Comp, ValueType<I>, V>
 constexpr I point_closer_to_upper_bound(I f, I l, const V& v, Comp comp) {
   return algo::point_closer_to_partition_point(
       f, l, [&](Reference<I> x) { return !comp(v, x); });

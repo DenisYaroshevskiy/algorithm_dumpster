@@ -65,6 +65,7 @@ Optimization with `half_positive` was upstreamed to libc++: https://reviews.llvm
 `lower_bound_linear` <br/>
 <br/>
 `point_closer_to_partition_point`<br/>
+`point_closer_to_lower_bound`<br/>
 `point_closer_to_upper_bound`
 
 _TODO_: `upper_bound`/`equal_range`/`_n`
