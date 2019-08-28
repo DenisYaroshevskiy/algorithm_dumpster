@@ -76,6 +76,7 @@ function(add_merge_benchmarks name type size)
   foreach(merge  algo_merge
                  algo_merge_expensive_cmp
                  algo_merge_biased_first
+                 algo_merge_biased_second
                  std_merge)
     add_benchmark(${name} ${merge} ${type} ${size})
   endforeach()

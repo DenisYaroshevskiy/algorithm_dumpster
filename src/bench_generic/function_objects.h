@@ -73,6 +73,13 @@ struct algo_merge_biased_first {
   }
 };
 
+struct algo_merge_biased_second {
+  template <typename... Args>
+  auto operator()(Args&&... args) const {
+    return algo::merge_biased_second(std::forward<Args>(args)...);
+  }
+};
+
 struct std_lower_bound {
   template <typename... Args>
   auto operator()(Args&&... args) const {
