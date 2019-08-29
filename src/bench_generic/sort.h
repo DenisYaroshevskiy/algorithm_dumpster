@@ -40,12 +40,12 @@ BENCH_DECL_ATTRIBUTES void sort_common(benchmark::State& state, const R& r,
   }
 }
 
-template <typename Alg>
+template <typename Alg, typename T>
 void sort_int_vec(benchmark::State& state) {
   const size_t size = static_cast<size_t>(state.range(0));
   const int percentage = static_cast<int>(state.range(1));
 
-  auto sorted_vec = sorted_vector<int>(size);
+  auto sorted_vec = sorted_vector<T>(size);
 
   using big_int = boost::multiprecision::cpp_int;
   const big_int selected_permutation =

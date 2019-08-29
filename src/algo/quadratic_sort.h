@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-#include "bench_generic/sort.h"
+#ifndef ALGO_QUADRATIC_SORT_H
+#define ALGO_QUADRATIC_SORT_H
 
-#include <algorithm>
+namespace algo {
 
-#include "bench_generic/function_objects.h"
-#include "bench_generic/set_parameters.h"
+}  // namespace algo
 
-namespace bench {
-
-BENCHMARK_TEMPLATE(sort_int_vec, SELECTED_ALGORITHM, SELECTED_TYPE)
-    ->Apply(set_every_5th_percent<SELECTED_NUMBER>);
-
-}  // namespace bench
+#endif  // ALGO_QUADRATIC_SORT_H

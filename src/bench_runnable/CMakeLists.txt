@@ -44,10 +44,6 @@ add_benchmark(code_alignment A int 1 USE_ARG)
 add_benchmark(code_alignment A int 1)
 add_benchmark(code_alignment_almost NO_ALGORITH int 0)
 
-# Sort #########################
-add_benchmark(sort std_sort int 1000)
-add_benchmark(sort std_stable_sort int 1000)
-
 # Copy with reverse iterators
 add_benchmark(copy_reverse_iterators std_copy int 1000)
 add_benchmark(copy_reverse_iterators algo_copy int 1000)
@@ -85,3 +81,19 @@ endfunction()
 add_merge_benchmarks(merge int 2000)
 add_merge_benchmarks(merge double 2000)
 add_merge_benchmarks(merge std_int64_t 2000)
+
+
+# Sort #########################
+function(add_sort_benchmarks name type size)
+  foreach(srt algo_stable_sort_sufficient_allocation
+              std_sort
+              std_stable_sort)
+    add_benchmark(${name} ${srt} ${type} ${size})
+  endforeach()
+endfunction()
+
+add_sort_benchmarks(sort int 1000)
+add_sort_benchmarks(sort double 1000)
+
+add_sort_benchmarks(sort int 10000)
+add_sort_benchmarks(sort double 10000)
