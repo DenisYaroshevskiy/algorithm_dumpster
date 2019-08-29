@@ -107,7 +107,9 @@ Like: `container_cast<std::list>(v)`. Will move values from an rvalue container.
 ### copy
 
 `copy`<br/>
-`copy_backward`
+`copy_backward` <br/>
+`copy_n` <br/>
+`copy_backward_n` <br/>
 
 Same as std::copy/std::copy_backward but covers more optimizations.<br/>
 Tried to upstream it but failed: https://reviews.llvm.org/D38653
@@ -125,6 +127,10 @@ In the sandard library version I use it's not yet in.
 
 _NOTE_: I have seen cases where this is a good win, however - my microbenchmark of just copy_reverse_iterators doesn't show it.<br/>
 Will update when I migrate propper benchmark in this repo.
+
+`_n` versions are for range and size.<br/>
+_NOTE_: unlike std I return the last input iterator.
+_NOTE_: copy_backward_n accepts LAST as it's only input iterator.
 
 ### half_positive
 
@@ -239,6 +245,8 @@ consider using big number library.
 _NOTE_: algorithm can potentially be done in place but it's hard and unneccary.
 
 Allocates O(distance(f, l)) memory.
+
+### stable_sort
 
 ### unroll
 

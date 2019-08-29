@@ -18,6 +18,7 @@
 #define ALGO_COPY_H
 
 #include <type_traits>
+#include <utility>
 
 #include "algo/type_functions.h"
 
@@ -60,15 +61,49 @@ struct copy_runtime_traits {
 }  // namespace detail
 
 template <typename I, typename O>
-// require ForwardIterator<I> && OutputIterator<O>
+// require InputIterator<I> && OutputIterator<O>
 O copy(I f, I l, O o) {
   return detail::do_copy<false, detail::copy_runtime_traits>(f, l, o);
 }
 
 template <typename I, typename O>
-// require BidirectionalIterator<I> && OutputIterator<O>
+// require BidirectionalIterator<I> && BidirectionalIterator<O>
 O copy_backward(I f, I l, O o) {
   return detail::do_copy<true, detail::copy_runtime_traits>(f, l, o);
+}
+
+template <typename I, typename N, typename O>
+// require InputIterator<I> && Number<N> && OutputIterator<O>
+std::pair<I, O> copy_n(I f, N n, O o) {
+  if constexpr (RandomAccessIterator<I>) {
+    I l = f + n;
+    return {l, algo::copy(f, l, o)};
+  } else {
+    // clang-format off
+    while (n) {
+      *o = *f; ++o; ++f;
+      --n;
+    }
+    // clang-format on
+    return {f, o};
+  }
+}
+
+template <typename I, typename N, typename O>
+// require BidirectionalIterator<I> && Number<N> && BidirectionalIterator<O>
+std::pair<I, O> copy_backward_n(I l, N n, O o) {
+  if constexpr (RandomAccessIterator<I>) {
+    I f = l - n;
+    return {f, algo::copy_backward(f, l, o)};
+  } else {
+    // clang-format off
+    while (n) {
+      *--o = *--l;
+      --n;
+    }
+    // clang-format on
+    return {l, o};
+  }
 }
 
 }  // namespace algo

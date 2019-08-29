@@ -20,6 +20,8 @@
 #include <list>
 #include <string>
 
+#include "algo/container_cast.h"
+
 #include "test/catch.h"
 
 namespace algo {
@@ -165,10 +167,21 @@ TEST_CASE("algorithm.copy.overlaps.specific", "[algorithm]") {
 
     REQUIRE(expected == actual_std);  // sanity check test correctness
 
-    std::array actual = init;
-    algo::copy(actual.begin(), actual.begin() + 4, actual.begin() + 2);
+    // copy
+    {
+      std::array actual = init;
+      algo::copy(actual.begin(), actual.begin() + 4, actual.begin() + 2);
 
-    REQUIRE(expected == actual);
+      REQUIRE(expected == actual);
+    }
+
+    // copy_n
+    {
+      std::array actual = init;
+      algo::copy_n(actual.begin(), 4, actual.begin() + 2);
+
+      REQUIRE(expected == actual);
+    }
   }
   {
     const std::array expected{"1"s, "2"s, "1"s, "2"s, "3"s, "4"s};
@@ -179,10 +192,21 @@ TEST_CASE("algorithm.copy.overlaps.specific", "[algorithm]") {
 
     REQUIRE(expected == actual_std);  // sanity check test correctness
 
-    std::array actual = init;
-    algo::copy_backward(actual.begin(), actual.begin() + 4, actual.end());
+    // copy_backward
+    {
+      std::array actual = init;
+      algo::copy_backward(actual.begin(), actual.begin() + 4, actual.end());
 
-    REQUIRE(expected == actual);
+      REQUIRE(expected == actual);
+    }
+
+    // copy_backward_n
+    {
+      std::array actual = init;
+      algo::copy_backward_n(actual.begin() + 4, 4, actual.end());
+
+      REQUIRE(expected == actual);
+    }
   }
 }
 
@@ -194,16 +218,37 @@ TEST_CASE("algorithm.copy.overlaps.running", "[algorithm]") {
     auto expected = arr;
     std::copy(expected.begin(), expected.begin() + n, expected.begin() + where);
 
-    auto actual_fwd = arr;
-    algo::copy(actual_fwd.begin(), actual_fwd.begin() + n,
-               actual_fwd.begin() + where);
+    // copy
+    {
+      auto actual_fwd = arr;
+      algo::copy(actual_fwd.begin(), actual_fwd.begin() + n,
+                 actual_fwd.begin() + where);
 
-    REQUIRE(expected == actual_fwd);
+      REQUIRE(expected == actual_fwd);
+    }
 
-    auto actual_back = arr;
-    algo::copy_backward(actual_back.rend() - n, actual_back.rend(),
-                        actual_back.rend() - where);
-    REQUIRE(expected == actual_back);
+    // copy_n
+    {
+      auto actual_fwd = arr;
+      algo::copy_n(actual_fwd.begin(), n, actual_fwd.begin() + where);
+
+      REQUIRE(expected == actual_fwd);
+    }
+
+    // copy_backward
+    {
+      auto actual_back = arr;
+      algo::copy_backward(actual_back.rend() - n, actual_back.rend(),
+                          actual_back.rend() - where);
+      REQUIRE(expected == actual_back);
+    }
+
+    // copy_backward_n
+    {
+      auto actual_back = arr;
+      algo::copy_backward_n(actual_back.rend(), n, actual_back.rend() - where);
+      REQUIRE(expected == actual_back);
+    }
   };
 
   auto test_back = [](auto arr, int n, int where) {
@@ -229,6 +274,64 @@ TEST_CASE("algorithm.copy.overlaps.running", "[algorithm]") {
       test_back(init, n, where);
     }
   }
+}
+
+TEST_CASE("algorithm.copy_n", "[algorithm]") {
+  auto test = [](const std::vector<int>& ints) {
+    const auto lints = algo::container_cast<std::list>(ints);
+
+    // copy_n vector
+    {
+      const std::vector<int> expected = ints;
+      std::vector<int> actual(ints.size());
+
+      auto res = algo::copy_n(ints.begin(), ints.size(), actual.begin());
+
+      REQUIRE(expected == actual);
+      REQUIRE(res.first == ints.end());
+      REQUIRE(res.second == actual.end());
+    }
+
+    // copy_n list
+    {
+      auto actual =
+          algo::container_cast<std::list>(std::vector<int>(ints.size()));
+
+      auto res = algo::copy_n(lints.begin(), lints.size(), actual.begin());
+
+      REQUIRE(lints == actual);
+      REQUIRE(res.first == lints.end());
+      REQUIRE(res.second == actual.end());
+    }
+
+    // copy_backward_n vector
+    {
+      const std::vector<int> expected = ints;
+      std::vector<int> actual(ints.size());
+
+      auto res = algo::copy_backward_n(ints.end(), ints.size(), actual.end());
+
+      REQUIRE(expected == actual);
+      REQUIRE(res.first == ints.begin());
+      REQUIRE(res.second == actual.begin());
+    }
+
+    // copy_backward_n list
+    {
+      auto actual =
+          algo::container_cast<std::list>(std::vector<int>(ints.size()));
+
+      auto res = algo::copy_backward_n(lints.end(), lints.size(), actual.end());
+
+      REQUIRE(lints == actual);
+      REQUIRE(res.first == lints.begin());
+      REQUIRE(res.second == actual.begin());
+    }
+  };
+
+  test({});
+  test({1, 2, 3});
+  test({1});
 }
 
 }  // namespace
