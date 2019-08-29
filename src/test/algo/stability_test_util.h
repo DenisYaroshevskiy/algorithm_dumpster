@@ -33,6 +33,16 @@ inline std::ostream& operator<<(std::ostream& out, const stable_unique& x) {
   return out << '{' << x.first << ',' << x.second << '}';
 }
 
+template <template <typename...> class ToC, typename C>
+auto cast_container_of_stable_unique(const C& c) {
+  ToC<stable_unique> res;
+  std::transform(c.begin(), c.end(), std::inserter(res, res.end()),
+                 [&](const stable_unique& x) {
+                   return stable_unique{zeroed_int(x.first.body), x.second};
+                 });
+  return res;
+}
+
 template <typename C>
 auto copy_container_of_stable_unique(const C& c) {
   C res;
@@ -49,6 +59,17 @@ auto make_container_of_stable_unique(const std::vector<int>& values, int tag) {
   std::transform(values.begin(), values.end(), std::inserter(res, res.end()),
                  [&](int x) {
                    return stable_unique{zeroed_int(x), tag};
+                 });
+  return res;
+}
+
+template <template <typename...> class C>
+auto make_container_of_stable_unique_iota(const std::vector<int>& values) {
+  int tag = 0;
+  C<stable_unique> res;
+  std::transform(values.begin(), values.end(), std::inserter(res, res.end()),
+                 [&](int x) mutable {
+                   return stable_unique{zeroed_int(x), ++tag};
                  });
   return res;
 }

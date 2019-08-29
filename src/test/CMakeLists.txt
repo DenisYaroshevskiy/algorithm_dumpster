@@ -35,6 +35,7 @@ target_sources(tests PRIVATE
                algo/merge.t.cc
                algo/move.t.cc
                algo/nth_permutation.t.cc
+               algo/stable_sort.t.cc
                algo/type_functions.t.cc
                algo/unroll.t.cc
                bench_generic/input_generators.t.cpp

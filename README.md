@@ -112,14 +112,13 @@ Like: `container_cast<std::list>(v)`. Will move values from an rvalue container.
 `copy_backward_n` <br/>
 
 Same as std::copy/std::copy_backward but covers more optimizations.<br/>
-Tried to upstream it but failed: https://reviews.llvm.org/D38653
+Tried to upstream it but failed: [patch](https://reviews.llvm.org/D38653).
 
-Small presentation:<br/>
-https://docs.google.com/presentation/d/1JcpsUq2s-cK_3A4sco23YRrsSKMV4EoeD8s4u8f_q0w/edit?usp=sharing
+[Small presentation](
+https://docs.google.com/presentation/d/1JcpsUq2s-cK_3A4sco23YRrsSKMV4EoeD8s4u8f_q0w/edit?usp=sharing)
 
 For now non-constexpr, requires extra work.<br/>
-Implement necessary bits for libc++ here: https://reviews.llvm.org/D63063<br/>
-(not accepted as of yet)
+Implement necessary bits for libc++ [pathc](https://reviews.llvm.org/D63063).(not accepted as of yet)
 
 There was also a bug, that std::copy optimization didn't work at all<br/>
 https://bugs.llvm.org/show_bug.cgi?id=40575<br/>
@@ -140,7 +139,7 @@ Dividing by two is faster for unsigned numbers. <br/>
 If I know that the number is positive I can cast to the unsigned.
 I have measured - code generated for right shift gave me slower results + I'm not too sure that's legal.
 
-libc++ commit: https://reviews.llvm.org/D53994
+[libc++ commit](https://reviews.llvm.org/D53994)
 
 ### factoriadic_representation
 
@@ -200,10 +199,12 @@ Not terribly efficient - currently uses std::map to implement storage.
 `merge_expensive_cmp`
 
 Variations on std::merge - tried to contribute the `merge` one:<br/>
-https://reviews.llvm.org/D63063
+[patch](https://reviews.llvm.org/D63063)
 
 `merge_expensive_cmp` only useful if you inline the comparison and it's big.<br/>
-The reason for it's existance is that `merge` unrolls + 1 extra invocation of the comparator.
+The reason for it's existance is that `merge` unrolls + 1 extra invocation of the comparator. <br/>
+For some reason my latest benchmarks don't show how it's superior to `std::merge`, <br/>
+some of my previous benchmarks did, see presentation mentioned in `merge_biased`.
 
 ### merge_biased
 
@@ -255,6 +256,16 @@ _NOTE_: algorithm can potentially be done in place but it's hard and unneccary.
 Allocates O(distance(f, l)) memory.
 
 ### stable_sort
+
+`stable_sort_n_buffered`<br/>
+
+In many respects, this is my crack at the last task in the <br/>
+[Efficient programming with components](https://www.youtube.com/playlist?list=PLHxtyCq_WDLXryyw91lahwdtpZsmo4BGD)
+
+(work in progress).<br/>
+I just want to see how my merge would perform.
+
+`stable_sort_n_buffered` - idea originally from [here](https://github.com/rjernst/stepanov-components-course/blob/375bcb790ee40020ff639e0b8ddec0cfe58ba27a/code/lecture17/merge.h#L59).
 
 ### unroll
 
@@ -341,6 +352,7 @@ _TODO_: write a test for input iterators.
 
 `copy_container_of_stable_unique`<br/>
 `make_container_of_stable_unique`<br/>
+`make_container_of_stable_unique_iota` <br/>
 `stable_unique`
 
 `stable_unique` - is a move only type, consisting of zeroed_int for the value + an int<br/>
