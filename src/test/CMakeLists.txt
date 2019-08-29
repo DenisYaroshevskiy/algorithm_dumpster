@@ -20,8 +20,8 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                algo/advance_up_to.t.cc
-               algo/binary_search.t.cc
                algo/binary_search_biased.t.cc
+               algo/binary_search.t.cc
                algo/comparisons.t.cc
                algo/container_cast.t.cc
                algo/copy.t.cc
@@ -31,8 +31,9 @@ target_sources(tests PRIVATE
                algo/half_positive.t.cc
                algo/make_vector_of_iterators.t.cc
                algo/memoized_function.t.cc
-               algo/merge.t.cc
                algo/merge_biased.t.cc
+               algo/merge.t.cc
+               algo/move.t.cc
                algo/nth_permutation.t.cc
                algo/type_functions.t.cc
                algo/unroll.t.cc

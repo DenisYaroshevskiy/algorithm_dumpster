@@ -217,6 +217,14 @@ that there is a big a gap of elements from the range it's biased towards.
 Presentation from the meetup:
 https://docs.google.com/presentation/d/1675lZkaJ2FcH9wwdUPYptFGnV_A_TW4tAyObIHGBYgs/edit?usp=sharing
 
+### move
+`move`
+`move_backward`
+`move_n`
+`move_backward_n`
+
+See copy
+
 ### nth_permutation
 
 `nth_permutation`

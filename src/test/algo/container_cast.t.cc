@@ -24,7 +24,7 @@
 
 #include "test/catch.h"
 
-#include "zeroed_int.h"
+#include "test/algo/zeroed_int.h"
 
 namespace algo {
 namespace {
