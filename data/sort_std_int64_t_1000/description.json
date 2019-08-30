@@ -1,0 +1,20 @@
+{
+  "base": "data/plots/sort_base.json",
+  "general": {
+    "title": "sort std int64 t 1000"
+  },
+  "measurements": [
+    {
+      "name": "std_stable_sort",
+      "url": "data/sort_std_int64_t_1000/std_stable_sort.json"
+    },
+    {
+      "name": "std_sort",
+      "url": "data/sort_std_int64_t_1000/std_sort.json"
+    },
+    {
+      "name": "algo_stable_sort_sufficient_allocation",
+      "url": "data/sort_std_int64_t_1000/algo_stable_sort_sufficient_allocation.json"
+    }
+  ]
+}

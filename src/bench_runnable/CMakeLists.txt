@@ -94,6 +94,7 @@ endfunction()
 
 add_sort_benchmarks(sort int 1000)
 add_sort_benchmarks(sort double 1000)
+add_sort_benchmarks(sort std_int64_t 1000)
 
 add_sort_benchmarks(sort int 10000)
 add_sort_benchmarks(sort double 10000)

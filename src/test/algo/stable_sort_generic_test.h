@@ -22,6 +22,8 @@
 #include <random>
 #include <vector>
 
+#include <iostream>
+
 #include "test/catch.h"
 
 #include "algo/comparisons.h"
@@ -31,6 +33,11 @@ namespace algo {
 namespace detail {
 
 struct stable_sort_generic_test_impl {
+  int big_reasonable_size;
+
+  stable_sort_generic_test_impl(int big_reasonable_size)
+      : big_reasonable_size(big_reasonable_size) {}
+
   template <typename Sorter>
   static void run_test(const std::vector<int>& values, Sorter sorter) {
     const auto vec = make_container_of_stable_unique_iota<std::vector>(values);
@@ -97,7 +104,7 @@ struct stable_sort_generic_test_impl {
   template <typename Sorter>
   void test_rather_big_ranges(Sorter sorter) {
     for (size_t i = 0; i < 100; ++i) {
-      auto t = random_vector(10'000 + i);
+      auto t = random_vector(big_reasonable_size + i);
       run_test(t, sorter);
     }
   }
@@ -114,7 +121,12 @@ struct stable_sort_generic_test_impl {
 
 template <typename Sorter>
 void stable_sort_test(Sorter sorter) {
-  detail::stable_sort_generic_test_impl{}.run(sorter);
+  detail::stable_sort_generic_test_impl{10'000}.run(sorter);
+}
+
+template <typename Sorter>
+void stable_sort_quadratic_test(Sorter sorter) {
+  detail::stable_sort_generic_test_impl{100}.run(sorter);
 }
 
 }  // namespace algo

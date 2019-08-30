@@ -17,7 +17,24 @@
 #ifndef ALGO_QUADRATIC_SORT_H
 #define ALGO_QUADRATIC_SORT_H
 
+#include <algorithm>
+
 namespace algo {
+
+template <typename I, typename N, typename R>
+// require ForwardIterator<I> && Number<N> && WeakStrictOrdering<R,
+// ValueType<I>>
+void bubble_sort_n(I f, N n, R r) {
+  while (--n) {
+    N m = n;
+    I cur = f;
+    do {
+      I next = std::next(cur);
+      if (r(*next, *cur)) std::iter_swap(cur, next);
+      cur = next;
+    } while (--m);
+  }
+}
 
 }  // namespace algo
 

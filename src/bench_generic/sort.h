@@ -41,7 +41,7 @@ BENCH_DECL_ATTRIBUTES void sort_common(benchmark::State& state, const R& r,
 }
 
 template <typename Alg, typename T>
-void sort_int_vec(benchmark::State& state) {
+void sort_vec(benchmark::State& state) {
   const size_t size = static_cast<size_t>(state.range(0));
   const int percentage = static_cast<int>(state.range(1));
 
@@ -51,7 +51,7 @@ void sort_int_vec(benchmark::State& state) {
   const big_int selected_permutation =
       (algo::factorial<big_int>(static_cast<int>(size)) - 1) * percentage / 100;
 
-  std::vector<int> vec(size);
+  std::vector<T> vec(size);
   algo::nth_permutation(sorted_vec.begin(), sorted_vec.end(), vec.begin(),
                         selected_permutation);
 

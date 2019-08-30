@@ -25,16 +25,21 @@
 #include "algo/half_positive.h"
 #include "algo/merge.h"
 #include "algo/move.h"
+#include "algo/quadratic_sort.h"
 #include "algo/type_functions.h"
 
 namespace algo {
+
+inline static constexpr int stable_sort_n_buffered_quadratic_boundary = 16;
 
 template <typename I, typename N, typename B, typename R>
 // require BiderectionalIterator<I> && Number<N> && ForwardIterator<B>
 //         && WeakStrictOrdering<R, ValueType<I>>
 I stable_sort_n_buffered(I f, N n, R r, B buf) {
-  if (!n) return f;
-  if (n == N(1)) return ++f;
+  if (n <= N(stable_sort_n_buffered_quadratic_boundary)) {
+    algo::bubble_sort_n(f, n, r);
+    return std::next(f, n);
+  }
 
   N half = algo::half_positive(n);
   auto [m, buf_l] = algo::move_n(f, half, buf);

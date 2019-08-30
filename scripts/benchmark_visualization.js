@@ -92,6 +92,7 @@ function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
         let percentage = undefined;
         if (benchmarkDescription.general.percentage_position !== undefined) {
             percentage = Number(parts[benchmarkDescription.general.percentage_position + 1]);
+            x = percentage;
         }
 
         let size = undefined;

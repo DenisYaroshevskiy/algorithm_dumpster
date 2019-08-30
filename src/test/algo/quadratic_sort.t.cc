@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-#include "bench_generic/sort.h"
+#include "algo/quadratic_sort.h"
 
-#include <algorithm>
+#include "test/catch.h"
 
-#include "bench_generic/function_objects.h"
-#include "bench_generic/set_parameters.h"
+#include "test/algo/stable_sort_generic_test.h"
 
-namespace bench {
+namespace algo {
+namespace {
 
-BENCHMARK_TEMPLATE(sort_vec, SELECTED_ALGORITHM, SELECTED_TYPE)
-    ->Apply(set_every_5th_percent<SELECTED_NUMBER>);
+TEST_CASE("algorithm.bubble_sort_n", "[algorithm]") {
+  stable_sort_quadratic_test([](auto f, auto l, auto... params) {
+    algo::bubble_sort_n(f, std::distance(f, l), params...);
+  });
+}
 
-}  // namespace bench
+}  // namespace
+}  // namespace algo
