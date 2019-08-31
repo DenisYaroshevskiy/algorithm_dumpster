@@ -47,6 +47,7 @@ constexpr void cycle_from_position(II f, II cur, Op original_pos, ValueType<II> 
   } while (next_n != start);
 
   **cur = std::move(tmp);
+  *cur = marker;
 }
 
 }  // namespace detail
@@ -85,7 +86,7 @@ auto apply_rearrangment(II f, II l, Op original_pos, ValueType<II> marker)
   II cur = f;
   while (cur != l) {
     detail::cycle_from_position(f, cur, original_pos, marker);
-    cur = std::find_if(++cur, l, [&](Reference<II> x) { x != marker; });
+    cur = std::find_if(++cur, l, [&](Reference<II> x) { return x != marker; });
   }
 }
 

@@ -65,6 +65,56 @@ struct zeroed_int {
   }
 };
 
+struct zeroed_int_regular {
+  int body = 0;
+
+  zeroed_int_regular() = default;
+  explicit zeroed_int_regular(int body) : body{body} {}
+  zeroed_int_regular(const zeroed_int_regular&) = default;
+  zeroed_int_regular(zeroed_int_regular&& x) noexcept
+      : body{std::exchange(x.body, 0)} {}
+  zeroed_int_regular& operator=(const zeroed_int_regular&) = default;
+  zeroed_int_regular& operator=(zeroed_int_regular&& x) noexcept {
+    body = std::exchange(x.body, 0);
+    return *this;
+  }
+  ~zeroed_int_regular() = default;
+
+  friend bool operator==(const zeroed_int_regular& x,
+                         const zeroed_int_regular& y) {
+    return x.body == y.body;
+  }
+
+  friend bool operator!=(const zeroed_int_regular& x,
+                         const zeroed_int_regular& y) {
+    return !(x == y);
+  }
+
+  friend bool operator<(const zeroed_int_regular& x,
+                        const zeroed_int_regular& y) {
+    return x.body < y.body;
+  }
+
+  friend bool operator>(const zeroed_int_regular& x,
+                        const zeroed_int_regular& y) {
+    return y < x;
+  }
+
+  friend bool operator>=(const zeroed_int_regular& x,
+                         const zeroed_int_regular& y) {
+    return !(x < y);
+  }
+
+  friend bool operator<=(const zeroed_int_regular& x,
+                         const zeroed_int_regular& y) {
+    return !(y < x);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out,
+                                  const zeroed_int_regular& x) {
+    return out << x.body;
+  }
+};
 }  // namespace algo
 
 #endif  // TEST_ZEROED_INT_H

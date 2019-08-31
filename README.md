@@ -44,19 +44,21 @@ This is what this algorithm does - takes the rearranged iterators and makes the 
 
 The copy/move versions are trivial.
 
-The inplace version needs to know the original number of the underlying iterator (distance(f, it)):
-it can either deduce it by subtracting the original f or it<br/>
-can accept a functor to do this.
+**The inplace version** needs to know the original number of the underlying iterator (distance(f, it)): <br/>
+it can either deduce it by subtracting the original f or it can accept a functor to do this.
 
-It also needs a marker to replace the iterators that were already processed (_TODO_: we can not do that by using iterators from that position already).
+It also needs a marker to replace the iterators that were already processed <br/>
+(_TODO_: we can not do that by using iterators from that position already but I have to check performance).
 
 The iterator range get's destroyed.
 
 Implemenantation is based on the ideas from Elements of Programming, section 10
 
-Lemma 10.6 Every element in a permutation belongs to a unique cycle.
-Lemma 10.7 Any permutation of a set with n elements contains k ≤ n cycles.
-Lemma 10.9 Every permutation can be represented as a product of the cyclic permutations corresponding to its cycles.
+Lemma 10.6 Every element in a permutation belongs to a unique cycle.<br/>
+Lemma 10.7 Any permutation of a set with n elements contains k ≤ n cycles.<br/>
+Lemma 10.9 Every permutation can be represented as a product of the cyclic permutations corresponding to its cycles.<br/>
+
+Basic
 
 ### binary_search
 
@@ -251,17 +253,6 @@ https://docs.google.com/presentation/d/1675lZkaJ2FcH9wwdUPYptFGnV_A_TW4tAyObIHGB
 `move_backward_n`
 
 See copy
-
-### n_iterator
-
-// TODO:
-<b>ForwardNIterator, BidirectionalNIterator<b/>
-
-Iterator category that can compute distance in constant time.
-
-Canonical models: RandomAccessIterator, ForwardIterator that stores distance.
-
-distance is computed via '-'
 
 ### nth_permutation
 
