@@ -51,8 +51,7 @@ it can either deduce it by subtracting the original f or it can accept a functor
 There are two inplace versions: `apply_rearrangment` and `apply_rearrangment_no_marker`.
 
 The thing is the algorithm needs to know which iterators were already processed.
-If there is a marker it can use to signify iterators that were already moved (like last or nullptr),
-it can be slightly faster.
+If there is a marker it can use to signify iterators that were already moved (like last or nullptr), it can be faster.
 
 The iterator range get's destroyed (see - the algorith needs to mark what was processed).
 
@@ -63,6 +62,9 @@ Lemma 10.7 Any permutation of a set with n elements contains k ≤ n cycles.<br/
 Lemma 10.9 Every permutation can be represented as a product of the cyclic permutations corresponding to its cycles.<br/>
 
 Basicly - it just applies the cycles through all of the permutations.
+
+We can also **move away and then move back** (`apply_rearrangment_move` to a buffer and then `move`).<br/>
+I did measure that - for ints/doubles it was faster. However - for strings - the inplace version with marker did better.
 
 ### binary_search
 

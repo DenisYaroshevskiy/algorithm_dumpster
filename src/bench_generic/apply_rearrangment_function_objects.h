@@ -25,25 +25,23 @@
 
 namespace bench {
 
-struct apply_rearrangment_move_and_back {
+struct algo_apply_rearrangment_move {
   template <typename II, typename I>
-  void operator()(II f, II l, I base, I) const {
-    std::vector<algo::ValueType<I>> tmp(static_cast<size_t>(l - f));
-    algo::apply_rearrangment_move(f, l, tmp.begin());
-    algo::move(tmp.begin(), tmp.end(), base);
+  void operator()(II f, II l, I, I, I output) const {
+    algo::apply_rearrangment_move(f, l, output);
   }
 };
 
-struct apply_rearrangment {
+struct algo_apply_rearrangment {
   template <typename II, typename I>
-  void operator()(II f, II l, I base, I marker) const {
+  void operator()(II f, II l, I base, I marker, I) const {
     algo::apply_rearrangment(f, l, base, marker);
   }
 };
 
-struct apply_rearrangment_no_marker {
+struct algo_apply_rearrangment_no_marker {
   template <typename II, typename I>
-  void operator()(II f, II l, I base, I) const {
+  void operator()(II f, II l, I base, I, I) const {
     algo::apply_rearrangment_no_marker(f, l, base);
   }
 };

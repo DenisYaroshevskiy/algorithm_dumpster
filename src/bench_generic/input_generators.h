@@ -26,10 +26,13 @@
 #include <vector>
 
 #include "algo/memoized_function.h"
+#include "bench_generic/fake_url.h"
 
 namespace bench {
 
 using std_int64_t = std::int64_t;
+
+using fake_url_pair = std::pair<fake_url, fake_url>;
 
 template <typename>
 struct int_to_t;
@@ -47,6 +50,18 @@ struct int_to_t<double> {
 template <>
 struct int_to_t<std_int64_t> {
   std_int64_t operator()(int x) const { return x; }
+};
+
+template <>
+struct int_to_t<fake_url> {
+  fake_url operator()(int x) const { return fake_url(x); }
+};
+
+template <>
+struct int_to_t<fake_url_pair> {
+  fake_url_pair operator()(int x) const {
+    return std::make_pair(fake_url(x), fake_url(x));
+  }
 };
 
 namespace detail {

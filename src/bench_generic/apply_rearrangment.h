@@ -31,11 +31,12 @@ namespace bench {
 template <typename Alg, typename I>
 BENCH_DECL_ATTRIBUTES void apply_rearrangment_common(
     benchmark::State& state, const std::vector<I>& saved_positions, I base,
-    I marker) {
+    I marker, I out_output) {
   for (auto _ : state) {
     std::vector<I> positions = saved_positions;
-    Alg{}(positions.begin(), positions.end(), base, marker);
+    Alg{}(positions.begin(), positions.end(), base, marker, out_output);
     benchmark::DoNotOptimize(base);
+    benchmark::DoNotOptimize(out_output);
   }
 }
 
@@ -45,11 +46,13 @@ void apply_rearrangment_vec(benchmark::State& state) {
   const int percentage = static_cast<int>(state.range(1));
 
   auto data = bench::random_vector<T>(size);
+  std::vector<T> opt_output(size);
   using I = typename std::vector<T>::iterator;
   std::vector<I> positions(size);
 
   {
-    auto initial_positions = algo::make_vector_of_iterators(data.begin(), data.end());
+    auto initial_positions =
+        algo::make_vector_of_iterators(data.begin(), data.end());
     using big_int = boost::multiprecision::cpp_int;
     const big_int selected_permutation =
         (algo::factorial<big_int>(static_cast<int>(size)) - 1) * percentage /
@@ -59,7 +62,8 @@ void apply_rearrangment_vec(benchmark::State& state) {
                           positions.begin(), selected_permutation);
   }
 
-  apply_rearrangment_common<Alg>(state, positions, data.begin(), data.end());
+  apply_rearrangment_common<Alg>(state, positions, data.begin(), data.end(),
+                                 opt_output.begin());
 }
 
 }  // namespace bench
