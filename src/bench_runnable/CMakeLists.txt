@@ -100,8 +100,11 @@ add_sort_benchmarks(sort double 10000)
 
 # Apply rearrangemenet ##################
 function(add_apply_rearrangement_benchmarks name type size)
-  foreach(appl apply_rearrangment_move_and_back
-              apply_rearrangment)
+  foreach(appl
+               apply_rearrangment
+               apply_rearrangment_move_and_back
+               apply_rearrangment_no_marker
+              )
     add_benchmark(${name} ${appl} ${type} ${size})
   endforeach()
 endfunction()

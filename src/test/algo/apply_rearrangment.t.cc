@@ -87,7 +87,7 @@ void apply_rearrangement_test(Alg alg) {
       std::vector<test_t> res(size);
       int i = 0;
       std::generate(res.begin(), res.end(),
-                    [&]() mutable { return test_t{i}; });
+                    [&]() mutable { return test_t{++i}; });
       return res;
     };
 
@@ -119,6 +119,12 @@ TEST_CASE("algorithm.apply_rearrangment_move", "[algorithm]") {
 TEST_CASE("algorithm.apply_rearrangment", "[algorithm]") {
   apply_rearrangement_test([](auto positions, auto f, auto l) {
     apply_rearrangment(positions.begin(), positions.end(), f, l);
+  });
+}
+
+TEST_CASE("algorithm.apply_rearrangment_no_marker", "[algorithm]") {
+  apply_rearrangement_test([](auto positions, auto f, auto) {
+    apply_rearrangment_no_marker(positions.begin(), positions.end(), f);
   });
 }
 

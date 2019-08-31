@@ -35,10 +35,11 @@ So it's undefined.
 
 `apply_rearrangment`<br/>
 `apply_rearrangment_copy`<br/>
-`apply_rearrangment_move`
+`apply_rearrangment_move`<br/>
+`apply_rearrangment_no_marker`
 
 Let's say you need to sort smth that's expensive to move.<br/>
-You can sort pointers/iterators instead and then just rearrange the original sequence based on where everything landed.
+You can sort iterators instead and then just rearrange the original sequence based on where everything landed.
 
 This is what this algorithm does - takes the rearranged iterators and makes the values have the ordering as the iterator ordering.
 
@@ -47,10 +48,13 @@ The copy/move versions are trivial.
 **The inplace version** needs to know the original number of the underlying iterator (distance(f, it)): <br/>
 it can either deduce it by subtracting the original f or it can accept a functor to do this.
 
-It also needs a marker to replace the iterators that were already processed <br/>
-(_TODO_: we can not do that by using iterators from that position already but I have to check performance).
+There are two inplace versions: `apply_rearrangment` and `apply_rearrangment_no_marker`.
 
-The iterator range get's destroyed.
+The thing is the algorithm needs to know which iterators were already processed.
+If there is a marker it can use to signify iterators that were already moved (like last or nullptr),
+it can be slightly faster.
+
+The iterator range get's destroyed (see - the algorith needs to mark what was processed).
 
 Implemenantation is based on the ideas from Elements of Programming, section 10
 
@@ -58,7 +62,7 @@ Lemma 10.6 Every element in a permutation belongs to a unique cycle.<br/>
 Lemma 10.7 Any permutation of a set with n elements contains k ≤ n cycles.<br/>
 Lemma 10.9 Every permutation can be represented as a product of the cyclic permutations corresponding to its cycles.<br/>
 
-Basic
+Basicly - it just applies the cycles through all of the permutations.
 
 ### binary_search
 

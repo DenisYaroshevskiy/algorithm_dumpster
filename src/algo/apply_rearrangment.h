@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <type_traits>
 
+#include <iostream>
+
 #include "algo/type_functions.h"
 
 namespace algo {
@@ -28,20 +30,51 @@ namespace detail {
 template <typename II, typename Op>
 // require RandomAccessPositionIteator<II> &&
 //         IteratorToPosition<Op, ValueType<I>>
-constexpr void cycle_from_position(II f, II cur, Op original_pos, ValueType<II> marker) {
+constexpr void cycle_from_position(II f, II cur, Op original_pos,
+                                   ValueType<II> marker) {
   using N = DifferenceType<II>;
+  using I = ValueType<II>;
+  using T = ValueType<I>;
 
   const N start = cur - f;
   N next_n = N{original_pos(*cur)};
 
   if (next_n == start) return;
 
-  ValueType<ValueType<II>> tmp = std::move(**cur);
+  T tmp = std::move(**cur);
 
   do {
     II next_cur = f + next_n;
     **cur = std::move(**next_cur);
     *cur = marker;
+    cur = next_cur;
+    next_n = N{original_pos(*cur)};
+  } while (next_n != start);
+
+  **cur = std::move(tmp);
+  *cur = marker;
+}
+
+template <typename II, typename Op>
+// require RandomAccessPositionIteator<II> &&
+//         IteratorToPosition<Op, ValueType<I>>
+constexpr void cycle_from_position_no_marker(II f, II cur, Op original_pos) {
+  using N = DifferenceType<II>;
+  using I = ValueType<II>;
+  using T = ValueType<I>;
+
+  const N start = cur - f;
+  N next_n = N{original_pos(*cur)};
+
+  if (next_n == start) return;
+
+  T tmp = std::move(**cur);
+  I marker;
+
+  do {
+    II next_cur = f + next_n;
+    **cur = std::move(**next_cur);
+    std::swap(*cur, marker);
     cur = next_cur;
     next_n = N{original_pos(*cur)};
   } while (next_n != start);
@@ -95,6 +128,25 @@ template <typename II>
 //         ForwardNIterator<ValueType<II>
 void apply_rearrangment(II f, II l, ValueType<II> base, ValueType<II> marker) {
   apply_rearrangment(f, l, [&](ValueType<II> x) { return x - base; }, marker);
+}
+
+template <typename II, typename Op>
+// require RandomAccessPositionIteator<II> &&
+//         IteratorToPosition<Op, ValueType<I>>
+constexpr auto apply_rearrangment_no_marker(II f, II l, Op original_pos)
+    -> std::enable_if_t<std::is_invocable_v<Op, ValueType<II>>> {
+  II cur = f;
+  while (cur != l) {
+    detail::cycle_from_position_no_marker(f, cur, original_pos);
+    ++cur;
+  }
+}
+
+template <typename II>
+// require RandomAccessPositionIteator<II> &&
+//         ForwardNIterator<ValueType<II>
+constexpr void apply_rearrangment_no_marker(II f, II l, ValueType<II> base) {
+  apply_rearrangment_no_marker(f, l, [&](ValueType<II> x) { return x - base; });
 }
 
 }  // namespace algo

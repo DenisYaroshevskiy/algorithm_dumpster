@@ -41,6 +41,13 @@ struct apply_rearrangment {
   }
 };
 
+struct apply_rearrangment_no_marker {
+  template <typename II, typename I>
+  void operator()(II f, II l, I base, I) const {
+    algo::apply_rearrangment_no_marker(f, l, base);
+  }
+};
+
 }  // namespace bench
 
 #endif  // BENCH_GENERIC_FUNCTION_OBJECTS_H
