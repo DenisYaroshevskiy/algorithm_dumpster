@@ -318,6 +318,10 @@ _NOTE_: I don't know how to CMAKE - dependencies are found in installed folders.
 Still in the hopes to find some magic attibutes that would help with the code alignment.
 For now - just noinline, to help when looking at assembly.
 
+### _function objects
+
+Algorithms wrapped in objects.
+
 ### input_generators
 
 `int_to_t`<br/>
@@ -325,6 +329,13 @@ For now - just noinline, to help when looking at assembly.
 `two_sorted_vectors`
 
 Utils to generate data for benchmarks.
+
+### apply_rearrangment
+
+`apply_rearrangment_common`<br/>
+`apply_rearrangment_vec`
+
+Benchmarking `apply_rearrangment` algorithms.
 
 ### copy
 

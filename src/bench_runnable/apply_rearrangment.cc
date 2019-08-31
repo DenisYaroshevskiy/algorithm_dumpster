@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include "bench_generic/sort.h"
+#include "bench_generic/apply_rearrangment.h"
 
-#include "bench_generic/function_objects.h"
+#include "bench_generic/apply_rearrangment_function_objects.h"
 #include "bench_generic/set_parameters.h"
 
 namespace bench {
 
-BENCHMARK_TEMPLATE(sort_vec, SELECTED_ALGORITHM, SELECTED_TYPE)
+BENCHMARK_TEMPLATE(apply_rearrangment_vec, SELECTED_ALGORITHM, SELECTED_TYPE)
     ->Apply(set_every_5th_percent<SELECTED_NUMBER>);
 
 }  // namespace bench

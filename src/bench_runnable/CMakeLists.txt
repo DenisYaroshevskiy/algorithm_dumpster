@@ -96,5 +96,16 @@ add_sort_benchmarks(sort int 1000)
 add_sort_benchmarks(sort double 1000)
 add_sort_benchmarks(sort std_int64_t 1000)
 
-add_sort_benchmarks(sort int 10000)
 add_sort_benchmarks(sort double 10000)
+
+# Apply rearrangemenet ##################
+function(add_apply_rearrangement_benchmarks name type size)
+  foreach(appl apply_rearrangment_move_and_back
+              apply_rearrangment)
+    add_benchmark(${name} ${appl} ${type} ${size})
+  endforeach()
+endfunction()
+
+add_apply_rearrangement_benchmarks(apply_rearrangment int 1000)
+add_apply_rearrangement_benchmarks(apply_rearrangment double 1000)
+add_apply_rearrangement_benchmarks(apply_rearrangment std_int64_t 1000)
