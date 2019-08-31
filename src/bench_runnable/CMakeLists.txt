@@ -86,6 +86,7 @@ add_merge_benchmarks(merge std_int64_t 2000)
 # Sort #########################
 function(add_sort_benchmarks name type size)
   foreach(srt algo_stable_sort_sufficient_allocation
+              algo_stable_sort_sufficient_allocation_std_merge
               std_sort
               std_stable_sort)
     add_benchmark(${name} ${srt} ${type} ${size})

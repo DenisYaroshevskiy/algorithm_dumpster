@@ -21,7 +21,6 @@
 #include "algo/binary_search.h"
 #include "algo/merge_biased.h"
 #include "algo/merge.h"
-#include "algo/stable_sort.h"
 
 namespace bench {
 
@@ -81,13 +80,6 @@ struct algo_merge_biased_second {
   }
 };
 
-struct algo_stable_sort_sufficient_allocation {
-  template <typename... Args>
-  auto operator()(Args&&... args) const {
-    return algo::stable_sort_sufficient_allocation(std::forward<Args>(args)...);
-  }
-};
-
 struct std_lower_bound {
   template <typename... Args>
   auto operator()(Args&&... args) const {
@@ -99,20 +91,6 @@ struct std_merge {
   template <typename... Args>
   auto operator()(Args&&... args) {
     return std::merge(std::forward<Args>(args)...);
-  }
-};
-
-struct std_sort {
-  template <typename I, typename Cmp>
-  void operator()(I f, I l, Cmp cmp) {
-    std::sort(f, l, cmp);
-  }
-};
-
-struct std_stable_sort {
-  template <typename I, typename Cmp>
-  void operator()(I f, I l, Cmp cmp) {
-    std::stable_sort(f, l, cmp);
   }
 };
 

@@ -16,7 +16,7 @@
 
 #include "bench_generic/sort.h"
 
-#include "bench_generic/function_objects.h"
+#include "bench_generic/sort_function_objects.h"
 #include "bench_generic/set_parameters.h"
 
 namespace bench {

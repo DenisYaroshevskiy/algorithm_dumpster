@@ -35,6 +35,47 @@ inline static constexpr int stable_sort_n_buffered_quadratic_boundary = 16;
 template <typename I, typename N, typename B, typename R>
 // require BiderectionalIterator<I> && Number<N> && ForwardIterator<B>
 //         && WeakStrictOrdering<R, ValueType<I>>
+I stable_sort_n_buffered_std_merge(I f, N n, R r, B buf) {
+  if (n <= N(stable_sort_n_buffered_quadratic_boundary)) {
+    algo::bubble_sort_n(f, n, r);
+    return std::next(f, n);
+  }
+
+  N half = algo::half_positive(n);
+  auto [m, buf_l] = algo::move_n(f, half, buf);
+
+  stable_sort_n_buffered_std_merge(buf, half, r, f);
+  I l = stable_sort_n_buffered_std_merge(m, n - half, r, f);
+
+  using MI = std::move_iterator<I>;
+  using MB = std::move_iterator<B>;
+  return std::merge(MB(buf), MB(buf_l), MI(m), MI(l), f, r);
+}
+
+template <typename I, typename N, typename R>
+I stable_sort_n_sufficient_allocation_std_merge(I f, N n, R r) {
+  std::vector<ValueType<I>> buf(algo::half_positive(n));
+  return algo::stable_sort_n_buffered_std_merge(f, n, r, buf.begin());
+}
+
+template <typename I, typename N, typename R>
+I stable_sort_n_sufficient_allocation_std_merge(I f, N n) {
+  return stable_sort_n_sufficient_allocation_std_merge(f, n, std::less<>{});
+}
+
+template <typename I, typename R>
+void stable_sort_sufficient_allocation_std_merge(I f, I l, R r) {
+  stable_sort_n_sufficient_allocation_std_merge(f, std::distance(f, l), r);
+}
+
+template <typename I, typename R>
+void stable_sort_sufficient_allocation_std_merge(I f, I l) {
+  stable_sort_sufficient_allocation_std_merge(f, l, std::less<>{});
+}
+
+template <typename I, typename N, typename B, typename R>
+// require BiderectionalIterator<I> && Number<N> && ForwardIterator<B>
+//         && WeakStrictOrdering<R, ValueType<I>>
 I stable_sort_n_buffered(I f, N n, R r, B buf) {
   if (n <= N(stable_sort_n_buffered_quadratic_boundary)) {
     algo::bubble_sort_n(f, n, r);
