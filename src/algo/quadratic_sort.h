@@ -25,7 +25,7 @@ template <typename I, typename N, typename R>
 // require ForwardIterator<I> && Number<N> && WeakStrictOrdering<R,
 // ValueType<I>>
 void bubble_sort_n(I f, N n, R r) {
-  while (--n) {
+  while (--n > 0) {
     N m = n;
     I cur = f;
     do {

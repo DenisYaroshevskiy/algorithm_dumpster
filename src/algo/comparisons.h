@@ -26,6 +26,13 @@ struct less_by_first {
   }
 };
 
+struct dereference_less {
+  template <typename I>
+  constexpr bool operator()(const I& x, const I& y) {
+    return *x < *y;
+  }
+};
+
 }  // namespace algo
 
 #endif  // ALGO_COMPARISONS_H

@@ -20,6 +20,7 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                algo/advance_up_to.t.cc
+               algo/apply_rearrangment.t.cc
                algo/binary_search_biased.t.cc
                algo/binary_search.t.cc
                algo/comparisons.t.cc

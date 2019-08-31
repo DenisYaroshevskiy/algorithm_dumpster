@@ -31,6 +31,33 @@ Returns both where it got and how much of 'n' was left.
 I don't know how this is suppose to work for negative advance.
 So it's undefined.
 
+### apply_rearrangment
+
+`apply_rearrangment`<br/>
+`apply_rearrangment_copy`<br/>
+`apply_rearrangment_move`
+
+Let's say you need to sort smth that's expensive to move.<br/>
+You can sort pointers/iterators instead and then just rearrange the original sequence based on where everything landed.
+
+This is what this algorithm does - takes the rearranged iterators and makes the values have the ordering as the iterator ordering.
+
+The copy/move versions are trivial.
+
+The inplace version needs to know the original number of the underlying iterator (distance(f, it)):
+it can either deduce it by subtracting the original f or it<br/>
+can accept a functor to do this.
+
+It also needs a marker to replace the iterators that were already processed (_TODO_: we can not do that by using iterators from that position already).
+
+The iterator range get's destroyed.
+
+Implemenantation is based on the ideas from Elements of Programming, section 10
+
+Lemma 10.6 Every element in a permutation belongs to a unique cycle.
+Lemma 10.7 Any permutation of a set with n elements contains k ≤ n cycles.
+Lemma 10.9 Every permutation can be represented as a product of the cyclic permutations corresponding to its cycles.
+
 ### binary_search
 
 `partition_point_n`<br/>
@@ -41,8 +68,7 @@ So it's undefined.
 _TODO_: `upper_bound`/`equal_range`/`_counting`
 
 Implementation of standard binary search algorithms.<br/>
-The n versions based on Efficient Programming With Components:<br/>
-https://youtu.be/MHHLKuvfBwQ
+The n versions based on ideas from [Efficient Programming With Components](https://youtu.be/MHHLKuvfBwQ)<br/>
 
 The n versions are a bit weird - they do not return the distance from the beginning
 or to the end, which means that they have questionable usability unless one knows<br/>
@@ -51,7 +77,7 @@ both `n` and `last`.
 _TODO_: couting versions that return the distance to the end by doing
 extra work. This can be more efficient then just computing the distance.
 
-Optimization with `half_positive` was upstreamed to libc++: https://reviews.llvm.org/D53994
+Optimization with `half_positive` was upstreamed to libc++: [patch](https://reviews.llvm.org/D53994)
 
 ### binary_search_biased
 
@@ -70,11 +96,10 @@ Optimization with `half_positive` was upstreamed to libc++: https://reviews.llvm
 
 _TODO_: `upper_bound`/`equal_range`/`_n`
 
-My blog post on the subject (the measurements can be outdated):<br/>
-https://medium.com/@denis.yaroshevskij/between-linear-and-binary-search-8d21877cfce5
+My [blog post](https://medium.com/@denis.yaroshevskij/between-linear-and-binary-search-8d21877cfce5)
+on the subject (the measurements are outdated):<br/>
 
-Or a video from the meetup:
-https://skillsmatter.com/skillscasts/12831-between-linear-and-binary-search
+Or a [meetup video](https://skillsmatter.com/skillscasts/12831-between-linear-and-binary-search).
 
 My variations on the galloping (exponential) search. <br/>
 Non `_expensive` trade off to do more predicate invocations in order<br/>
@@ -209,22 +234,34 @@ some of my previous benchmarks did, see presentation mentioned in `merge_biased`
 ### merge_biased
 
 `merge_biased_first` <br/>
+`merge_biased_second`
 
-_TODO_: `merge_biased_second`, migrate set unions.
+_TODO_: migrate set unions.
 
 Variation on std::merge that falls back on binari-ish search when it suspects
 that there is a big a gap of elements from the range it's biased towards.
 
-Presentation from the meetup:
-https://docs.google.com/presentation/d/1675lZkaJ2FcH9wwdUPYptFGnV_A_TW4tAyObIHGBYgs/edit?usp=sharing
+[Presentation from the meetup](
+https://docs.google.com/presentation/d/1675lZkaJ2FcH9wwdUPYptFGnV_A_TW4tAyObIHGBYgs/edit?usp=sharing)
 
 ### move
-`move`
-`move_backward`
-`move_n`
+`move`<br/>
+`move_backward`<br/>
+`move_n`<br/>
 `move_backward_n`
 
 See copy
+
+### n_iterator
+
+// TODO:
+<b>ForwardNIterator, BidirectionalNIterator<b/>
+
+Iterator category that can compute distance in constant time.
+
+Canonical models: RandomAccessIterator, ForwardIterator that stores distance.
+
+distance is computed via '-'
 
 ### nth_permutation
 
