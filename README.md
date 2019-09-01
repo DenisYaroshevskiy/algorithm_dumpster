@@ -307,6 +307,7 @@ Allocates O(distance(f, l)) memory.
 `stable_sort_n_buffered`<br/>
 `stable_sort_n_sufficient_allocation` <br/>
 `stable_sort_sufficient_allocation`<br/>
+`stable_sort_lifting`
 
 Also
 `stable_sort_n_buffered_std_merge` <br/>
@@ -317,9 +318,10 @@ In many respects, this is my crack at the last task in the <br/>
 [Efficient programming with components](https://www.youtube.com/playlist?list=PLHxtyCq_WDLXryyw91lahwdtpZsmo4BGD)
 
 (work in progress).<br/>
-I just want to see how my merge would perform.
 
 `stable_sort_n_buffered` - idea originally from [here](https://github.com/rjernst/stepanov-components-course/blob/375bcb790ee40020ff639e0b8ddec0cfe58ba27a/code/lecture17/merge.h#L59).
+
+`_lifting` - lifts a vector of iterators, sorts that and then applies the rearrengment.
 
 `_std_merge` versions - more to check how important it is to use my merge over std one.
 

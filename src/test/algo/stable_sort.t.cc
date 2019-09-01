@@ -35,5 +35,11 @@ TEST_CASE("algorithm.stable_sort_sufficient_allocation_std_merge", "[algorithm]"
   });
 }
 
+TEST_CASE("algorithm.stable_sort_lifting", "[algorithm]") {
+  stable_sort_test([](auto... params) {
+    algo::stable_sort_lifting(params...);
+  });
+}
+
 }  // namespace
 }  // namespace algo
