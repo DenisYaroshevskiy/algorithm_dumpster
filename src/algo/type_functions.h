@@ -33,9 +33,11 @@ template <typename I>
 struct is_reverse_iterator : std::false_type {};
 
 template <typename I>
-struct is_reverse_iterator<std::reverse_iterator<I>> : std::true_type{};
+struct is_reverse_iterator<std::reverse_iterator<I>> : std::true_type {};
 
 }  // namespace detail
+
+struct n_iterator_tag {};
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;
@@ -51,6 +53,14 @@ using Reference = typename std::iterator_traits<I>::reference;
 
 template <typename I>
 using IteratorCategory = typename std::iterator_traits<I>::iterator_category;
+
+template <typename I>
+constexpr bool ForwardIterator =
+    std::is_base_of_v<std::forward_iterator_tag, IteratorCategory<I>>;
+
+template <typename I>
+constexpr bool BidirectionalIterator =
+    std::is_base_of_v<std::bidirectional_iterator_tag, IteratorCategory<I>>;
 
 template <typename I>
 constexpr bool RandomAccessIterator =

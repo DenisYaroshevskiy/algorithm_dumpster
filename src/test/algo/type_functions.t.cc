@@ -26,12 +26,12 @@
 namespace algo {
 namespace {
 
-TEST_CASE("iterator categories", "[aglorithm]") {
+TEST_CASE("algorithm.iterator_categories", "[aglorithm]") {
   static_assert(RandomAccessIterator<int*>);
   static_assert(!RandomAccessIterator<std::list<int>::iterator>);
 }
 
-TEST_CASE("ReverseIterator", "[algorithm]") {
+TEST_CASE("algorithm.reverseIterator", "[algorithm]") {
   static_assert(ReverseIterator<std::reverse_iterator<int*>>);
   static_assert(ReverseIterator<std::reverse_iterator<const int*>>);
   static_assert(ReverseIterator<std::array<int, 3>::reverse_iterator>);

@@ -22,6 +22,7 @@
 #include <utility>
 #include <vector>
 
+#include "algo/apply_rearrangment.h"
 #include "algo/half_positive.h"
 #include "algo/merge.h"
 #include "algo/move.h"
@@ -58,7 +59,7 @@ I stable_sort_n_sufficient_allocation_std_merge(I f, N n, R r) {
   return algo::stable_sort_n_buffered_std_merge(f, n, r, buf.begin());
 }
 
-template <typename I, typename N, typename R>
+template <typename I, typename N>
 I stable_sort_n_sufficient_allocation_std_merge(I f, N n) {
   return stable_sort_n_sufficient_allocation_std_merge(f, n, std::less<>{});
 }
@@ -68,7 +69,7 @@ void stable_sort_sufficient_allocation_std_merge(I f, I l, R r) {
   stable_sort_n_sufficient_allocation_std_merge(f, std::distance(f, l), r);
 }
 
-template <typename I, typename R>
+template <typename I>
 void stable_sort_sufficient_allocation_std_merge(I f, I l) {
   stable_sort_sufficient_allocation_std_merge(f, l, std::less<>{});
 }
@@ -101,7 +102,7 @@ I stable_sort_n_sufficient_allocation(I f, N n, R r) {
   return algo::stable_sort_n_buffered(f, n, r, buf.begin());
 }
 
-template <typename I, typename N, typename R>
+template <typename I, typename N>
 I stable_sort_n_sufficient_allocation(I f, N n) {
   return stable_sort_n_sufficient_allocation(f, n, std::less<>{});
 }
@@ -111,7 +112,7 @@ void stable_sort_sufficient_allocation(I f, I l, R r) {
   stable_sort_n_sufficient_allocation(f, std::distance(f, l), r);
 }
 
-template <typename I, typename R>
+template <typename I>
 void stable_sort_sufficient_allocation(I f, I l) {
   stable_sort_sufficient_allocation(f, l, std::less<>{});
 }

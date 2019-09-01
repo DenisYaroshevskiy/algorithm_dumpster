@@ -211,6 +211,19 @@ Similar to std::find/find_if but returns nth_entry instead of the first one.
 
 Indexing is from 0 - find 0th returns the first encouted element.
 
+### lift_iterators
+
+`lift_as_vector` <br/>
+
+From a range make a range of iterators. At least for now I always add a couter to<br/>
+non-random access iterators in a shape of a wrapper.
+
+This gives me a constnat time distance and position/comparisons.<br/>
+This sort of 'lifted' iterators as a result are more powerful than their counterpars without it<br/>
+I refer to this concept with an `N` suffix, like `ForwardNIterator` `BidirectionalNIterator`.
+
+This is a minimal requirement for `apply_rearrangment` in place for example.
+
 ### make_vector_of_iterators
 
 `make_vector_of_iterators`
@@ -295,7 +308,6 @@ Allocates O(distance(f, l)) memory.
 `stable_sort_n_sufficient_allocation` <br/>
 `stable_sort_sufficient_allocation`<br/>
 
-
 Also
 `stable_sort_n_buffered_std_merge` <br/>
 `stable_sort_n_sufficient_allocation_std_merge`<br/>
@@ -310,6 +322,15 @@ I just want to see how my merge would perform.
 `stable_sort_n_buffered` - idea originally from [here](https://github.com/rjernst/stepanov-components-course/blob/375bcb790ee40020ff639e0b8ddec0cfe58ba27a/code/lecture17/merge.h#L59).
 
 `_std_merge` versions - more to check how important it is to use my merge over std one.
+
+### type functions
+
+`ValueType`<br/>
+`DifferenceType`<br/>
+`Pointer`<br/>
+`Reference`
+
+Collection of basic template magic stuff.
 
 ### unroll
 
