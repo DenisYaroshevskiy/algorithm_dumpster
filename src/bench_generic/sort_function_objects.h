@@ -36,6 +36,13 @@ struct algo_stable_sort_sufficient_allocation_std_merge {
   }
 };
 
+struct algo_stable_sort_lifting {
+  template <typename... Args>
+  auto operator()(Args&&... args) const {
+    return algo::stable_sort_lifting(std::forward<Args>(args)...);
+  }
+};
+
 struct std_sort {
   template <typename I, typename Cmp>
   void operator()(I f, I l, Cmp cmp) {
