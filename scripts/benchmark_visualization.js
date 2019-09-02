@@ -16,6 +16,14 @@
 
 'use strict';
 
+const predefinedStyles = [
+    ["rgb(000, 0, 255)", "solid"],
+    ["rgb(128, 0, 128)", "dot"],
+    ["rgb(255, 0, 0)", "dash"],
+    ["rgb(50, 50, 0)", "dashdot"],
+    ["rgb(55, 128, 191)", "solid"],
+];
+
 function getName(benchmarLongkName) {
     return benchmarLongkName.split('<')[1].split('>')[0];
 }
@@ -197,6 +205,17 @@ function overrideWithDerived(base, derived) {
     return base;
 }
 
+function populateStyles(algorithmSettingsSection) {
+    let algorithms = Object.keys(algorithmSettingsSection);
+    if (algorithms.length > predefinedStyles.length) {
+        throw new Error('not enough line styles for section: ' + algorithms.toString());
+    }
+    zipArrays(algorithms, predefinedStyles).forEach((zippedObj) => {
+        algorithmSettingsSection[zippedObj[0]].color = zippedObj[1][0];
+        algorithmSettingsSection[zippedObj[0]].dash = zippedObj[1][1];
+    });
+}
+
 async function loadBenchmarkDescription(description) {
     if (description['base']) {
         const loaded = await fetch(description.base);
@@ -214,5 +233,6 @@ async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
     let allAlgorithmSettings = await fetch(benchmarkDescription.general.algorithm_settings_url);
     allAlgorithmSettings = await allAlgorithmSettings.json();
     let algorithmSettings = allAlgorithmSettings[benchmarkDescription.general.algorithm_settings_section];
+    populateStyles(algorithmSettings);
     visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings);
 }

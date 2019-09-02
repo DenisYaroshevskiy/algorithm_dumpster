@@ -21,10 +21,9 @@
 
 namespace bench {
 
-class fake_url {
+struct fake_url {
   std::string data;
 
- public:
   fake_url() = default;
 
   explicit fake_url(int seed)

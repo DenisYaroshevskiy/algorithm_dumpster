@@ -1,100 +1,64 @@
 {
   "apply_rearrangment": {
     "algo_apply_rearrangment": {
-      "display_name" : "algo::apply_rearrangment",
-      "color": "rgb(50, 50, 0)",
-      "dash": "dashdot"
+      "display_name" : "algo::apply_rearrangment"
     },
     "algo_apply_rearrangment_move": {
-      "display_name" : "algo::apply_rearrangment_move",
-      "color": "rgb(128, 0, 128)",
-      "dash": "dot"
+      "display_name" : "algo::apply_rearrangment_move"
     },
     "algo_apply_rearrangment_no_marker": {
-      "display_name" : "algo::apply_rearrangment_no_marker",
-      "color": "rgb(55, 128, 191)",
-      "dash": "solid"
+      "display_name" : "algo::apply_rearrangment_no_marker"
     }
   },
   "lower_bound": {
     "algo_lower_bound_linear": {
-      "display_name" : "algo::lower_bound_linear",
-      "color": "rgb(50, 50, 0)",
-      "dash": "dashdot"
+      "display_name" : "algo::lower_bound_linear"
     },
     "algo_lower_bound_biased": {
-      "display_name" : "algo::lower_bound_biased",
-      "color": "rgb(128, 0, 128)",
-      "dash": "dot"
+      "display_name" : "algo::lower_bound_biased"
     },
     "algo_lower_bound": {
-      "display_name" : "algo::lower_bound",
-      "color": "rgb(55, 128, 191)",
-      "dash": "solid"
+      "display_name" : "algo::lower_bound"
     },
     "algo_lower_bound_biased_expensive_cmp": {
-      "display_name" : "algo::lower_bound_biased_expensive_cmp",
-      "color": "rgb(255, 0, 0)",
-      "dash": "dash"
+      "display_name" : "algo::lower_bound_biased_expensive_cmp"
     },
     "std_lower_bound": {
-      "display_name" : "std::lower_bound",
-      "color": "rgb(000, 0, 255)",
-      "dash": "solid"
+      "display_name" : "std::lower_bound"
     }
   },
   "merge/set_union": {
     "algo_merge": {
-      "display_name" : "algo::merge",
-      "color": "rgb(50, 50, 0)",
-      "dash": "solid"
+      "display_name" : "algo::merge"
     },
     "algo_merge_biased_first": {
-      "display_name" : "algo::merge_biased_first",
-      "color": "rgb(128, 0, 128)",
-      "dash": "dot"
+      "display_name" : "algo::merge_biased_first"
     },
     "algo_merge_biased_second": {
-      "display_name" : "algo::merge_biased_second",
-      "color": "rgb(55, 128, 255)",
-      "dash": "dashdot"
+      "display_name" : "algo::merge_biased_second"
     },
     "algo_merge_expensive_cmp": {
-      "display_name" : "algo::merge_expensive_cmp",
-      "color": "rgb(255, 0, 0)",
-      "dash": "dash"
+      "display_name" : "algo::merge_expensive_cmp"
     },
     "std_merge": {
-      "display_name" : "std::merge",
-      "color": "rgb(000, 0, 255)",
-      "dash": "solid"
+      "display_name" : "std::merge"
     }
   },
   "sort": {
     "algo_stable_sort_sufficient_allocation": {
-      "display_name" : "algo::stable_sort_sufficient_allocation",
-      "color": "rgb(50, 50, 0)",
-      "dash": "solid"
+      "display_name" : "algo::stable_sort_sufficient_allocation"
     },
     "std_sort": {
-      "display_name" : "std::sort",
-      "color": "rgb(128, 0, 128)",
-      "dash": "dot"
+      "display_name" : "std::sort"
     },
     "std_stable_sort": {
-      "display_name" : "std::stable_sort",
-      "color": "rgb(55, 128, 255)",
-      "dash": "dashdot"
+      "display_name" : "std::stable_sort"
     },
     "algo_stable_sort_sufficient_allocation_std_merge": {
-      "display_name" : "algo::stable_sort_sufficient_allocation_std_merge",
-      "color": "rgb(255, 0, 0)",
-      "dash": "dash"
+      "display_name" : "algo::stable_sort_sufficient_allocation_std_merge"
     },
     "algo_stable_sort_lifting": {
-      "display_name" : "algo::stable_sort_lifting",
-      "color": "rgb(000, 0, 255)",
-      "dash": "solid"
+      "display_name" : "algo::stable_sort_lifting"
     }
   }
 }

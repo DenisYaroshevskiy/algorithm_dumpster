@@ -33,11 +33,30 @@ TEST_CASE("bench.input_generators.generate_random_vector", "[bench]") {
 }
 
 TEST_CASE("bench.input_generators.generate_sorted_vector", "[bench]") {
+  {
   std::array inputs = {0, 5, 2, 2, 1};
   auto src = [&, pos = 0]() mutable { return inputs[pos++]; };
 
   auto res = generate_sorted_vector<int>(inputs.size(), src);
   REQUIRE(res == std::vector{0, 1, 2, 2, 5});
+  }
+  {
+    std::array inputs = {0, 2, 4};
+    auto src = [&, pos = 0]() mutable { return inputs[pos++]; };
+
+    auto res = generate_sorted_vector<std_int64_t>(inputs.size(), src);
+
+    REQUIRE(res == std::vector<std_int64_t>{0, 2, 4});
+  }
+  {
+    std::array inputs = {0, 2};
+    auto src = [&, pos = 0]() mutable { return inputs[pos++]; };
+
+    auto res = generate_sorted_vector<fake_url>(inputs.size(), src);
+
+    REQUIRE(res[0].data == "https://0.com");
+    REQUIRE(res[1].data == "https://2.com");
+  }
 }
 
 TEST_CASE("bench.input_generators.generate_unique_sorted_vector", "[bench]") {
