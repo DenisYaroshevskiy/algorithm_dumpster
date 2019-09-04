@@ -30,16 +30,17 @@ target_sources(tests PRIVATE
                algo/factorial.t.cc
                algo/find_nth.t.cc
                algo/half_positive.t.cc
-               algo/positions.t.cc
                algo/memoized_function.t.cc
                algo/merge_biased.t.cc
                algo/merge.t.cc
                algo/move.t.cc
                algo/nth_permutation.t.cc
+               algo/positions.t.cc
                algo/quadratic_sort.t.cc
                algo/stable_sort.t.cc
                algo/type_functions.t.cc
                algo/unroll.t.cc
+               bench_generic/counting_wrapper.t.cc
                bench_generic/input_generators.t.cpp
                catch_main.cc)
 target_compile_options(tests PRIVATE
