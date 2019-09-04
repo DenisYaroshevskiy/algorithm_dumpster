@@ -24,8 +24,8 @@
 
 #include "algo/comparisons.h"
 #include "algo/copy.h"
-#include "algo/make_vector_of_iterators.h"
 #include "algo/move.h"
+#include "algo/positions.h"
 #include "test/algo/zeroed_int.h"
 
 namespace algo {
@@ -38,13 +38,11 @@ void apply_rearrangement_test_all_permutations(const std::vector<test_t>& in,
                                                Alg alg) {
   auto expected = in;
   auto actual = in;
-  auto positions = make_vector_of_iterators(actual.begin(), actual.end());
+  auto [positions, base, marker] = lift_as_vector(actual.begin(), actual.end());
 
   while (true) {
     algo::copy(in.begin(), in.end(), actual.begin());
-    auto positions_copy = positions;
-
-    alg(positions_copy, actual.begin(), actual.end());
+    alg(positions, base, marker);
 
     REQUIRE(expected == actual);
 
@@ -64,10 +62,10 @@ class apply_rearrangement_test_random_permutation {
     std::shuffle(expected.begin(), expected.end(), g1);
 
     std::vector<test_t> actual = in;
-    auto positions = make_vector_of_iterators(actual.begin(), actual.end());
+    auto [positions, base, marker] = lift_as_vector(actual.begin(), actual.end());
     std::shuffle(positions.begin(), positions.end(), g2);
 
-    alg(positions, actual.begin(), actual.end());
+    alg(positions, base, marker);
 
     REQUIRE(expected == actual);
   }

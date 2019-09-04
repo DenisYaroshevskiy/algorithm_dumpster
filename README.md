@@ -38,15 +38,14 @@ So it's undefined.
 `apply_rearrangment_move`<br/>
 `apply_rearrangment_no_marker`
 
-Let's say you need to sort smth that's expensive to move.<br/>
-You can sort iterators instead and then just rearrange the original sequence based on where everything landed.
+_See **position** on concepts)_
 
-This is what this algorithm does - takes the rearranged iterators and makes the values have the ordering as the iterator ordering.
+Taking a range of posittions, rearrange the elements pointed to by those positions in the same order as the positions.
 
-The copy/move versions are trivial.
+Copy/Move versions put the rearranged elements into the new memory.
+(trivial to write)
 
-**The inplace version** needs to know the original number of the underlying iterator (distance(f, it)): <br/>
-it can either deduce it by subtracting the original f or it can accept a functor to do this.
+**The inplace version**
 
 There are two inplace versions: `apply_rearrangment` and `apply_rearrangment_no_marker`.
 
@@ -211,26 +210,38 @@ Similar to std::find/find_if but returns nth_entry instead of the first one.
 
 Indexing is from 0 - find 0th returns the first encouted element.
 
-### lift_iterators
+### positions
 
 `lift_as_vector` <br/>
 
-From a range make a range of iterators. At least for now I always add a couter to<br/>
-non-random access iterators in a shape of a wrapper.
+Position concept:
 
-This gives me a constnat time distance and position/comparisons.<br/>
-This sort of 'lifted' iterators as a result are more powerful than their counterpars without it<br/>
-I refer to this concept with an `N` suffix, like `ForwardNIterator` `BidirectionalNIterator`.
+Idea:
+This concept arises from, so far 3 algorithms from this library:
+`apply_rearrangement`, `stable_sort_lifting`, `nth_permutation`.
 
-This is a minimal requirement for `apply_rearrangment` in place for example.
+For these algorithms have in common that you take a range, make pointers
+to all of the elements and then do smth with them.
 
-### make_vector_of_iterators
+For actually`apply_rearrangement` (and therefor `stable_sort_lifting`) we
+need to know how the original elements were ordered.
+If we do an operation on the contigious range (like a vector), we can totally use pointer math for this.
+We can extend that to arbitrary RandomAccessIterators - it's sufficient to
+know the base where they begin.
+However, we can also apply the same algorithms for either randomly distributed elements (like: select a bunch of things out of a collection), or - many algorithms require you to mark or remove elements (like nth_permutation).
 
-`make_vector_of_iterators`
+Syntactically positions satisfy everything about RandomAccessIterator,<br/>
+except for ++,--, +=, [] => you cannot go from one position to another.
 
-For a range returns a vector with iterators for each element.
-Had a choice to use this or pointers, decided for iterators - since they can<br/>
-support more relaxed iterator concepts from C++20.
+Canonical models are: Pointers, ForwardIterator + Number, Pointer + Number.
+
+There are two related definitions I use: <br/>
+`base` - the position corresponding to the first element,<br/>
+`marker` - the special tag value - position that doesn't mean anything, that is useful for some algorithms.
+
+So far `marker` is just position that we got from `last`, because I have been dealing with lifting positions from ranges. However - it can be relaxed in general case to be `nullptr` with arbitrary `N`for example.
+
+`lift_as_vector` - takes a range and returns a vector of `positions` + `base` and `marker` value.
 
 ### memoized_function
 

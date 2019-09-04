@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "algo/lift_iterators.h"
+#include "algo/positions.h"
 
 #include <iostream>
 #include <list>
@@ -27,7 +27,7 @@ namespace {
 
 TEST_CASE("algorithm.lift_as_vector", "[algorithm]") {
   auto run_test = [](auto f, auto l) {
-    const auto [actual, lifted_l] = lift_as_vector(f, l);
+    const auto [actual, lifted_f, lifted_l] = lift_as_vector(f, l);
 
     using lifted_I = typename decltype(actual)::value_type;
 
@@ -67,6 +67,12 @@ TEST_CASE("algorithm.lift_as_vector", "[algorithm]") {
     }
 
     { REQUIRE(std::is_sorted(actual.begin(), actual.end())); }
+
+    if (actual.size() >= 1) {
+      REQUIRE(lifted_f == actual[0]);
+    }
+
+    { REQUIRE(actual.size() == lifted_l - lifted_f); }
 
     if (actual.size() >= 2) {
       auto x = actual[0];

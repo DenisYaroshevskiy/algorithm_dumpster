@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ALGO_LIFT_ITERATORS_H
-#define ALGO_LIFT_ITERATORS_H
+#ifndef ALGO_POSITIONS_H
+#define ALGO_POSITIONS_H
 
 #include <algorithm>
 #include <iterator>
@@ -113,24 +113,33 @@ using lifted_iterator = std::conditional_t<RandomAccessIterator<I>, I,
                                            detail::iterator_with_number<I>>;
 
 template <typename I>
-std::pair<std::vector<lifted_iterator<I>>, lifted_iterator<I>> lift_as_vector(
-    I f, I l) {
-  std::vector<lifted_iterator<I>> res;
+struct lift_as_vector_result_type {
+  using position = algo::lifted_iterator<I>;
+
+  std::vector<position> positions;
+  position base;
+  position marker;
+};
+
+template <typename I>
+lift_as_vector_result_type<I> lift_as_vector(I f, I l) {
+  std::vector<lifted_iterator<I>> positions;
   if constexpr (RandomAccessIterator<I>) {
-    res.resize(std::distance(f, l));
-    std::iota(res.begin(), res.end(), f);
-    return {std::move(res), l};
+    positions.resize(std::distance(f, l));
+    std::iota(positions.begin(), positions.end(), f);
+    return {std::move(positions), f, l};
   } else {
     DifferenceType<I> n(0);
+    lifted_iterator<I> base = lifted_iterator<I>(f, n);
     while (f != l) {
-      res.emplace_back(f, n);
+      positions.emplace_back(f, n);
       ++f;
       ++n;
     }
-    return {std::move(res), lifted_iterator<I>(f, n)};
+    return {std::move(positions), base, lifted_iterator<I>(l, n)};
   }
 }
 
 }  // namespace algo
 
-#endif  // ALGO_LIFT_ITERATORS_H
+#endif  // ALGO_POSITIONS_H

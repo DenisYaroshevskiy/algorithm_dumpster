@@ -30,8 +30,7 @@ target_sources(tests PRIVATE
                algo/factorial.t.cc
                algo/find_nth.t.cc
                algo/half_positive.t.cc
-               algo/lift_iterators.t.cc
-               algo/make_vector_of_iterators.t.cc
+               algo/positions.t.cc
                algo/memoized_function.t.cc
                algo/merge_biased.t.cc
                algo/merge.t.cc

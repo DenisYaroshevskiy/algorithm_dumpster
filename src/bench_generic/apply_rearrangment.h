@@ -21,8 +21,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include "algo/factorial.h"
-#include "algo/make_vector_of_iterators.h"
 #include "algo/nth_permutation.h"
+#include "algo/positions.h"
 #include "bench_generic/declaration.h"
 #include "bench_generic/input_generators.h"
 
@@ -52,7 +52,7 @@ void apply_rearrangment_vec(benchmark::State& state) {
 
   {
     auto initial_positions =
-        algo::make_vector_of_iterators(data.begin(), data.end());
+        algo::lift_as_vector(data.begin(), data.end()).positions;
     using big_int = boost::multiprecision::cpp_int;
     const big_int selected_permutation =
         (algo::factorial<big_int>(static_cast<int>(size)) - 1) * percentage /

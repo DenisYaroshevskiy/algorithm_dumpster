@@ -24,9 +24,9 @@
 
 #include "algo/apply_rearrangment.h"
 #include "algo/half_positive.h"
-#include "algo/lift_iterators.h"
 #include "algo/merge.h"
 #include "algo/move.h"
+#include "algo/positions.h"
 #include "algo/quadratic_sort.h"
 #include "algo/type_functions.h"
 
@@ -120,17 +120,15 @@ void stable_sort_sufficient_allocation(I f, I l) {
 
 template <typename I, typename R>
 void stable_sort_lifting(I f, I l, R r) {
-  if (f == l) return;
+  auto [positions, base, marker] = algo::lift_as_vector(f, l);
 
-  auto [lifted, marker] = algo::lift_as_vector(f, l);
-  auto base = lifted[0];
+  std::sort(positions.begin(), positions.end(),
+            [&](const auto& ix, const auto& iy) {
+              if (ix < iy) return !r(*iy, *ix);
+              return r(*ix, *iy);
+            });
 
-  std::sort(lifted.begin(), lifted.end(), [&](const auto& ix, const auto& iy) {
-    if (ix < iy) return !r(*iy, *ix);
-    return r(*ix, *iy);
-  });
-
-  algo::apply_rearrangment(lifted.begin(), lifted.end(), base, marker);
+  algo::apply_rearrangment(positions.begin(), positions.end(), base, marker);
 }
 
 template <typename I>
