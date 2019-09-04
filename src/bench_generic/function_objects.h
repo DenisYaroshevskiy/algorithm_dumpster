@@ -89,7 +89,7 @@ struct std_lower_bound {
 
 struct std_merge {
   template <typename... Args>
-  auto operator()(Args&&... args) {
+  auto operator()(Args&&... args) const {
     return std::merge(std::forward<Args>(args)...);
   }
 };
