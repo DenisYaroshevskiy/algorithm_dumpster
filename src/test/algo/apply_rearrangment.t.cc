@@ -17,12 +17,15 @@
 #include "algo/apply_rearrangment.h"
 
 #include <algorithm>
+#include <array>
+#include <forward_list>
 #include <random>
 #include <vector>
 
 #include "test/catch.h"
 
 #include "algo/comparisons.h"
+#include "algo/container_cast.h"
 #include "algo/copy.h"
 #include "algo/move.h"
 #include "algo/positions.h"
@@ -40,34 +43,53 @@ void apply_rearrangement_test_all_permutations(const std::vector<test_t>& in,
   auto actual = in;
   auto [positions, base, marker] = lift_as_vector(actual.begin(), actual.end());
 
+  auto actual_list = algo::container_cast<std::forward_list>(actual);
+  auto [positions_list, base_list, marker_list] =
+      lift_as_vector(actual_list.begin(), actual_list.end());
+
   while (true) {
     algo::copy(in.begin(), in.end(), actual.begin());
+    algo::copy(in.begin(), in.end(), actual_list.begin());
     alg(positions, base, marker);
+    alg(positions_list, base_list, marker_list);
 
     REQUIRE(expected == actual);
+    REQUIRE(
+        std::equal(actual_list.begin(), actual_list.end(), expected.begin()));
 
     if (!std::next_permutation(expected.begin(), expected.end())) break;
     // positions are sorted the same as ints
     std::next_permutation(positions.begin(), positions.end());
+    std::next_permutation(positions_list.begin(), positions_list.end());
   }
 }
 
 class apply_rearrangement_test_random_permutation {
-  std::mt19937 g1, g2;
+  std::array<std::mt19937, 3> gs;
 
  public:
   template <typename Alg>
   void operator()(const std::vector<test_t>& in, Alg alg) {
     std::vector<test_t> expected = in;
-    std::shuffle(expected.begin(), expected.end(), g1);
+    std::shuffle(expected.begin(), expected.end(), gs[0]);
 
     std::vector<test_t> actual = in;
-    auto [positions, base, marker] = lift_as_vector(actual.begin(), actual.end());
-    std::shuffle(positions.begin(), positions.end(), g2);
+    auto actual_list = algo::container_cast<std::forward_list>(actual);
+
+    auto [positions, base, marker] =
+        lift_as_vector(actual.begin(), actual.end());
+    std::shuffle(positions.begin(), positions.end(), gs[1]);
+
+    auto [positions_list, base_list, marker_list] =
+        lift_as_vector(actual_list.begin(), actual_list.end());
+    std::shuffle(positions_list.begin(), positions_list.end(), gs[2]);
 
     alg(positions, base, marker);
+    alg(positions_list, base_list, marker_list);
 
     REQUIRE(expected == actual);
+    REQUIRE(
+        std::equal(actual_list.begin(), actual_list.end(), expected.begin()));
   }
 };
 
