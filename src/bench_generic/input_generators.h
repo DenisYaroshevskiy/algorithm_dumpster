@@ -25,7 +25,11 @@
 #include <utility>
 #include <vector>
 
+#include <boost/multiprecision/cpp_int.hpp>
+
+#include "algo/factorial.h"
 #include "algo/memoized_function.h"
+#include "algo/nth_permutation.h"
 #include "bench_generic/fake_url.h"
 
 namespace bench {
@@ -142,6 +146,21 @@ std::pair<std::vector<T>, std::vector<T>> two_sorted_vectors(size_t x_size,
       });
 
   return gen({x_size, y_size});
+}
+
+template <typename T>
+std::vector<T> nth_vector_permutation(size_t size, int percentage) {
+  auto sorted_vec = sorted_vector<T>(size);
+
+  using big_int = boost::multiprecision::cpp_int;
+  const big_int selected_permutation =
+      (algo::factorial<big_int>(static_cast<int>(size)) - 1) * percentage / 100;
+
+  std::vector<T> vec(size);
+  algo::nth_permutation(sorted_vec.begin(), sorted_vec.end(), vec.begin(),
+                        selected_permutation);
+
+  return vec;
 }
 
 }  // namespace bench
