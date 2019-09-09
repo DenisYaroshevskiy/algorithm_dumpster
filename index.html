@@ -5,7 +5,8 @@
 <title>Benchmarking results</title>
 
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-<script type='text/javascript' src='scripts/benchmark_visualization.js'></script>
+<script type='text/javascript'
+  src='scripts/benchmark_visualization.js'></script>
 
 </html>
 
@@ -38,7 +39,8 @@
   <h2><a href="#lower_bounds">Lower bounds</a></h2>
 
   <a name="lower_bounds_whole_range"></a>
-  <h3><a href="#lower_bounds_whole_range">Lower bounds whole range, 1000 elements</a></h3>
+  <h3><a href="#lower_bounds_whole_range">Lower bounds whole range, 1000
+      elements</a></h3>
 
   <div id='lower_bound_int_1000'></div>
   <script> visualizeBenchmarkFromJson('lower_bound_int_1000', 'data/lower_bound_int_1000/description.json') </script>
@@ -83,6 +85,9 @@
 
   Left to right => left - input is sorted, right is reverse sortered.<br>
   Goes through every 5th percent of all lexicographical permutations.
+
+  <div id='sort_1000_counting'></div>
+  <script>visualizeCountingBenchmarkFromJson('sort_1000_counting', 'data/sort_counting_1000/description.json', 'less')</script>
 
   <div id='sort_int_1000'></div>
   <script> visualizeBenchmarkFromJson('sort_int_1000', 'data/sort_int_1000/description.json') </script>

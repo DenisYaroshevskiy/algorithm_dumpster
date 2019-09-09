@@ -87,6 +87,37 @@ function divideByX(bench) {
     return bench;
 }
 
+function benchNameSplit(benchmarkDescription, name) {
+    let parts = name.split('/');
+    let x = parts[1];
+
+    let percentage = undefined;
+    if (benchmarkDescription.general.percentage_position !== undefined) {
+        percentage = Number(parts[benchmarkDescription.general.percentage_position + 1]);
+        x = percentage;
+    }
+
+    let size = undefined;
+    if (benchmarkDescription.general.size_position !== undefined) {
+        size = Number(parts[benchmarkDescription.general.size_position + 1]);
+        if (benchmarkDescription.general.slice_percentage) {
+            size = size * benchmarkDescription.general.slice_percentage / 100;
+        }
+    }
+
+    if (benchmarkDescription.general.convert_size_times_percentage_to_x) {
+        console.assert(size !== undefined);
+        console.assert(percentage !== undefined);
+
+        x = size * percentage / 100;
+    }
+
+    return {
+        str: parts[0],
+        x
+    };
+}
+
 function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
     let result = {
         x: [],
@@ -94,30 +125,7 @@ function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
     };
 
     loadedJson.benchmarks.forEach((measurement) => {
-        let parts = measurement.name.split('/');
-        let x = parts[1];
-
-        let percentage = undefined;
-        if (benchmarkDescription.general.percentage_position !== undefined) {
-            percentage = Number(parts[benchmarkDescription.general.percentage_position + 1]);
-            x = percentage;
-        }
-
-        let size = undefined;
-        if (benchmarkDescription.general.size_position !== undefined) {
-            size = Number(parts[benchmarkDescription.general.size_position + 1]);
-            if (benchmarkDescription.general.slice_percentage) {
-                size = size * benchmarkDescription.general.slice_percentage / 100;
-            }
-        }
-
-        if (benchmarkDescription.general.convert_size_times_percentage_to_x) {
-            console.assert(size !== undefined);
-            console.assert(percentage !== undefined);
-
-            x = size * percentage / 100;
-        }
-
+        let x = benchNameSplit(benchmarkDescription, measurement.name).x;
         result.x.push(x);
         result.y.push(measurement.real_time);
     });
@@ -195,9 +203,9 @@ async function visualizeBecnhmark(elementID, benchmarkDescription, algorithmSett
 function overrideWithDerived(base, derived) {
     Object.keys(derived).forEach((key) => {
         if (base[key]) {
-            if (typeof(base[key]) !== 'string' && typeof(base[key]) !== 'number') {
-              overrideWithDerived(base[key], derived[key]);
-              return;
+            if (typeof (base[key]) !== 'string' && typeof (base[key]) !== 'number') {
+                overrideWithDerived(base[key], derived[key]);
+                return;
             }
         }
         base[key] = derived[key];
@@ -225,14 +233,59 @@ async function loadBenchmarkDescription(description) {
     return description;
 }
 
-async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
-    let benchmarkDescription = await fetch(jsonBenchmarkDescription);
-    benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
-    console.log(benchmarkDescription.general.algorithm_settings_url);
-
+async function loadAlgorithmSettings(benchmarkDescription) {
     let allAlgorithmSettings = await fetch(benchmarkDescription.general.algorithm_settings_url);
     allAlgorithmSettings = await allAlgorithmSettings.json();
     let algorithmSettings = allAlgorithmSettings[benchmarkDescription.general.algorithm_settings_section];
     populateStyles(algorithmSettings);
+    return algorithmSettings;
+}
+
+async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
+    let benchmarkDescription = await fetch(jsonBenchmarkDescription);
+    benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
+
+    let algorithmSettings = await loadAlgorithmSettings(benchmarkDescription);
     visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings);
+}
+
+function transformCountingData(benchmarkDescription, algorithmSettings, data, selected) {
+    let namesToData = {};
+
+    Object.keys(data).forEach((name) => {
+        let {str, x} = benchNameSplit(benchmarkDescription, name);
+        let y = data[name][selected];
+        if (namesToData[str] === undefined) {
+            namesToData[str] = {
+                name: algorithmSettings[str].display_name,
+                x: [],
+                y: []
+            };
+        }
+        namesToData[str].x.push(x);
+        namesToData[str].y.push(y);
+    });
+
+    let res = [];
+    Object.keys(namesToData).forEach((key) => res.push(namesToData[key]));
+
+    return res;
+}
+
+
+async function visualizeCountingBenchmark(
+    elementID, benchmarkDescription,
+    algorithmSettings, data, selected) {
+    let element = document.getElementById(elementID);
+    let loadedData = transformCountingData(benchmarkDescription, algorithmSettings, data, selected);
+    drawWithPlotly(element, benchmarkDescription, loadedData)
+}
+
+async function visualizeCountingBenchmarkFromJson(elementID, jsonBenchmarkDescription, selected) {
+    let benchmarkDescription = await fetch(jsonBenchmarkDescription);
+    benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
+    let algorithmSettings = await loadAlgorithmSettings(benchmarkDescription);
+    let data = await fetch(benchmarkDescription.measurements);
+    data = await data.json();
+    visualizeCountingBenchmark(elementID, benchmarkDescription, algorithmSettings, data, selected);
 }

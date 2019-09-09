@@ -33,6 +33,7 @@ target_sources(tests PRIVATE
                algo/memoized_function.t.cc
                algo/merge_biased.t.cc
                algo/merge.t.cc
+               algo/mersenne_primes.t.cc
                algo/move.t.cc
                algo/nth_permutation.t.cc
                algo/positions.t.cc
