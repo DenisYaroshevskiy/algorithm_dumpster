@@ -17,30 +17,14 @@
 #ifndef BENCH_SET_PARAMETERS_H
 #define BENCH_SET_PARAMETERS_H
 
-#include <benchmark/benchmark.h>
 #include "bench_generic/counting_benchmark.h"
 
 namespace bench {
 
 template <size_t total_size>
-inline void set_every_5th_percent(benchmark::internal::Benchmark* b) {
-  for (int i = 0; i <= 100; i += 5) {
-    b->Args({static_cast<int>(total_size), i});
-  }
-}
-
-template <size_t total_size>
 inline void set_every_5th_percent(counting_benchmark* b) {
   for (int i = 0; i <= 100; i += 5) {
     b->args({static_cast<int>(total_size), i});
-  }
-}
-
-
-template <size_t total_size>
-inline void set_every_2th_percent(benchmark::internal::Benchmark* b) {
-  for (int i = 0; i <= 100; i += 2) {
-    b->Args({static_cast<int>(total_size), i});
   }
 }
 

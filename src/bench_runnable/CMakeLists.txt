@@ -38,6 +38,15 @@ function(add_benchmark source algo type number)
                           OUTPUT_NAME ${algo})
 endfunction()
 
+function (add_counting_benchmark name)
+  set(compiler_options --std=c++17 -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native)
+
+  add_executable(${name})
+  target_sources(${name} PRIVATE
+                 ${name}.cc)
+  target_compile_options(${name} PRIVATE ${compiler_options})
+endfunction()
+
 # Code alignment ####################
 # Stopped reproducing for some reason.
 add_benchmark(code_alignment A int 1 USE_ARG)
@@ -101,6 +110,8 @@ add_sort_benchmarks(sort fake_url 1000)
 add_sort_benchmarks(sort fake_url_pair 1000)
 
 add_sort_benchmarks(sort double 10000)
+
+add_counting_benchmark(sort_1000_counting)
 
 # Apply rearrangemenet ##################
 function(add_apply_rearrangement_benchmarks name type size)
