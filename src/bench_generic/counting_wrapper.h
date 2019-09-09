@@ -108,22 +108,6 @@ struct counting_wrapper : detail::counting_wrapper_base {
   }
 };
 
-void counters_to_json_dict(std::ostream& out, size_t tab_length = 0) {
-  auto counters = detail::counting_wrapper_base::tie_with_names();
-
-  std::string tab(tab_length, ' ');
-
-  out << tab << "{\n";
-
-  auto f = counters.begin();
-
-  for (; f != counters.end() - 1; ++f) {
-    out << tab << "  \"" << f->first << "\": " << *f->second << ",\n";
-  }
-
-  out << tab << "  \"" << f->first << "\": " << *f->second << "\n}";
-}
-
 }  // namespace bench
 
 namespace std {
@@ -140,5 +124,50 @@ struct hash<bench::counting_wrapper<T>> {
 };
 
 }  // namespace std
+
+namespace bench {
+
+void counters_to_json_dict(std::ostream& out, size_t tab_length = 0) {
+  auto counters = detail::counting_wrapper_base::tie_with_names();
+
+  std::string tab(tab_length, ' ');
+
+  out << "{\n";
+
+  auto f = counters.begin();
+
+  for (; f != counters.end() - 1; ++f) {
+    out << tab << "  \"" << f->first << "\": " << *f->second << ",\n";
+  }
+
+  out << tab << "  \"" << f->first << "\": " << *f->second << '\n' << tab << '}';
+}
+
+class counters_writer {
+  std::ostream* out_;
+  bool is_first_ = true;
+
+ public:
+  counters_writer(const counters_writer&) = default;
+  counters_writer(counters_writer&&) = default;
+  counters_writer& operator=(const counters_writer&) = default;
+  counters_writer& operator=(counters_writer&&) = default;
+
+  counters_writer(std::ostream& out) : out_(&out) { *out_ << "{\n"; }
+
+  void operator()(std::string_view name) {
+    if (!is_first_) *out_ << ",\n";
+    is_first_ = false;
+
+    *out_ << "  \"" << name << "\": ";
+    counters_to_json_dict(*out_, 2);
+
+    detail::counting_wrapper_base::clear();
+  }
+
+  ~counters_writer() { *out_ << "\n}"; }
+};
+
+}  // namespace bench
 
 #endif  // BENCH_GENERIC_COUNTING_REGULAR_H

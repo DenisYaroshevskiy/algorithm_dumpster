@@ -77,7 +77,7 @@ TEST_CASE("bench.counting_wrapper", "[bench]") {
   }
 }
 
-TEST_CASE("bench.counting_wrapper.json", "[bench]") {
+TEST_CASE("bench.counters_to_json_dict", "[bench]") {
   counting_wrapper<int>::clear();
 
   std::stringstream actual;
@@ -88,12 +88,48 @@ TEST_CASE("bench.counting_wrapper.json", "[bench]") {
   counters_to_json_dict(actual);
 
   static constexpr std::string_view expected =  //
-R"_({
+      R"_({
   "copy": 1,
   "move": 0,
   "equal": 0,
   "less": 0,
   "hash": 0
+})_";
+
+  REQUIRE(expected == actual.str());
+}
+
+TEST_CASE("bench.counters_writer", "[bench]") {
+  std::stringstream actual;
+  counting_wrapper<int>::clear();
+
+  {
+    counters_writer writer(actual);
+
+    counting_wrapper<int> x;
+    auto y = x;
+    writer("m1");
+
+    y = std::move(x);
+    writer("m2");
+  }
+
+  static constexpr std::string_view expected =  //
+R"_({
+  "m1": {
+    "copy": 1,
+    "move": 0,
+    "equal": 0,
+    "less": 0,
+    "hash": 0
+  },
+  "m2": {
+    "copy": 0,
+    "move": 1,
+    "equal": 0,
+    "less": 0,
+    "hash": 0
+  }
 })_";
 
   REQUIRE(expected == actual.str());
