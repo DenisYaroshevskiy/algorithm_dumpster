@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "bench_generic/counting_wrapper.h"
+#include "bench_generic/counting_benchmark.h"
 
 #include <sstream>
 
@@ -101,7 +101,7 @@ TEST_CASE("bench.counters_to_json_dict", "[bench]") {
 
 TEST_CASE("bench.counters_writer", "[bench]") {
   std::stringstream actual;
-  counting_wrapper<int>::clear();
+  clear_counters();
 
   {
     counters_writer writer(actual);
@@ -110,12 +110,14 @@ TEST_CASE("bench.counters_writer", "[bench]") {
     auto y = x;
     writer("m1");
 
+    clear_counters();
+
     y = std::move(x);
     writer("m2");
   }
 
   static constexpr std::string_view expected =  //
-R"_({
+      R"_({
   "m1": {
     "copy": 1,
     "move": 0,
@@ -128,6 +130,57 @@ R"_({
     "move": 1,
     "equal": 0,
     "less": 0,
+    "hash": 0
+  }
+})_";
+
+  REQUIRE(expected == actual.str());
+}
+
+TEST_CASE("bench.counting_benchmark", "[bench]") {
+  auto x_less_y = [](const std::vector<int>& data) {
+    counting_wrapper<int> x(data[0]), y(data[1]);
+    REQUIRE(x < y);
+  };
+
+  std::stringstream actual;
+
+  {
+    counting_benchmark b(actual);
+    b.args({0, 1});
+    b.args({1, 2});
+    b.run("swaps1", x_less_y);
+    b.run("swaps2", x_less_y);
+  }
+
+  static constexpr std::string_view expected =  //
+      R"_({
+  "swaps1/0/1": {
+    "copy": 0,
+    "move": 0,
+    "equal": 0,
+    "less": 1,
+    "hash": 0
+  },
+  "swaps1/1/2": {
+    "copy": 0,
+    "move": 0,
+    "equal": 0,
+    "less": 1,
+    "hash": 0
+  },
+  "swaps2/0/1": {
+    "copy": 0,
+    "move": 0,
+    "equal": 0,
+    "less": 1,
+    "hash": 0
+  },
+  "swaps2/1/2": {
+    "copy": 0,
+    "move": 0,
+    "equal": 0,
+    "less": 1,
     "hash": 0
   }
 })_";

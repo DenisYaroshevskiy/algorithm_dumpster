@@ -40,7 +40,7 @@ target_sources(tests PRIVATE
                algo/stable_sort.t.cc
                algo/type_functions.t.cc
                algo/unroll.t.cc
-               bench_generic/counting_wrapper.t.cc
+               bench_generic/counting_benchmark.t.cc
                bench_generic/input_generators.t.cpp
                catch_main.cc)
 target_compile_options(tests PRIVATE

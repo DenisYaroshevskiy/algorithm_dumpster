@@ -361,6 +361,16 @@ Depends on google benchmark and boost.
 
 _NOTE_: I don't know how to CMAKE - dependencies are found in installed folders.
 
+### counters_benchmark
+
+`counting_wrapper`<br/>
+`clear_counters`<br/>
+`counters_to_json_dict`<br/>
+`counters_writer`<br/>
+`counting_benchmark`
+
+Utils to count operations in the benchmark.
+
 ### declaration
 
 `BENCH_DECL_ATTRIBUTES`
@@ -376,7 +386,8 @@ Algorithms wrapped in objects.
 
 `int_to_t`<br/>
 `sorted_vector`<br/>
-`two_sorted_vectors`
+`two_sorted_vectors`<br/>
+`nth_vector_permutation`
 
 Utils to generate data for benchmarks.
 
