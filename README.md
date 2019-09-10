@@ -276,6 +276,14 @@ that there is a big a gap of elements from the range it's biased towards.
 [Presentation from the meetup](
 https://docs.google.com/presentation/d/1675lZkaJ2FcH9wwdUPYptFGnV_A_TW4tAyObIHGBYgs/edit?usp=sharing)
 
+### mersenne_primes
+
+`mersen_primes_int32`
+
+Constants representing Mersenne primes. <br/>
+I use them to select permutations for benchmarking - we need a divisor
+and the last Mersenne prime is very close to int max.
+
 ### move
 `move`<br/>
 `move_backward`<br/>

@@ -242,6 +242,7 @@ async function loadAlgorithmSettings(benchmarkDescription) {
 }
 
 async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
+    return;
     let benchmarkDescription = await fetch(jsonBenchmarkDescription);
     benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
 
@@ -249,8 +250,26 @@ async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
     visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings);
 }
 
+function makeBenchmarkWithSelection(div, options, drawSelected) {
+    let select = document.createElement("select");
+    let newDiv = document.createElement("div");
+
+    options.forEach((o) => {
+        select.options.add(new Option(o));
+    });
+
+    let frag = document.createDocumentFragment();
+    frag.appendChild(select);
+    frag.appendChild(newDiv);
+    div.appendChild(frag);
+
+    select.onchange = () => { drawSelected(newDiv, select.value); };
+    drawSelected(newDiv, select.value);
+}
+
 function transformCountingData(benchmarkDescription, algorithmSettings, data, selected) {
     let namesToData = {};
+    let hasNonZeroes = false;
 
     Object.keys(data).forEach((name) => {
         let {str, x} = benchNameSplit(benchmarkDescription, name);
@@ -264,28 +283,44 @@ function transformCountingData(benchmarkDescription, algorithmSettings, data, se
         }
         namesToData[str].x.push(x);
         namesToData[str].y.push(y);
+        if (y > 0) hasNonZeroes = true;
     });
 
     let res = [];
     Object.keys(namesToData).forEach((key) => res.push(namesToData[key]));
 
+    if (hasNonZeroes) return res;
+    return undefined;
+}
+
+function loadAllCountedKeys(benchmarkDescription, algorithmSettings, data) {
+    let firstKey = Object.keys(data)[0];
+    let firstValue = data[firstKey];
+    let res = {};
+    Object.keys(firstValue).forEach((key) => {
+        let selected = transformCountingData(benchmarkDescription, algorithmSettings, data, key);
+        if (!selected) return undefined;
+        res[key] = selected;
+    });
     return res;
 }
 
-
 async function visualizeCountingBenchmark(
     elementID, benchmarkDescription,
-    algorithmSettings, data, selected) {
+    algorithmSettings, data) {
     let element = document.getElementById(elementID);
-    let loadedData = transformCountingData(benchmarkDescription, algorithmSettings, data, selected);
-    drawWithPlotly(element, benchmarkDescription, loadedData)
+    let allLoaded = loadAllCountedKeys(benchmarkDescription, algorithmSettings, data);
+
+    makeBenchmarkWithSelection(element, Object.keys(allLoaded), (div, selected) => {
+      drawWithPlotly(div, benchmarkDescription, allLoaded[selected]);
+    });
 }
 
-async function visualizeCountingBenchmarkFromJson(elementID, jsonBenchmarkDescription, selected) {
+async function visualizeCountingBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
     let benchmarkDescription = await fetch(jsonBenchmarkDescription);
     benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
     let algorithmSettings = await loadAlgorithmSettings(benchmarkDescription);
     let data = await fetch(benchmarkDescription.measurements);
     data = await data.json();
-    visualizeCountingBenchmark(elementID, benchmarkDescription, algorithmSettings, data, selected);
+    visualizeCountingBenchmark(elementID, benchmarkDescription, algorithmSettings, data);
 }
