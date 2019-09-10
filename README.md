@@ -243,6 +243,13 @@ So far `marker` is just position that we got from `last`, because I have been de
 
 `lift_as_vector` - takes a range and returns a vector of `positions` + `base` and `marker` value.
 
+### shuffle_biased
+
+`shuffle_biased`
+
+Algorithm of questionable quality at the moment. <br/>
+The idea is that we want the probability of an element being distributed within certain limit to be bigger.
+
 ### memoized_function
 
 `memoized_function`
@@ -281,8 +288,6 @@ https://docs.google.com/presentation/d/1675lZkaJ2FcH9wwdUPYptFGnV_A_TW4tAyObIHGB
 `mersen_primes_int32`
 
 Constants representing Mersenne primes. <br/>
-I use them to select permutations for benchmarking - we need a divisor
-and the last Mersenne prime is very close to int max.
 
 ### move
 `move`<br/>

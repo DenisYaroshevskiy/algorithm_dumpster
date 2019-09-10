@@ -38,6 +38,7 @@ target_sources(tests PRIVATE
                algo/nth_permutation.t.cc
                algo/positions.t.cc
                algo/quadratic_sort.t.cc
+               algo/shuffle_biased.t.cc
                algo/stable_sort.t.cc
                algo/type_functions.t.cc
                algo/unroll.t.cc

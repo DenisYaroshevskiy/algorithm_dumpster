@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-#ifndef ALGO_MEMOIZED_FUNCTION_H
-#define ALGO_MEMOIZED_FUNCTION_H
+#ifndef ALGO_SHUFFLE_BIASED_H
+#define ALGO_SHUFFLE_BIASED_H
 
-#include <map>
-#include <type_traits>
+#include <random>
+
+#include "algo/type_functions.h"
+#include "algo/half_positive.h"
 
 namespace algo {
 
-template <typename T, typename Op>
-// require TotallyOrdered<T> && UnaryFunction<Op, T>
-auto memoized_function(Op op) {
-  using result_type = decltype(op(std::declval<T>()));
-  return [cache = std::map<T, result_type>{},
-          op](const T& x) mutable -> const result_type& {
-    auto lb = cache.lower_bound(x);
-    if (lb != cache.end() && lb->first == x) return lb->second;
-    return cache.insert(lb, {x, op(x)})->second;
-  };
+template <typename I, typename G>
+// require RandomAccessIterator<I> && UniformRandomGenerator<G>
+void shuffle_biased(I f, I l, DifferenceType<I> limit, G&& g) {
+  DifferenceType<I> half_limit = limit - algo::half_positive(limit);
+  while (l - f > half_limit) {
+    std::shuffle(f, f + std::min(l - f, limit), g);
+    f += half_limit;
+  }
 }
 
 }  // namespace algo
 
-#endif  // ALGO_MEMOIZED_FUNCTION_H
+#endif  // ALGO_SHUFFLE_BIASED_H
