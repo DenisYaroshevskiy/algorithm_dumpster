@@ -164,14 +164,14 @@ std::vector<T> nth_vector_permutation(size_t size, int percentage) {
   return vec;
 }
 
-template <typename T>
-std::vector<T> shuffled_vector(size_t size, int percentage) {
+template <typename Base>
+auto shuffled_vector(size_t size, int percentage, Base base) {
   const int left_percentage = percentage > 50 ? 100 - percentage : percentage;
 
   static auto gen = algo::memoized_function<std::pair<size_t, int>>(
-      [](std::pair<size_t, int> param) {
+      [base](std::pair<size_t, int> param) {
         auto [size, left_percentage] = param;
-        auto vec = sorted_vector<T>(size);
+        auto vec = base(size);
 
         int biased_limit = static_cast<int>(size) * left_percentage / 50;
         if (biased_limit == 0) biased_limit = 1;
@@ -184,6 +184,23 @@ std::vector<T> shuffled_vector(size_t size, int percentage) {
   auto vec = gen({size, left_percentage});
   if (percentage > 50) std::reverse(vec.begin(), vec.end());
   return vec;
+}
+
+template <typename T>
+auto shuffled_positions(std::vector<T>& data, size_t size, int percentage) {
+  auto shuffle_as = bench::shuffled_vector(size, percentage, [](size_t size) {
+    std::vector<int> idxes(size);
+    std::iota(idxes.begin(), idxes.end(), 0);
+    return idxes;
+  });
+
+  std::vector<T> opt_output(size);
+
+  using I = typename std::vector<T>::iterator;
+  std::vector<I> positions(size);
+  std::transform(shuffle_as.begin(), shuffle_as.end(), positions.begin(),
+                 [&](int idx) { return data.begin() + idx; });
+  return positions;
 }
 
 }  // namespace bench

@@ -103,17 +103,21 @@ TEST_CASE("bench.input_generators.nth_vector_permutation", "[bench]") {
 }
 
 TEST_CASE("bench.input_generators.shuffled_vector", "[bench]") {
+  auto run = [](int percentage) {
+    return shuffled_vector(100u, percentage, [](size_t size){ return sorted_vector<int>(size); });
+  };
+
   {
-    auto v = shuffled_vector<int>(100u, 0);
+    auto v = run(0);
     REQUIRE(std::is_sorted(v.begin(), v.end()));
   }
   {
-    auto v = shuffled_vector<int>(100u, 100);
+    auto v = run(100);
     REQUIRE(std::is_sorted(v.begin(), v.end(), std::greater<>{}));
   }
   {
-    auto v1 = shuffled_vector<int>(100u, 25);
-    auto v2 = shuffled_vector<int>(100u, 75);
+    auto v1 = run(25);
+    auto v2 = run(75);
     std::reverse(v2.begin(), v2.end());
 
     REQUIRE(v1 == v2);

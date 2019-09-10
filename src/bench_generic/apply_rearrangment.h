@@ -17,6 +17,8 @@
 #ifndef BENCH_GENERIC_APPLY_REARRANGEMENT_H
 #define BENCH_GENERIC_APPLY_REARRANGEMENT_H
 
+#include <numeric>
+
 #include <benchmark/benchmark.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -46,21 +48,8 @@ void apply_rearrangment_vec(benchmark::State& state) {
   const int percentage = static_cast<int>(state.range(1));
 
   auto data = bench::random_vector<T>(size);
+  auto positions = shuffled_positions(data, size, percentage);
   std::vector<T> opt_output(size);
-  using I = typename std::vector<T>::iterator;
-  std::vector<I> positions(size);
-
-  {
-    auto initial_positions =
-        algo::lift_as_vector(data.begin(), data.end()).positions;
-    using big_int = boost::multiprecision::cpp_int;
-    const big_int selected_permutation =
-        (algo::factorial<big_int>(static_cast<int>(size)) - 1) * percentage /
-        100;
-
-    algo::nth_permutation(initial_positions.begin(), initial_positions.end(),
-                          positions.begin(), selected_permutation);
-  }
 
   apply_rearrangment_common<Alg>(state, positions, data.begin(), data.end(),
                                  opt_output.begin());

@@ -1,0 +1,6 @@
+./build/src/bench_runnable/apply_rearrangment_1000_counting > data/apply_rearrangment_counting_1000/data.json
+python3 scripts/run_benchmark_folder.py data/plots/apply_rearrangment_base.json build/src/bench_runnable/apply_rearrangment_int_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/apply_rearrangment_base.json build/src/bench_runnable/apply_rearrangment_double_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/apply_rearrangment_base.json build/src/bench_runnable/apply_rearrangment_std_int64_t_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/apply_rearrangment_base.json build/src/bench_runnable/apply_rearrangment_fake_url_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/apply_rearrangment_base.json build/src/bench_runnable/apply_rearrangment_fake_url_pair_1000 data

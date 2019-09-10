@@ -129,3 +129,5 @@ add_apply_rearrangement_benchmarks(apply_rearrangment double 1000)
 add_apply_rearrangement_benchmarks(apply_rearrangment std_int64_t 1000)
 add_apply_rearrangement_benchmarks(apply_rearrangment fake_url 1000)
 add_apply_rearrangement_benchmarks(apply_rearrangment fake_url_pair 1000)
+
+add_counting_benchmark(apply_rearrangment_1000_counting)

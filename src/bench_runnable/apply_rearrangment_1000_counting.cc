@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
+#include "bench_generic/apply_rearrangment_function_objects.h"
 #include "bench_generic/counting_benchmark.h"
 #include "bench_generic/input_generators.h"
 #include "bench_generic/set_counting_parameters.h"
-#include "bench_generic/sort_function_objects.h"
 
 namespace {
 
 template <typename Alg, typename T>
-void sort_permutation_counting_bench(const std::vector<int>& args) {
+void apply_rearrangement_counting_bench(const std::vector<int>& args) {
   const size_t size = static_cast<size_t>(args[0]);
   const int percentage = args[1];
 
-  std::vector<T> raw_vec = bench::shuffled_vector(
-      size, percentage,
-      [](size_t size) { return bench::sorted_vector<T>(size); });
-  std::vector<bench::counting_wrapper<T>> vec(raw_vec.begin(), raw_vec.end());
+  auto raw_data = bench::random_vector<T>(size);
 
-  Alg{}(vec.begin(), vec.end(), std::less<>{});
+  std::vector<bench::counting_wrapper<T>> data(raw_data.begin(),
+                                               raw_data.end());
+  auto positions = shuffled_positions(data, size, percentage);
+  std::vector<bench::counting_wrapper<T>> opt_output(size);
+
+  Alg{}(positions.begin(), positions.end(), data.begin(), data.end(),
+        opt_output.begin());
 }
 
 }  // namespace
@@ -40,7 +43,14 @@ int main() {
   bench::counting_benchmark b(std::cout);
   bench::set_every_5th_percent<1000>(&b);
 
-  b.run("std_sort", sort_permutation_counting_bench<bench::std_sort, int>);
-  b.run("std_stable_sort",
-        sort_permutation_counting_bench<bench::std_stable_sort, int>);
+  b.run("algo_apply_rearrangment_move",
+        apply_rearrangement_counting_bench<bench::algo_apply_rearrangment_move,
+                                           int>);
+  b.run(
+      "algo_apply_rearrangment",
+      apply_rearrangement_counting_bench<bench::algo_apply_rearrangment, int>);
+
+  b.run("algo_apply_rearrangment_no_marker",
+        apply_rearrangement_counting_bench<
+            bench::algo_apply_rearrangment_no_marker, int>);
 }

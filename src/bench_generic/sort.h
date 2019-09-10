@@ -43,7 +43,8 @@ void sort_vec(benchmark::State& state) {
   const size_t size = static_cast<size_t>(state.range(0));
   const int percentage = static_cast<int>(state.range(1));
 
-  std::vector<T> vec = shuffled_vector<T>(size, percentage);
+  std::vector<T> vec = shuffled_vector(
+      size, percentage, [](size_t size) { return sorted_vector<T>(size); });
 
   sort_common<Alg>(state, vec, std::less<>{});
 }
