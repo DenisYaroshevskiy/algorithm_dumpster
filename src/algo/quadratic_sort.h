@@ -19,11 +19,39 @@
 
 #include <algorithm>
 
+#include "algo/type_functions.h"
+
 namespace algo {
+namespace detail {
+
+template <typename I, typename R>
+// require BidirectionalIterator<I> && WeakStrictOrdering<R, ValueType<I>>
+I linear_insert(I f, I cur, R r) {
+  // f != cur
+  I before = cur;
+  --before;
+  if (!r(*cur, *before)) return cur;
+
+  ValueType<I> tmp = std::move(*cur);
+
+  while(true) {
+    I write_to = cur;
+    cur = before;
+    *write_to = std::move(*cur);
+    if (f == cur) break;
+    --before;
+    if (!r(tmp, *before)) break;
+  }
+
+  *cur = std::move(tmp);
+  return cur;
+}
+
+}  // namespace detail
 
 template <typename I, typename N, typename R>
-// require ForwardIterator<I> && Number<N> && WeakStrictOrdering<R,
-// ValueType<I>>
+// require ForwardIterator<I> && Number<N> &&
+//         WeakStrictOrdering<R, ValueType<I>>
 void bubble_sort_n(I f, N n, R r) {
   while (--n > 0) {
     N m = n;
@@ -33,6 +61,34 @@ void bubble_sort_n(I f, N n, R r) {
       if (r(*next, *cur)) std::iter_swap(cur, next);
       cur = next;
     } while (--m);
+  }
+}
+
+template <typename I, typename R>
+// require BidirectionalIterator<I> && WeakStrictOrdering<R, ValueType<I>>
+I insertion_sort_n(I f, DifferenceType<I> n, R r) {
+  if (n == 0) return f;
+
+  I cur = f;
+
+  while (true) {
+    --n;
+    ++cur;
+    if (!n) break;
+    detail::linear_insert(f, cur, r);
+  }
+
+  return cur;
+}
+
+template <typename I, typename R>
+// require ForwardIterator<I> && WeakStrictOrdering<R, ValueType<I>>
+I quadratic_sort_n(I f, DifferenceType<I> n, R r) {
+  if constexpr (BidirectionalIterator<I>) {
+    return insertion_sort_n(f, n, r);
+  } else {
+    bubble_sort_n(f, n, r);
+    return std::next(f, n);
   }
 }
 

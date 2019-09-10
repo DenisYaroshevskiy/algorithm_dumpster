@@ -35,12 +35,11 @@ namespace algo {
 inline static constexpr int stable_sort_n_buffered_quadratic_boundary = 16;
 
 template <typename I, typename N, typename B, typename R>
-// require BiderectionalIterator<I> && Number<N> && ForwardIterator<B>
+// require ForwardIterator<I> && Number<N> && ForwardIterator<B>
 //         && WeakStrictOrdering<R, ValueType<I>>
 I stable_sort_n_buffered_std_merge(I f, N n, R r, B buf) {
   if (n <= N(stable_sort_n_buffered_quadratic_boundary)) {
-    algo::bubble_sort_n(f, n, r);
-    return std::next(f, n);
+    return algo::quadratic_sort_n(f, n, r);
   }
 
   N half = algo::half_positive(n);
@@ -76,12 +75,11 @@ void stable_sort_sufficient_allocation_std_merge(I f, I l) {
 }
 
 template <typename I, typename N, typename B, typename R>
-// require BiderectionalIterator<I> && Number<N> && ForwardIterator<B>
+// require ForwardIterator<I> && Number<N> && ForwardIterator<B>
 //         && WeakStrictOrdering<R, ValueType<I>>
 I stable_sort_n_buffered(I f, N n, R r, B buf) {
   if (n <= N(stable_sort_n_buffered_quadratic_boundary)) {
-    algo::bubble_sort_n(f, n, r);
-    return std::next(f, n);
+    return algo::quadratic_sort_n(f, n, r);
   }
 
   N half = algo::half_positive(n);
@@ -96,7 +94,7 @@ I stable_sort_n_buffered(I f, N n, R r, B buf) {
 }
 
 template <typename I, typename N, typename R>
-// require BiderectionalIterator<I> && Number<N> && ForwardIterator<B>
+// require ForwardIterator<I> && Number<N> && ForwardIterator<B>
 //         && WeakStrictOrdering<R, ValueType<I>>
 I stable_sort_n_sufficient_allocation(I f, N n, R r) {
   std::vector<ValueType<I>> buf(algo::half_positive(n));

@@ -29,5 +29,12 @@ TEST_CASE("algorithm.bubble_sort_n", "[algorithm]") {
   });
 }
 
+TEST_CASE("algorithm.insertion_sort_n", "[algorithm]") {
+  stable_sort_quadratic_test([](auto f, auto l, auto... params) {
+    auto res = algo::insertion_sort_n(f, std::distance(f, l), params...);
+    REQUIRE(res == l);
+  });
+}
+
 }  // namespace
 }  // namespace algo
