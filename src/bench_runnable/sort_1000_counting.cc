@@ -26,7 +26,7 @@ void sort_permutation_counting_bench(const std::vector<int>& args) {
   const size_t size = static_cast<size_t>(args[0]);
   const int percentage = args[1];
 
-  std::vector<T> raw_vec = bench::nth_vector_permutation<T>(size, percentage);
+  std::vector<T> raw_vec = bench::shuffled_vector<T>(size, percentage);
   std::vector<bench::counting_wrapper<T>> vec(raw_vec.begin(), raw_vec.end());
 
   Alg{}(vec.begin(), vec.end(), std::less<>{});

@@ -102,6 +102,24 @@ TEST_CASE("bench.input_generators.nth_vector_permutation", "[bench]") {
   }
 }
 
+TEST_CASE("bench.input_generators.shuffled_vector", "[bench]") {
+  {
+    auto v = shuffled_vector<int>(100u, 0);
+    REQUIRE(std::is_sorted(v.begin(), v.end()));
+  }
+  {
+    auto v = shuffled_vector<int>(100u, 100);
+    REQUIRE(std::is_sorted(v.begin(), v.end(), std::greater<>{}));
+  }
+  {
+    auto v1 = shuffled_vector<int>(100u, 25);
+    auto v2 = shuffled_vector<int>(100u, 75);
+    std::reverse(v2.begin(), v2.end());
+
+    REQUIRE(v1 == v2);
+  }
+}
+
 }  // namespace
 }  // namespace detail
 }  // namespace bench

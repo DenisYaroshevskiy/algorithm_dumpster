@@ -242,7 +242,6 @@ async function loadAlgorithmSettings(benchmarkDescription) {
 }
 
 async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
-    return;
     let benchmarkDescription = await fetch(jsonBenchmarkDescription);
     benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
 

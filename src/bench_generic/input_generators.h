@@ -30,6 +30,7 @@
 #include "algo/factorial.h"
 #include "algo/memoized_function.h"
 #include "algo/nth_permutation.h"
+#include "algo/shuffle_biased.h"
 #include "bench_generic/fake_url.h"
 
 namespace bench {
@@ -160,6 +161,28 @@ std::vector<T> nth_vector_permutation(size_t size, int percentage) {
   algo::nth_permutation(sorted_vec.begin(), sorted_vec.end(), vec.begin(),
                         selected_permutation);
 
+  return vec;
+}
+
+template <typename T>
+std::vector<T> shuffled_vector(size_t size, int percentage) {
+  const int left_percentage = percentage > 50 ? 100 - percentage : percentage;
+
+  static auto gen = algo::memoized_function<std::pair<size_t, int>>(
+      [](std::pair<size_t, int> param) {
+        auto [size, left_percentage] = param;
+        auto vec = sorted_vector<T>(size);
+
+        int biased_limit = static_cast<int>(size) * left_percentage / 50;
+        if (biased_limit == 0) biased_limit = 1;
+        algo::shuffle_biased(vec.begin(), vec.end(), biased_limit,
+                             detail::static_generator());
+
+        return vec;
+      });
+
+  auto vec = gen({size, left_percentage});
+  if (percentage > 50) std::reverse(vec.begin(), vec.end());
   return vec;
 }
 
