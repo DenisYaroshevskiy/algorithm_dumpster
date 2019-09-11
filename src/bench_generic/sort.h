@@ -49,6 +49,16 @@ void sort_vec(benchmark::State& state) {
   sort_common<Alg>(state, vec, std::less<>{});
 }
 
+template <typename Alg, typename T>
+void sort_vec_size(benchmark::State& state) {
+  const size_t initial_size = static_cast<size_t>(state.range(0));
+  const size_t multiplier = static_cast<size_t>(state.range(1));
+
+  auto vec = random_vector<T>(initial_size * multiplier);
+
+  sort_common<Alg>(state, vec, std::less<>{});
+}
+
 }  // namespace bench
 
 #endif  // BENCH_GENERIC_SORT_H

@@ -82,14 +82,9 @@ function loadBenchmark(benchmark) {
     return Promise.all([main, baseline]).then((ps) => subtractBaseline(ps[0], ps[1]));
 }
 
-function divideByX(bench) {
-    bench.times = bench.times.map((time, i) => time / bench.xs[i])
-    return bench;
-}
-
 function benchNameSplit(benchmarkDescription, name) {
     let parts = name.split('/');
-    let x = parts[1];
+    let x = Number(parts[2]);
 
     let percentage = undefined;
     if (benchmarkDescription.general.percentage_position !== undefined) {
@@ -103,6 +98,12 @@ function benchNameSplit(benchmarkDescription, name) {
         if (benchmarkDescription.general.slice_percentage) {
             size = size * benchmarkDescription.general.slice_percentage / 100;
         }
+    }
+
+    let initial_size = undefined;
+    if (benchmarkDescription.general.initial_size_position !== undefined) {
+        initial_size = Number(parts[benchmarkDescription.general.initial_size_position + 1]);
+        x = x * initial_size;
     }
 
     if (benchmarkDescription.general.convert_size_times_percentage_to_x) {
@@ -127,10 +128,21 @@ function transformGoogleBenchmarkData(benchmarkDescription, loadedJson) {
     loadedJson.benchmarks.forEach((measurement) => {
         let x = benchNameSplit(benchmarkDescription, measurement.name).x;
         result.x.push(x);
+        let y = measurement.real_time;
         result.y.push(measurement.real_time);
     });
 
     return result;
+}
+
+function tranformDataWithSettings(benchmarkDescription, loadedData) {
+    if (benchmarkDescription.general.divide_y_by_x) {
+        loadedData = loadedData.map((loaded) => {
+          loaded.y = zipArrays(loaded.x, loaded.y).map((x_y) => x_y[1] / x_y[0]);
+          return loaded;
+        });
+    }
+    return loadedData;
 }
 
 function drawWithPlotly(element, benchmarkDescription, loadedData) {
@@ -138,6 +150,8 @@ function drawWithPlotly(element, benchmarkDescription, loadedData) {
     console.log(benchmarkDescription);
     console.log('drawWithPlotly, loadedData:');
     console.log(loadedData);
+
+    loadedData = tranformDataWithSettings(benchmarkDescription, loadedData);
 
     let traces = loadedData.map((loaded) => {
         return {
@@ -164,6 +178,11 @@ function drawWithPlotly(element, benchmarkDescription, loadedData) {
             autorange: true
         }
     };
+
+    if (benchmarkDescription.general.x_log) {
+        if (!layout.xaxis) layout.xaxis = {};
+        layout.xaxis.type = 'log';
+    }
 
     Plotly.newPlot(element, traces, layout);
 }

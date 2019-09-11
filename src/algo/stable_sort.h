@@ -120,11 +120,9 @@ template <typename I, typename R>
 void stable_sort_lifting(I f, I l, R r) {
   auto [positions, base, marker] = algo::lift_as_vector(f, l);
 
-  std::sort(positions.begin(), positions.end(),
-            [&](const auto& ix, const auto& iy) {
-              if (ix < iy) return !r(*iy, *ix);
-              return r(*ix, *iy);
-            });
+  stable_sort_sufficient_allocation(
+      positions.begin(), positions.end(),
+      [&](const auto& ix, const auto& iy) { return r(*ix, *iy); });
 
   algo::apply_rearrangment(positions.begin(), positions.end(), base, marker);
 }

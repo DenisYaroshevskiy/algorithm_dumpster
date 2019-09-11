@@ -1,0 +1,28 @@
+{
+  "base": "data/plots/sort_size_base.json",
+  "general": {
+    "title": "sort size fake url pair 100"
+  },
+  "measurements": [
+    {
+      "name": "std_stable_sort",
+      "url": "data/sort_size_fake_url_pair_100/std_stable_sort.json"
+    },
+    {
+      "name": "algo_stable_sort_sufficient_allocation_std_merge",
+      "url": "data/sort_size_fake_url_pair_100/algo_stable_sort_sufficient_allocation_std_merge.json"
+    },
+    {
+      "name": "algo_stable_sort_lifting",
+      "url": "data/sort_size_fake_url_pair_100/algo_stable_sort_lifting.json"
+    },
+    {
+      "name": "std_sort",
+      "url": "data/sort_size_fake_url_pair_100/std_sort.json"
+    },
+    {
+      "name": "algo_stable_sort_sufficient_allocation",
+      "url": "data/sort_size_fake_url_pair_100/algo_stable_sort_sufficient_allocation.json"
+    }
+  ]
+}
