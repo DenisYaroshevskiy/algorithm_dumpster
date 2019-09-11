@@ -122,6 +122,16 @@ TEST_CASE("bench.input_generators.shuffled_vector", "[bench]") {
 
     REQUIRE(v1 == v2);
   }
+
+  {
+    for (int i = 0; i < 100; i += 5) {
+      auto expected = run(i);
+      for (int j = 0; j < 5; ++j) {
+        auto actual = run(i);
+        REQUIRE(expected == actual);
+      }
+    }
+  }
 }
 
 }  // namespace

@@ -32,7 +32,7 @@
 
 namespace algo {
 
-inline static constexpr int stable_sort_n_buffered_quadratic_boundary = 16;
+inline static constexpr int stable_sort_n_buffered_quadratic_boundary = 8;
 
 template <typename I, typename N, typename B, typename R>
 // require ForwardIterator<I> && Number<N> && ForwardIterator<B>
