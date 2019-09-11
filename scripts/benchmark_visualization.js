@@ -24,62 +24,8 @@ const predefinedStyles = [
     ["rgb(55, 128, 191)", "solid"],
 ];
 
-function getName(benchmarLongkName) {
-    return benchmarLongkName.split('<')[1].split('>')[0];
-}
-
-function transformGoogleBenchmarkOutput(loadedJson) {
-    let result = {
-        name: '',
-        xs: [],
-        times: []
-    };
-    result.name = getName(loadedJson.benchmarks[0].name);
-
-    loadedJson.benchmarks.forEach(measurement => {
-        let parts = measurement.name.split('/');
-        result.xs.push(parts[parts.length - 1]);
-        result.times.push(measurement.real_time);
-    });
-
-    return result;
-}
-
-function loadGoogleBenchmarkResults(file) {
-    return fetch(file).then(
-        (resp) => {
-            return resp.json();
-        }
-    ).then(
-        (loadedJson) => {
-            return transformGoogleBenchmarkOutput(loadedJson);
-        }
-    );
-}
-
 function zipArrays(arr1, arr2) {
     return arr1.map((x, i) => [x, arr2[i]]);
-}
-
-function subtractBaseline(main, baseline) {
-    const baselineMap = new Map(zipArrays(baseline.xs, baseline.times));
-    return {
-        name: main.name,
-        xs: main.xs,
-        times: main.times.map((time, i) => {
-            return time - baselineMap.get(main.xs[i]);
-        })
-    };
-}
-
-function loadBenchmark(benchmark) {
-    const split = benchmark.split(':');
-    const main = loadGoogleBenchmarkResults(split[0]);
-    if (split.length === 1) {
-        return main;
-    }
-    const baseline = loadGoogleBenchmarkResults(split[1]);
-    return Promise.all([main, baseline]).then((ps) => subtractBaseline(ps[0], ps[1]));
 }
 
 function benchNameSplit(benchmarkDescription, name) {
@@ -142,6 +88,16 @@ function tranformDataWithSettings(benchmarkDescription, loadedData) {
           return loaded;
         });
     }
+
+    if (benchmarkDescription.general.baseline) {
+      let baselineName = benchmarkDescription.general.baseline;
+      let baseline = loadedData.filter((loaded) => loaded.name == baselineName)[0];
+      loadedData = loadedData.filter((loaded) => loaded.name !== baselineName);
+      loadedData.map((loaded) => {
+          loaded.y = zipArrays(loaded.y, baseline.y).map(y_base => y_base[0] - y_base[1]);
+          return loaded;
+      });
+    }
     return loadedData;
 }
 
@@ -187,20 +143,18 @@ function drawWithPlotly(element, benchmarkDescription, loadedData) {
     Plotly.newPlot(element, traces, layout);
 }
 
-async function loadMeasurements(beenchmarkDescription, algorithmSettings) {
-    let rawDataPromises = beenchmarkDescription.measurements.map(async (m) => {
+
+async function loadMeasurements(benchmarkDescription, algorithmSettings) {
+    let rawDataPromises = benchmarkDescription.measurements.map(async (m) => {
         return fetch(m.url).then(
             async (raw) => {
                 raw = await raw.json();
-                const xs_and_ys = transformGoogleBenchmarkData(beenchmarkDescription, raw);
-                const curSettings = algorithmSettings[m.name];
-                console.log(curSettings);
+                const xs_and_ys = transformGoogleBenchmarkData(benchmarkDescription, raw);
+                const display_name = algorithmSettings[m.name] ? algorithmSettings[m.name].display_name : m.name;
                 return {
-                    name: curSettings.display_name,
+                    name: display_name,
                     x: xs_and_ys.x,
-                    y: xs_and_ys.y,
-                    color: curSettings.color,
-                    dash: curSettings.dash,
+                    y: xs_and_ys.y
                 };
             }
         )
@@ -295,8 +249,9 @@ function transformCountingData(benchmarkDescription, algorithmSettings, data, se
         let {str, x} = benchNameSplit(benchmarkDescription, name);
         let y = data[name][selected];
         if (namesToData[str] === undefined) {
+            const display_name = algorithmSettings[str] ? algorithmSettings[str].display_name : str;
             namesToData[str] = {
-                name: algorithmSettings[str].display_name,
+                name: display_name,
                 x: [],
                 y: []
             };

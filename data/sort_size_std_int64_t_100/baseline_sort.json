@@ -1,0 +1,73 @@
+{
+  "context": {
+    "date": "2019-09-11 16:32:35",
+    "executable": "build/src/bench_runnable/sort_size_std_int64_t_100/baseline_sort",
+    "num_cpus": 4,
+    "mhz_per_cpu": 1800,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 3145728000,
+        "num_sharing": 4
+      }
+    ],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/1",
+      "iterations": 4689363,
+      "real_time": 1.3655495533192902e+02,
+      "cpu_time": 1.3605451316095596e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/10",
+      "iterations": 3674637,
+      "real_time": 1.8928207003847865e+02,
+      "cpu_time": 1.8890763904026431e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/100",
+      "iterations": 170113,
+      "real_time": 4.1081735787353500e+03,
+      "cpu_time": 4.1016030520889080e+03,
+      "time_unit": "ns"
+    },
+    {
+      "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/1000",
+      "iterations": 12862,
+      "real_time": 5.4574035841815072e+04,
+      "cpu_time": 5.4386020836572847e+04,
+      "time_unit": "ns"
+    },
+    {
+      "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/10000",
+      "iterations": 347,
+      "real_time": 2.0263368991310627e+06,
+      "cpu_time": 2.0217204610951012e+06,
+      "time_unit": "ns"
+    }
+  ]
+}

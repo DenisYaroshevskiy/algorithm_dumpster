@@ -43,6 +43,11 @@ struct algo_stable_sort_lifting {
   }
 };
 
+struct baseline_sort {
+  template <typename... Args>
+  void operator()(Args&&...) const {}
+};
+
 struct std_sort {
   template <typename I, typename Cmp>
   void operator()(I f, I l, Cmp cmp) {

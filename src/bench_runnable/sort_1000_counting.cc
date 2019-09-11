@@ -45,6 +45,7 @@ int main() {
   ADD_BENCH(algo_stable_sort_sufficient_allocation);
   ADD_BENCH(algo_stable_sort_sufficient_allocation_std_merge);
   ADD_BENCH(algo_stable_sort_lifting);
+  ADD_BENCH(baseline_sort);
   ADD_BENCH(std_sort);
   ADD_BENCH(std_stable_sort);
 

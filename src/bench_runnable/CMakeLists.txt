@@ -97,6 +97,7 @@ function(add_sort_benchmarks name type size)
   foreach(srt algo_stable_sort_lifting
               algo_stable_sort_sufficient_allocation
               algo_stable_sort_sufficient_allocation_std_merge
+              baseline_sort
               std_sort
               std_stable_sort)
     add_benchmark(${name} ${srt} ${type} ${size})
