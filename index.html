@@ -23,20 +23,11 @@
   <div id='apply_rearrangment_counting_1000'></div>
   <script>visualizeCountingBenchmarkFromJson('apply_rearrangment_counting_1000', 'data/apply_rearrangment_counting_1000/description.json')</script>
 
-  <div id='apply_rearrangment_int_1000'></div>
-  <script> visualizeBenchmarkFromJson('apply_rearrangment_int_1000', 'data/apply_rearrangment_int_1000/description.json') </script>
-
-  <div id='apply_rearrangment_double_1000'></div>
-  <script> visualizeBenchmarkFromJson('apply_rearrangment_double_1000', 'data/apply_rearrangment_double_1000/description.json') </script>
-
-  <div id='apply_rearrangment_std_int64_t_1000'></div>
-  <script> visualizeBenchmarkFromJson('apply_rearrangment_std_int64_t_1000', 'data/apply_rearrangment_std_int64_t_1000/description.json')</script>
-
-  <div id='apply_rearrangment_fake_url_1000'></div>
-  <script> visualizeBenchmarkFromJson('apply_rearrangment_fake_url_1000', 'data/apply_rearrangment_fake_url_1000/description.json')</script>
-
-  <div id='apply_rearrangment_fake_url_pair_1000'></div>
-  <script> visualizeBenchmarkFromJson('apply_rearrangment_fake_url_pair_1000', 'data/apply_rearrangment_fake_url_pair_1000/description.json')</script>
+  <div id='apply_rearrangment_time_1000'></div>
+  <script>visualizeBecnhmarksForTypes('apply_rearrangment_time_1000',
+      'data/apply_rearrangment_{}_1000/description.json',
+      ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair']);
+  </script>
 
   <a name="lower_bounds"></a>
   <h2><a href="#lower_bounds">Lower bounds</a></h2>
@@ -45,26 +36,20 @@
   <h3><a href="#lower_bounds_whole_range">Lower bounds whole range, 1000
       elements</a></h3>
 
-  <div id='lower_bound_int_1000'></div>
-  <script> visualizeBenchmarkFromJson('lower_bound_int_1000', 'data/lower_bound_int_1000/description.json') </script>
-
-  <div id='lower_bound_double_1000'></div>
-  <script> visualizeBenchmarkFromJson('lower_bound_double_1000', 'data/lower_bound_double_1000/description.json') </script>
-
-  <div id='lower_bound_std_int64_t_1000'></div>
-  <script> visualizeBenchmarkFromJson('lower_bound_std_int64_t_1000', 'data/lower_bound_std_int64_t_1000/description.json')</script>
+  <div id='lower_bound_time_1000'></div>
+  <script>visualizeBecnhmarksForTypes('lower_bound_time_1000',
+    'data/lower_bound_{}_1000/description.json',
+    ['int', 'double', 'std_int64_t']);
+  </script>
 
   <a name="lower_bounds_first_5"></a>
   <h3><a href="#lower_bounds_first_5">Lower bounds first 5 percent</a></h3>
 
-  <div id='lower_bound_first_5_percent_int_1000'></div>
-  <script> visualizeBenchmarkFromJson('lower_bound_first_5_percent_int_1000', 'data/lower_bound_first_5_percent_int_1000/description.json') </script>
-
-  <div id='lower_bound_first_5_percent_double_1000'></div>
-  <script> visualizeBenchmarkFromJson('lower_bound_first_5_percent_double_1000', 'data/lower_bound_first_5_percent_double_1000/description.json') </script>
-
-  <div id='lower_bound_first_5_percent_std_int64_t_1000'></div>
-  <script> visualizeBenchmarkFromJson('lower_bound_first_5_percent_std_int64_t_1000', 'data/lower_bound_first_5_percent_std_int64_t_1000/description.json')</script>
+  <div id='lower_bound_first_5_percent_time_1000'></div>
+  <script>visualizeBecnhmarksForTypes('lower_bound_first_5_percent_time_1000',
+    'data/lower_bound_first_5_percent_{}_1000/description.json',
+    ['int', 'double', 'std_int64_t']);
+  </script>
 
   <a name="merges"></a>
   <h2><a href="#merges">Merges</a></h2>
@@ -74,37 +59,25 @@
 
   <b>Clear case of a code alignment issue for std::merge for ints.</b>
 
-  <div id='merge_int_2000'></div>
-  <script> visualizeBenchmarkFromJson('merge_int_2000', 'data/merge_int_2000/description.json') </script>
-
-  <div id='merge_double_2000'></div>
-  <script> visualizeBenchmarkFromJson('merge_double_2000', 'data/merge_double_2000/description.json') </script>
-
-  <div id='merge_std_int64_t_2000'></div>
-  <script> visualizeBenchmarkFromJson('merge_std_int64_t_2000', 'data/merge_std_int64_t_2000/description.json') </script>
+  <div id='merge_time_2000'></div>
+  <script>visualizeBecnhmarksForTypes('merge_time_2000',
+    'data/merge_{}_2000/description.json',
+    ['int', 'double', 'std_int64_t']);
+  </script>
 
   <a name="sorts"></a>
   <h2><a href="#sorts">Sorts</a></h2>
 
   Left to right => left - input is sorted, right is reverse sortered.<br>
-  Goes through every 5th percent of all lexicographical permutations.
+  Up to the middle - increase chance that the element would end up far from it's sorted position.
+  From middle to the very right, inverse of the left ones.
 
   <div id='sort_1000_counting'></div>
   <script>visualizeCountingBenchmarkFromJson('sort_1000_counting', 'data/sort_counting_1000/description.json')</script>
 
-  <div id='sort_int_1000'></div>
-  <script> visualizeBenchmarkFromJson('sort_int_1000', 'data/sort_int_1000/description.json') </script>
-
-  <div id='sort_double_1000'></div>
-  <script> visualizeBenchmarkFromJson('sort_double_1000', 'data/sort_double_1000/description.json') </script>
-
-  <div id='sort_std_int64_t_1000'></div>
-  <script> visualizeBenchmarkFromJson('sort_std_int64_t_1000', 'data/sort_std_int64_t_1000/description.json') </script>
-
-  <div id='sort_fake_url_1000'></div>
-  <script> visualizeBenchmarkFromJson('sort_fake_url_1000', 'data/sort_fake_url_1000/description.json') </script>
-
-  <div id='sort_fake_url_pair_1000'></div>
-  <script> visualizeBenchmarkFromJson('sort_fake_url_pair_1000', 'data/sort_fake_url_pair_1000/description.json') </script>
-
+  <div id='sort_time_1000'></div>
+  <script>visualizeBecnhmarksForTypes('sort_time_1000',
+    'data/sort_{}_1000/description.json',
+    ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair']);
+  </script>
 </body>

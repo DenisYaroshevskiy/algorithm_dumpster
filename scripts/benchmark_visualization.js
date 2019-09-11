@@ -194,8 +194,7 @@ async function loadMeasurements(beenchmarkDescription, algorithmSettings) {
     return rawData;
 }
 
-async function visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings) {
-    let element = document.getElementById(elementID);
+async function visualizeBecnhmark(element, benchmarkDescription, algorithmSettings) {
     let loaded = await loadMeasurements(benchmarkDescription, algorithmSettings);
     drawWithPlotly(element, benchmarkDescription, loaded);
 }
@@ -241,14 +240,6 @@ async function loadAlgorithmSettings(benchmarkDescription) {
     return algorithmSettings;
 }
 
-async function visualizeBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
-    let benchmarkDescription = await fetch(jsonBenchmarkDescription);
-    benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
-
-    let algorithmSettings = await loadAlgorithmSettings(benchmarkDescription);
-    visualizeBecnhmark(elementID, benchmarkDescription, algorithmSettings);
-}
-
 function makeBenchmarkWithSelection(div, options, drawSelected) {
     let select = document.createElement("select");
     let newDiv = document.createElement("div");
@@ -264,6 +255,17 @@ function makeBenchmarkWithSelection(div, options, drawSelected) {
 
     select.onchange = () => { drawSelected(newDiv, select.value); };
     drawSelected(newDiv, select.value);
+}
+
+async function visualizeBecnhmarksForTypes(elementID, template, types) {
+    let element = document.getElementById(elementID);
+    makeBenchmarkWithSelection(element, types, async (div, type) => {
+        let jsonURL = template.replace('{}', type);
+        let benchmarkDescription = await fetch(jsonURL);
+        benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
+        let algorithmSettings = await loadAlgorithmSettings(benchmarkDescription);
+        visualizeBecnhmark(div, benchmarkDescription, algorithmSettings);
+    });
 }
 
 function transformCountingData(benchmarkDescription, algorithmSettings, data, selected) {
