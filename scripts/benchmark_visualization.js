@@ -230,12 +230,14 @@ function makeBenchmarkWithSelection(div, options, drawSelected) {
     drawSelected(newDiv, select.value);
 }
 
-async function visualizeBecnhmarksForTypes(elementID, template, types) {
+async function visualizeBecnhmarksForTypes(elementID, template, types,
+                                           transformDescritpion = (x) => x) {
     let element = document.getElementById(elementID);
     makeBenchmarkWithSelection(element, types, async (div, type) => {
         let jsonURL = template.replace('{}', type);
         let benchmarkDescription = await fetch(jsonURL);
         benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
+        benchmarkDescription = transformDescritpion(benchmarkDescription);
         let algorithmSettings = await loadAlgorithmSettings(benchmarkDescription);
         visualizeBecnhmark(div, benchmarkDescription, algorithmSettings);
     });
