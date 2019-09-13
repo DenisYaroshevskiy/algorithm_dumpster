@@ -150,11 +150,20 @@ async function loadMeasurements(benchmarkDescription, algorithmSettings) {
             async (raw) => {
                 raw = await raw.json();
                 const xs_and_ys = transformGoogleBenchmarkData(benchmarkDescription, raw);
-                const display_name = algorithmSettings[m.name] ? algorithmSettings[m.name].display_name : m.name;
+                let display_name = m.name;
+                let color = undefined;
+                let dash = undefined;
+                if (algorithmSettings[m.name]) {
+                    display_name = algorithmSettings[m.name].display_name;
+                    color = algorithmSettings[m.name].color;
+                    dash = algorithmSettings[m.name].dash;
+                }
                 return {
                     name: display_name,
                     x: xs_and_ys.x,
-                    y: xs_and_ys.y
+                    y: xs_and_ys.y,
+                    color,
+                    dash
                 };
             }
         )
@@ -250,12 +259,22 @@ function transformCountingData(benchmarkDescription, algorithmSettings, data, se
     Object.keys(data).forEach((name) => {
         let {str, x} = benchNameSplit(benchmarkDescription, name);
         let y = data[name][selected];
+
         if (namesToData[str] === undefined) {
-            const display_name = algorithmSettings[str] ? algorithmSettings[str].display_name : str;
+            let display_name = str;
+            let color = undefined;
+            let dash = undefined;
+            if (algorithmSettings[str]) {
+                display_name = algorithmSettings[str].display_name;
+                color = algorithmSettings[str].color;
+                dash = algorithmSettings[str].dash;
+            }
             namesToData[str] = {
                 name: display_name,
                 x: [],
-                y: []
+                y: [],
+                color,
+                dash
             };
         }
         namesToData[str].x.push(x);
