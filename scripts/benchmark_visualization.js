@@ -312,9 +312,10 @@ async function visualizeCountingBenchmark(
     });
 }
 
-async function visualizeCountingBenchmarkFromJson(elementID, jsonBenchmarkDescription) {
+async function visualizeCountingBenchmarkFromJson(elementID, jsonBenchmarkDescription, transformDescritpion = (x) => x) {
     let benchmarkDescription = await fetch(jsonBenchmarkDescription);
     benchmarkDescription = await loadBenchmarkDescription(await benchmarkDescription.json());
+    benchmarkDescription = transformDescritpion(benchmarkDescription);
     let algorithmSettings = await loadAlgorithmSettings(benchmarkDescription);
     let data = await fetch(benchmarkDescription.measurements);
     data = await data.json();
