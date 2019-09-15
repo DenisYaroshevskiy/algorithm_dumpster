@@ -1,0 +1,32 @@
+{
+  "base": "data/plots/sort_base.json",
+  "general": {
+    "title": "sort int 20 1000"
+  },
+  "measurements": [
+    {
+      "name": "baseline_sort",
+      "url": "data/sort_int_20_1000/baseline_sort.json"
+    },
+    {
+      "name": "std_stable_sort",
+      "url": "data/sort_int_20_1000/std_stable_sort.json"
+    },
+    {
+      "name": "algo_stable_sort_sufficient_allocation_std_merge",
+      "url": "data/sort_int_20_1000/algo_stable_sort_sufficient_allocation_std_merge.json"
+    },
+    {
+      "name": "algo_stable_sort_lifting",
+      "url": "data/sort_int_20_1000/algo_stable_sort_lifting.json"
+    },
+    {
+      "name": "std_sort",
+      "url": "data/sort_int_20_1000/std_sort.json"
+    },
+    {
+      "name": "algo_stable_sort_sufficient_allocation",
+      "url": "data/sort_int_20_1000/algo_stable_sort_sufficient_allocation.json"
+    }
+  ]
+}

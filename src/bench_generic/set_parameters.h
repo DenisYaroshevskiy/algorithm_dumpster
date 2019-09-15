@@ -30,6 +30,13 @@ inline void set_every_5th_percent(benchmark::internal::Benchmark* b) {
 }
 
 template <size_t total_size>
+inline void set_every_percent(benchmark::internal::Benchmark* b) {
+  for (int i = 0; i <= 100; ++i) {
+    b->Args({static_cast<int>(total_size), i});
+  }
+}
+
+template <size_t total_size>
 inline void set_every_2th_percent(benchmark::internal::Benchmark* b) {
   for (int i = 0; i <= 100; i += 2) {
     b->Args({static_cast<int>(total_size), i});

@@ -91,7 +91,6 @@ add_merge_benchmarks(merge int 2000)
 add_merge_benchmarks(merge double 2000)
 add_merge_benchmarks(merge std_int64_t 2000)
 
-
 # Sort #########################
 function(add_sort_benchmarks name type size)
   foreach(srt algo_stable_sort_lifting
@@ -111,12 +110,14 @@ add_sort_benchmarks(sort double 1000)
 add_sort_benchmarks(sort std_int64_t 1000)
 add_sort_benchmarks(sort fake_url 1000)
 add_sort_benchmarks(sort fake_url_pair 1000)
+add_sort_benchmarks(sort int_20 1000)
 
 add_sort_benchmarks(sort_size int 100)
 add_sort_benchmarks(sort_size double 100)
 add_sort_benchmarks(sort_size std_int64_t 100)
 add_sort_benchmarks(sort_size fake_url 100)
 add_sort_benchmarks(sort_size fake_url_pair 100)
+add_sort_benchmarks(sort_size int_20 100)
 
 # Apply rearrangemenet ##################
 function(add_apply_rearrangement_benchmarks name type size)

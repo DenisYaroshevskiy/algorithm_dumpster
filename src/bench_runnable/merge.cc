@@ -22,6 +22,6 @@
 namespace bench {
 
 BENCHMARK_TEMPLATE(merge_vec, SELECTED_ALGORITHM, SELECTED_TYPE)
-    ->Apply(set_every_2th_percent<SELECTED_NUMBER>);
+    ->Apply(set_every_percent<SELECTED_NUMBER>);
 
 }  // namespace bench

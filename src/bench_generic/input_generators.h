@@ -18,6 +18,7 @@
 #define BENCH_GENERIC_INPUT_GENERATORS_H
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <random>
@@ -38,6 +39,8 @@ namespace bench {
 using std_int64_t = std::int64_t;
 
 using fake_url_pair = std::pair<fake_url, fake_url>;
+
+using int_20 = std::array<int, 20>;
 
 template <typename>
 struct int_to_t;
@@ -66,6 +69,15 @@ template <>
 struct int_to_t<fake_url_pair> {
   fake_url_pair operator()(int x) const {
     return std::make_pair(fake_url(x), fake_url(x));
+  }
+};
+
+template <>
+struct int_to_t<int_20> {
+  int_20 operator()(int x) const {
+    int_20 r;
+    r[0] = x;
+    return r;
   }
 };
 
