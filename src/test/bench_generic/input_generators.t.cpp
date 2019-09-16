@@ -57,6 +57,16 @@ TEST_CASE("bench.input_generators.generate_sorted_vector", "[bench]") {
     REQUIRE(res[0].data == "https://0.com");
     REQUIRE(res[1].data == "https://2.com");
   }
+  {
+    std::array inputs = {0, 2, 4};
+    auto src = [&, pos = 0]() mutable { return inputs[pos++]; };
+
+    auto res = generate_sorted_vector<noinline_int>(inputs.size(), src);
+
+    REQUIRE(res[0].data == 0);
+    REQUIRE(res[1].data == 2);
+    REQUIRE(res[2].data == 4);
+  }
 }
 
 TEST_CASE("bench.input_generators.generate_unique_sorted_vector", "[bench]") {

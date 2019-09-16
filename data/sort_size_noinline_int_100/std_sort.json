@@ -1,7 +1,7 @@
 {
   "context": {
-    "date": "2019-09-15 15:45:40",
-    "executable": "build/src/bench_runnable/sort_size_int_20_100/baseline_sort",
+    "date": "2019-09-17 00:09:41",
+    "executable": "build/src/bench_runnable/sort_size_noinline_int_100/std_sort",
     "num_cpus": 4,
     "mhz_per_cpu": 1800,
     "cpu_scaling_enabled": false,
@@ -36,37 +36,37 @@
   "benchmarks": [
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/1",
-      "iterations": 3532499,
-      "real_time": 1.9472817798243034e+02,
-      "cpu_time": 1.9447082646024811e+02,
+      "iterations": 221017,
+      "real_time": 3.1731163214784042e+03,
+      "cpu_time": 3.1673219707081366e+03,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/10",
-      "iterations": 169556,
-      "real_time": 4.1330766236781647e+03,
-      "cpu_time": 4.1251444950340874e+03,
+      "iterations": 9399,
+      "real_time": 7.3447350462596791e+04,
+      "cpu_time": 7.3338440259602081e+04,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/100",
-      "iterations": 12410,
-      "real_time": 5.3958717888779487e+04,
-      "cpu_time": 5.3805801772763880e+04,
+      "iterations": 655,
+      "real_time": 1.0611619725236881e+06,
+      "cpu_time": 1.0595160305343515e+06,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/1000",
-      "iterations": 342,
-      "real_time": 2.0507684298137433e+06,
-      "cpu_time": 2.0457923976608184e+06,
+      "iterations": 54,
+      "real_time": 1.2823536351788791e+07,
+      "cpu_time": 1.2795185185185183e+07,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/10000",
-      "iterations": 35,
-      "real_time": 2.0201036114511747e+07,
-      "cpu_time": 2.0146742857142843e+07,
+      "iterations": 5,
+      "real_time": 1.5243676999816671e+08,
+      "cpu_time": 1.5212280000000006e+08,
       "time_unit": "ns"
     }
   ]

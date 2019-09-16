@@ -33,14 +33,13 @@
 #include "algo/nth_permutation.h"
 #include "algo/shuffle_biased.h"
 #include "bench_generic/fake_url.h"
+#include "bench_generic/noinline_int.h"
 
 namespace bench {
 
 using std_int64_t = std::int64_t;
 
 using fake_url_pair = std::pair<fake_url, fake_url>;
-
-using int_20 = std::array<int, 20>;
 
 template <typename>
 struct int_to_t;
@@ -73,11 +72,9 @@ struct int_to_t<fake_url_pair> {
 };
 
 template <>
-struct int_to_t<int_20> {
-  int_20 operator()(int x) const {
-    int_20 r;
-    r[0] = x;
-    return r;
+struct int_to_t<noinline_int> {
+  noinline_int operator()(int x) const {
+    return noinline_int{x};
   }
 };
 
