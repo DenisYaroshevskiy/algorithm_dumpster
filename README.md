@@ -69,9 +69,11 @@ I did measure that - for ints/doubles it was faster. However - for strings - the
 
 `add_to_counter`<br/>
 `reduce_counter`<br/>
-`binary_counter`
+`binary_counter_fixed`
 
 [Efficient programming with components](https://youtu.be/yUZ3y5w3f0o)
+
+_TODO_: `binary_counter` from the course, vector based.
 
 Idea from the Efficient programming with components course, generalized binary counter.
 
@@ -81,6 +83,14 @@ you get a very interesting device.
 
 I wanted to use this (as was one of the ideas from the course) in stable_sort to convert
 a 'divide and conqure' merge sort to a bottom up merge sort.
+
+I chose for a different implementation for `reserve` - instead of increasing the vector capacity, it adds zeroes to the front.
+It gives me a natural and consistent impletemtation between vector and array.
+
+I also chose to have a type of `zero` to be convertible to `ValueType` instead of directly `ValueType` because this gives me support to move only types. (Like reducing `unique_ptr`s with `nullptr` as zero).
+
+_TODO_: Since we know limits on logarithms, we can implement 'add no overflow' if that's
+useful. Maybe not since 'counting' is nothing compared to the cost of the reduction operation. Still.
 
 ### binary_search
 

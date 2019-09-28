@@ -20,6 +20,7 @@
 #include <iterator>
 #include <list>
 #include <vector>
+#include <functional>
 
 #include "test/catch.h"
 
@@ -60,6 +61,7 @@ TEST_CASE("algorithm.argument_type", "[algorithm]") {
   } s;
 
   argument_type_test<int>(s);
+  argument_type_test<const int&>(std::plus<int>{});
 }
 
 }  // namespace

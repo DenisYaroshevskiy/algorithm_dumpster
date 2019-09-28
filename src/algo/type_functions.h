@@ -45,11 +45,15 @@ template <typename Op>
 struct argument_type_impl {
   static constexpr auto call_pointer() { return &Op::operator(); }
 
-  template <typename R, typename C,  typename Arg>
-  static constexpr type_t<Arg> extract_arg(R(C::*)(Arg)) { return {}; }
+  template <typename R, typename C, typename T, typename... Arg>
+  static constexpr type_t<T> extract_arg(R (C::*)(T, Arg...)) {
+    return {};
+  }
 
-  template <typename R, typename C,  typename Arg>
-  static constexpr type_t<Arg> extract_arg(R(C::*)(Arg) const) { return {}; }
+  template <typename R, typename C, typename T, typename... Arg>
+  static constexpr type_t<T> extract_arg(R (C::*)(T, Arg...) const) {
+    return {};
+  }
 
   using type = typename decltype(extract_arg(call_pointer()))::type;
 };
