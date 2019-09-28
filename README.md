@@ -243,6 +243,31 @@ So far `marker` is just position that we got from `last`, because I have been de
 
 `lift_as_vector` - takes a range and returns a vector of `positions` + `base` and `marker` value.
 
+### registry
+
+`registry` <br/>
+`stable_registry`
+
+(_TODO_ just wrote the readme, so far didn't implement)
+
+Registry - storage for objects with unqiue keys.<br/>
+Difference between stable and non-stable is:
+a) stable does not reuse keys <br/>
+b) iteration retuns elements in the same order they were put in.
+
+See Sean Parent's [planery](https://youtu.be/ejF6qqohp3M) on "Russian Coatchecking Algorithm" (couldn't google it though) on how stable regisrty is implemented.
+
+Also - Sean Parent uses optionals for elements. I don't do that - I have a 'dummy' argument. There are a couple of ways one could go about 'no element' - one - use equality comparison on the element with the dummy, the other - store information in the key. I chose the key.
+
+Another thing is - we can use either one array of pairs or two parallel arrays.
+I chose one array because it's much easier. Also - I did measure this at some point -
+the effect of one integer on binary search is minimal.
+
+(Not implemented yet): slot_map - is the idea behind a non-stable (or just registry.
+_TODO_: maybe I want to support iterations to reduce key reuse in a registry.
+On the other hand - it's not really a registry - maybe it should just be a slot-map.
+[Allan Deutsch on Slot map](https://youtu.be/-8UZhDjgeZU)
+
 ### shuffle_biased
 
 `shuffle_biased`
