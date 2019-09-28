@@ -42,5 +42,25 @@ TEST_CASE("algorithm.reverseIterator", "[algorithm]") {
   static_assert(ReverseIterator<std::list<int>::const_reverse_iterator>);
 }
 
+template <typename T>
+void is_same_test(type_t<T>, type_t<T>){}
+
+template <typename T, typename F>
+void argument_type_test(F) {
+  is_same_test(type_t<T>{}, type_t<ArgumentType<F>>{});
+}
+
+TEST_CASE("algorithm.argument_type", "[algorithm]") {
+  argument_type_test<int>([](int){});
+  argument_type_test<int&>([](int&){});
+  argument_type_test<const int&>([](const int&){});
+
+  struct non_const_callable {
+    void operator()(int) {}
+  } s;
+
+  argument_type_test<int>(s);
+}
+
 }  // namespace
 }  // namespace algo

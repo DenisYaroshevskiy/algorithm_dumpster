@@ -65,6 +65,23 @@ Basicly - it just applies the cycles through all of the permutations.
 We can also **move away and then move back** (`apply_rearrangment_move` to a buffer and then `move`).<br/>
 I did measure that - for ints/doubles it was faster. However - for strings - the inplace version with marker did better.
 
+### binary_counter
+
+`add_to_counter`<br/>
+`reduce_counter`<br/>
+`binary_counter`
+
+[Efficient programming with components](https://youtu.be/yUZ3y5w3f0o)
+
+Idea from the Efficient programming with components course, generalized binary counter.
+
+Binary counter is smth like: 00000 => 00001 ==> 00010 ==> 00011 ==> 00100
+Now, if you replace the add in the power of two with an arbitrary reduction operaton,<br/>
+you get a very interesting device.
+
+I wanted to use this (as was one of the ideas from the course) in stable_sort to convert
+a 'divide and conqure' merge sort to a bottom up merge sort.
+
 ### binary_search
 
 `partition_point_n`<br/>
@@ -379,7 +396,11 @@ In many respects, this is my crack at the last task in the <br/>
 `ValueType`<br/>
 `DifferenceType`<br/>
 `Pointer`<br/>
-`Reference`
+`Reference` <br/>
+`IteratorCategory` <br/>
+`ForwardIterator`/`BidirectionalIterator`/`RandomAccessIterator` <br/>
+`MoveIterator`/`ReverseIterator`<br/>
+`ArgumentType`
 
 Collection of basic template magic stuff.
 

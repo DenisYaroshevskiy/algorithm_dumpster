@@ -21,6 +21,12 @@
 #include <type_traits>
 
 namespace algo {
+
+template <typename T>
+struct type_t {
+  using type = T;
+};
+
 namespace detail {
 
 template <typename I>
@@ -35,9 +41,20 @@ struct is_reverse_iterator : std::false_type {};
 template <typename I>
 struct is_reverse_iterator<std::reverse_iterator<I>> : std::true_type {};
 
-}  // namespace detail
+template <typename Op>
+struct argument_type_impl {
+  static constexpr auto call_pointer() { return &Op::operator(); }
 
-struct n_iterator_tag {};
+  template <typename R, typename C,  typename Arg>
+  static constexpr type_t<Arg> extract_arg(R(C::*)(Arg)) { return {}; }
+
+  template <typename R, typename C,  typename Arg>
+  static constexpr type_t<Arg> extract_arg(R(C::*)(Arg) const) { return {}; }
+
+  using type = typename decltype(extract_arg(call_pointer()))::type;
+};
+
+}  // namespace detail
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;
@@ -71,6 +88,10 @@ constexpr bool MoveIterator = detail::is_move_iterator<I>::value;
 
 template <typename I>
 constexpr bool ReverseIterator = detail::is_reverse_iterator<I>::value;
+
+template <typename F>
+// require UnaryCallable<F>
+using ArgumentType = typename detail::argument_type_impl<F>::type;
 
 }  // namespace algo
 
