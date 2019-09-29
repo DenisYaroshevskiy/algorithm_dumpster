@@ -32,7 +32,7 @@ TEST_CASE("algorithm.iterator_categories", "[aglorithm]") {
   static_assert(!RandomAccessIterator<std::list<int>::iterator>);
 }
 
-TEST_CASE("algorithm.reverseIterator", "[algorithm]") {
+TEST_CASE("algorithm.ReverseIterator", "[algorithm]") {
   static_assert(ReverseIterator<std::reverse_iterator<int*>>);
   static_assert(ReverseIterator<std::reverse_iterator<const int*>>);
   static_assert(ReverseIterator<std::array<int, 3>::reverse_iterator>);
@@ -44,7 +44,7 @@ TEST_CASE("algorithm.reverseIterator", "[algorithm]") {
 }
 
 template <typename T>
-void is_same_test(type_t<T>, type_t<T>){}
+void is_same_test(T, T){}
 
 template <typename T, typename F>
 void argument_type_test(F) {
@@ -62,6 +62,24 @@ TEST_CASE("algorithm.argument_type", "[algorithm]") {
 
   argument_type_test<int>(s);
   argument_type_test<const int&>(std::plus<int>{});
+}
+
+template <size_t N, typename = void>
+struct assert_no_such_uint_t {};
+
+template <size_t N>
+struct assert_no_such_uint_t<N, std::void_t<uint_t<N>>>;
+
+TEST_CASE("algorithm.uint_t", "[algorithm]") {
+  is_same_test(uint_t<8>{}, std::uint8_t{});
+  is_same_test(uint_t<16>{}, std::uint16_t{});
+  is_same_test(uint_t<32>{}, std::uint32_t{});
+  is_same_test(uint_t<64>{}, std::uint64_t{});
+#ifdef HAS_128_INTS
+  is_same_test(uint_t<128>{}, __uint128_t{});
+#endif
+
+  (void)assert_no_such_uint_t<10>{};
 }
 
 }  // namespace

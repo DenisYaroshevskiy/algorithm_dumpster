@@ -20,12 +20,16 @@
 #include <iterator>
 #include <type_traits>
 
+#include "compiler/introspection.h"
+
 namespace algo {
 
 template <typename T>
 struct type_t {
   using type = T;
 };
+
+struct null_t {};
 
 namespace detail {
 
@@ -57,6 +61,27 @@ struct argument_type_impl {
 
   using type = typename decltype(extract_arg(call_pointer()))::type;
 };
+
+template <size_t N>
+constexpr auto uint_t_impl() {
+  if constexpr(N == 8) {
+    return type_t<std::uint8_t>{};
+  } else if constexpr (N == 16) {
+    return type_t<std::uint16_t>{};
+  } else if constexpr (N == 32) {
+    return type_t<std::uint32_t>{};
+  } else if constexpr (N == 64) {
+    return type_t<std::uint64_t>{};
+  }
+#ifdef HAS_128_INTS
+  else if constexpr (N == 128) {
+    return type_t<__uint128_t>{};
+  }
+#endif  // HAS_128_INTS
+  else {
+    return null_t{};
+  }
+}
 
 }  // namespace detail
 
@@ -96,6 +121,9 @@ constexpr bool ReverseIterator = detail::is_reverse_iterator<I>::value;
 template <typename F>
 // require UnaryCallable<F>
 using ArgumentType = typename detail::argument_type_impl<F>::type;
+
+template <size_t N>
+using uint_t = typename decltype(detail::uint_t_impl<N>())::type;
 
 }  // namespace algo
 

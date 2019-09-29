@@ -403,14 +403,15 @@ In many respects, this is my crack at the last task in the <br/>
 
 ### type functions
 
-`ValueType`<br/>
+`ArgumentType` <br/>
 `DifferenceType`<br/>
+`ForwardIterator`/`BidirectionalIterator`/`RandomAccessIterator` <br/>
+`IteratorCategory` <br/>
+`MoveIterator`/`ReverseIterator`<br/>
 `Pointer`<br/>
 `Reference` <br/>
-`IteratorCategory` <br/>
-`ForwardIterator`/`BidirectionalIterator`/`RandomAccessIterator` <br/>
-`MoveIterator`/`ReverseIterator`<br/>
-`ArgumentType`
+`uint_t` <br/>
+`ValueType`
 
 Collection of basic template magic stuff.
 
@@ -419,6 +420,16 @@ Collection of basic template magic stuff.
 `unroll`
 
 Repeat the same operation multiple types without the loop.
+
+### unsigned_int_tuple
+
+`unsigned_int_tuple`
+
+A tuple that stores unsigned numbers into a single unsgined integer of an appropritate size.<br/>
+The main benefit is the abitlity to compare them with one machine instruction.
+
+Thanks to Philip Trettner for help with paddings and comparisons.
+Some inspiration from [Andrew Alexandrescu's talk, Writing Quick Code in C++, Quickly](https://youtu.be/ea5DiCg8HOY) - about Tudor Bosman's bitfield stuff.
 
 ## Bench (generic/runnable)
 
