@@ -425,6 +425,8 @@ Repeat the same operation multiple types without the loop.
 
 `unsigned_int_tuple`
 
+(_TODO_ just wrote the readme, so far didn't implement)
+
 A tuple that stores unsigned numbers into a single unsgined integer of an appropritate size.<br/>
 The main benefit is the abitlity to compare them with one machine instruction.
 
