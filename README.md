@@ -111,7 +111,7 @@ both `n` and `last`.
 _TODO_: couting versions that return the distance to the end by doing
 extra work. This can be more efficient then just computing the distance.
 
-Optimization with `half_positive` was upstreamed to libc++: [patch](https://reviews.llvm.org/D53994)
+Optimization with `half_nonnegative` was upstreamed to libc++: [patch](https://reviews.llvm.org/D53994)
 
 ### binary_search_biased
 
@@ -190,15 +190,16 @@ Will update when I migrate propper benchmark in this repo.
 _NOTE_: unlike std I return the last input iterator.
 _NOTE_: copy_backward_n accepts LAST as it's only input iterator.
 
-### half_positive
+### half_nonnegative
 
-`half_positive`
+`half_nonnegative`
 
+(Name is taken from EOP)
 Dividing by two is faster for unsigned numbers. <br/>
 If I know that the number is positive I can cast to the unsigned.
 I have measured - code generated for right shift gave me slower results + I'm not too sure that's legal.
 
-[libc++ commit](https://reviews.llvm.org/D53994)
+[libc++ commit](https://reviews.llvm.org/D53994) (named half_positive).
 
 ### factoriadic_representation
 

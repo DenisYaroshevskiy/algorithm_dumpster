@@ -17,7 +17,7 @@
 #ifndef ALGO_BINARY_SEARCH_H
 #define ALGO_BINARY_SEARCH_H
 
-#include "algo/half_positive.h"
+#include "algo/half_nonnegative.h"
 #include "algo/type_functions.h"
 
 namespace algo {
@@ -26,7 +26,7 @@ template <typename I, typename P>
 // require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
 constexpr I partition_point_n(I f, DifferenceType<I> n, P p) {
   while (n) {
-    DifferenceType<I> n2 = half_positive(n);
+    DifferenceType<I> n2 = half_nonnegative(n);
     I m = std::next(f, n2);
     if (p(*m)) {
       f = ++m;

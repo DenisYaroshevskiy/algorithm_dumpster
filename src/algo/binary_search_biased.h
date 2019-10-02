@@ -23,7 +23,7 @@
 
 #include "algo/advance_up_to.h"
 #include "algo/binary_search.h"
-#include "algo/half_positive.h"
+#include "algo/half_nonnegative.h"
 
 namespace algo {
 namespace detail {
@@ -80,7 +80,7 @@ constexpr I partition_point_biased(I f, I l, P p,
 
   DifferenceType<I> n = l - f;
   while (n) {
-    DifferenceType<I> n2 = half_positive(n);
+    DifferenceType<I> n2 = half_nonnegative(n);
     I sent = f + n2;
     if (!p(*sent)) return detail::partition_point_biased_no_checks(f, p);
     f = ++sent;
@@ -113,7 +113,7 @@ I partition_point_hinted(I f, I h, I l, P p) {
 template <typename I, typename P>
 // require ForwardIterator<I> && UnaryPredicate<P, ValueType<I>>
 constexpr I point_closer_to_partition_point(I f, I l, P p) {
-  DifferenceType<I> n2 = half_positive(std::distance(f, l));
+  DifferenceType<I> n2 = half_nonnegative(std::distance(f, l));
   I sent = std::next(f, n2);
   if (p(*sent)) return sent;
   return detail::partition_point_biased_no_checks(f, p);

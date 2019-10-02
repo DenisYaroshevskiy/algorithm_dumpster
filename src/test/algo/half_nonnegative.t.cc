@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "algo/half_positive.h"
+#include "algo/half_nonnegative.h"
 
 #include <numeric>
 
@@ -46,7 +46,7 @@ struct Numeric {
 
 template <typename N, typename UnderlyingN = N>
 constexpr bool test(N max_v = N{std::numeric_limits<UnderlyingN>::max()}) {
-  return algo::half_positive(max_v) == max_v / 2;
+  return algo::half_nonnegative(max_v) == max_v / 2;
 }
 
 TEST_CASE("algorithm.half_positve", "[algorithm]") {

@@ -30,7 +30,7 @@ target_sources(tests PRIVATE
                algo/factoriadic_representation.t.cc
                algo/factorial.t.cc
                algo/find_nth.t.cc
-               algo/half_positive.t.cc
+               algo/half_nonnegative.t.cc
                algo/memoized_function.t.cc
                algo/merge_biased.t.cc
                algo/merge.t.cc

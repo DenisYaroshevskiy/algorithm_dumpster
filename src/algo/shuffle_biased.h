@@ -20,14 +20,14 @@
 #include <random>
 
 #include "algo/type_functions.h"
-#include "algo/half_positive.h"
+#include "algo/half_nonnegative.h"
 
 namespace algo {
 
 template <typename I, typename G>
 // require RandomAccessIterator<I> && UniformRandomGenerator<G>
 void shuffle_biased(I f, I l, DifferenceType<I> limit, G&& g) {
-  DifferenceType<I> half_limit = limit - algo::half_positive(limit);
+  DifferenceType<I> half_limit = limit - algo::half_nonnegative(limit);
   while (l - f > half_limit) {
     std::shuffle(f, f + std::min(l - f, limit), g);
     f += half_limit;

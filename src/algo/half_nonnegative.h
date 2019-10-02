@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ALGO_HALF_POSITIVE_H
-#define ALGO_HALF_POSITIVE_H
+#ifndef ALGO_HALF_NONNEGATIVE_H
+#define ALGO_HALF_NONNEGATIVE_H
 
 #include <type_traits>
 #include <utility>
@@ -24,17 +24,17 @@ namespace algo {
 
 template <typename N>
 constexpr typename std::enable_if<std::is_integral<N>::value, N>::type  //
-half_positive(N n) {
+half_nonnegative(N n) {
   using UnsignedN = typename std::make_unsigned<N>::type;
   return static_cast<N>(static_cast<UnsignedN>(n) / 2);
 }
 
 template <typename N>
 constexpr typename std::enable_if<!std::is_integral<N>::value, N>::type  //
-half_positive(N n) {
+half_nonnegative(N n) {
   return std::move(n) / 2;
 }
 
 }  // namespace algo
 
-#endif  // ALGO_HALF_POSITIVE_H
+#endif  // ALGO_HALF_NONNEGATIVE_H

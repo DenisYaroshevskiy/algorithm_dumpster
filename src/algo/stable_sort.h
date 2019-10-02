@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "algo/apply_rearrangment.h"
-#include "algo/half_positive.h"
+#include "algo/half_nonnegative.h"
 #include "algo/merge.h"
 #include "algo/move.h"
 #include "algo/positions.h"
@@ -42,7 +42,7 @@ I stable_sort_n_buffered_std_merge(I f, N n, R r, B buf) {
     return algo::quadratic_sort_n(f, n, r);
   }
 
-  N half = algo::half_positive(n);
+  N half = algo::half_nonnegative(n);
   auto [m, buf_l] = algo::move_n(f, half, buf);
 
   stable_sort_n_buffered_std_merge(buf, half, r, f);
@@ -55,7 +55,7 @@ I stable_sort_n_buffered_std_merge(I f, N n, R r, B buf) {
 
 template <typename I, typename N, typename R>
 I stable_sort_n_sufficient_allocation_std_merge(I f, N n, R r) {
-  std::vector<ValueType<I>> buf(algo::half_positive(n));
+  std::vector<ValueType<I>> buf(algo::half_nonnegative(n));
   return algo::stable_sort_n_buffered_std_merge(f, n, r, buf.begin());
 }
 
@@ -82,7 +82,7 @@ I stable_sort_n_buffered(I f, N n, R r, B buf) {
     return algo::quadratic_sort_n(f, n, r);
   }
 
-  N half = algo::half_positive(n);
+  N half = algo::half_nonnegative(n);
   auto [m, buf_l] = algo::move_n(f, half, buf);
 
   stable_sort_n_buffered(buf, half, r, f);
@@ -97,7 +97,7 @@ template <typename I, typename N, typename R>
 // require ForwardIterator<I> && Number<N> && ForwardIterator<B>
 //         && WeakStrictOrdering<R, ValueType<I>>
 I stable_sort_n_sufficient_allocation(I f, N n, R r) {
-  std::vector<ValueType<I>> buf(algo::half_positive(n));
+  std::vector<ValueType<I>> buf(algo::half_nonnegative(n));
   return algo::stable_sort_n_buffered(f, n, r, buf.begin());
 }
 
