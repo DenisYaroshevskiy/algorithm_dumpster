@@ -38,8 +38,8 @@
 
   <div id='lower_bound_time_1000'></div>
   <script>visualizeBecnhmarksForTypes('lower_bound_time_1000',
-    'data/lower_bound_{}_1000/description.json',
-    ['int', 'double', 'std_int64_t']);
+      'data/lower_bound_{}_1000/description.json',
+      ['int', 'double', 'std_int64_t']);
   </script>
 
   <a name="lower_bounds_first_5"></a>
@@ -47,8 +47,8 @@
 
   <div id='lower_bound_first_5_percent_time_1000'></div>
   <script>visualizeBecnhmarksForTypes('lower_bound_first_5_percent_time_1000',
-    'data/lower_bound_first_5_percent_{}_1000/description.json',
-    ['int', 'double', 'std_int64_t']);
+      'data/lower_bound_first_5_percent_{}_1000/description.json',
+      ['int', 'double', 'std_int64_t']);
   </script>
 
   <a name="merges"></a>
@@ -58,18 +58,32 @@
   <h2><a href="#merge_whole_range">Merge whole range, 2000 elements</a></h2>
 
   <b>Clear case of a code alignment issue for std::merge for ints.</b>
+  Merge with small benchmarks merge a big first range with a small (0-100) second one.
 
   <div id='merge_time_2000'></div>
   <script>visualizeBecnhmarksForTypes('merge_time_2000',
-    'data/merge_{}_2000/description.json',
-    ['int', 'double', 'std_int64_t']);
+      'data/merge_{}_2000/description.json',
+      ['int', 'double', 'std_int64_t']);
+  </script>
+
+  <div id='merge_with_small_2000'></div>
+  <script>visualizeBecnhmarksForTypes('merge_with_small_2000',
+      'data/merge_with_small_{}_2000/description.json',
+      ['int', 'double', 'std_int64_t']);
+  </script>
+
+  <div id='merge_with_small_1000000'></div>
+  <script>visualizeBecnhmarksForTypes('merge_with_small_1000000',
+      'data/merge_with_small_{}_1000000/description.json',
+      ['int', 'double', 'std_int64_t']);
   </script>
 
   <a name="sorts"></a>
   <h2><a href="#sorts">Sorts</a></h2>
 
   Left to right => left - input is sorted, right is reverse sortered.<br>
-  Up to the middle - increase chance that the element would end up far from it's sorted position.
+  Up to the middle - increase chance that the element would end up far from it's
+  sorted position.
   From middle to the very right, inverse of the left ones.
 
   <div id='sort_1000_counting'></div>
@@ -77,13 +91,13 @@
 
   <div id='sort_time_1000'></div>
   <script>visualizeBecnhmarksForTypes('sort_time_1000',
-    'data/sort_{}_1000/description.json',
-    ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair', 'noinline_int']);
+      'data/sort_{}_1000/description.json',
+      ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair', 'noinline_int']);
   </script>
 
   <div id='sort_size_time_1000'></div>
   <script>visualizeBecnhmarksForTypes('sort_size_time_1000',
-    'data/sort_size_{}_100/description.json',
-    ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair', 'noinline_int']);
+      'data/sort_size_{}_100/description.json',
+      ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair', 'noinline_int']);
   </script>
 </body>

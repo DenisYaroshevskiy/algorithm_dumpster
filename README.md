@@ -504,9 +504,11 @@ Benchmarking lower_bound like algotihmms.<br>
 ### merge
 
 `merge_common`<br/>
-`merge_vec`
+`merge_vec` <br/>
+`merge_with_small`
 
 Benchmarking merge like algorithms.
+Merge with small - benchmarks merge of a big first range with a small second one.
 
 ### sort
 

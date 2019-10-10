@@ -91,6 +91,14 @@ add_merge_benchmarks(merge int 2000)
 add_merge_benchmarks(merge double 2000)
 add_merge_benchmarks(merge std_int64_t 2000)
 
+add_merge_benchmarks(merge_with_small int 2000)
+add_merge_benchmarks(merge_with_small double 2000)
+add_merge_benchmarks(merge_with_small std_int64_t 2000)
+
+add_merge_benchmarks(merge_with_small int 1000000)
+add_merge_benchmarks(merge_with_small double 1000000)
+add_merge_benchmarks(merge_with_small std_int64_t 1000000)
+
 # Sort #########################
 function(add_sort_benchmarks name type size)
   foreach(srt algo_stable_sort_lifting

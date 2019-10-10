@@ -1,0 +1,28 @@
+{
+  "base": "data/plots/merge_with_small_base.json",
+  "general": {
+    "title": "merge with small double 1000000"
+  },
+  "measurements": [
+    {
+      "name": "algo_merge",
+      "url": "data/merge_with_small_double_1000000/algo_merge.json"
+    },
+    {
+      "name": "algo_merge_expensive_cmp",
+      "url": "data/merge_with_small_double_1000000/algo_merge_expensive_cmp.json"
+    },
+    {
+      "name": "algo_merge_biased_first",
+      "url": "data/merge_with_small_double_1000000/algo_merge_biased_first.json"
+    },
+    {
+      "name": "algo_merge_biased_second",
+      "url": "data/merge_with_small_double_1000000/algo_merge_biased_second.json"
+    },
+    {
+      "name": "std_merge",
+      "url": "data/merge_with_small_double_1000000/std_merge.json"
+    }
+  ]
+}
