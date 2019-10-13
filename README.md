@@ -434,6 +434,11 @@ The main benefit is the abitlity to compare them with one machine instruction.
 Thanks to Philip Trettner for help with paddings and comparisons.
 Some inspiration from [Andrew Alexandrescu's talk, Writing Quick Code in C++, Quickly](https://youtu.be/ea5DiCg8HOY) - about Tudor Bosman's bitfield stuff.
 
+Looked at the codegen for shifts vs manually selecting elements in the struct.<br/>
+Clang generates identical code, at least for the simplest case. I'm impressed.
+https://godbolt.org/z/10l9Ri
+It means that I can use bit shifts and write portable and efficient code.
+
 ## Bench (generic/runnable)
 
 Collection of benchmarks and some tools to do benchmarks.
