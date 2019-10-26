@@ -42,6 +42,7 @@ target_sources(tests PRIVATE
                algo/shuffle_biased.t.cc
                algo/stable_sort.t.cc
                algo/type_functions.t.cc
+               algo/uint_tuple.t.cc
                algo/unroll.t.cc
                bench_generic/counting_benchmark.t.cc
                bench_generic/input_generators.t.cpp

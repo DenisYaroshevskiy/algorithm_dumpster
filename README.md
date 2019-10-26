@@ -422,9 +422,9 @@ Collection of basic template magic stuff.
 
 Repeat the same operation multiple types without the loop.
 
-### unsigned_int_tuple
+### uint_tuple
 
-`unsigned_int_tuple`
+`uint_tuple`
 
 (_TODO_ just wrote the readme, so far didn't implement)
 

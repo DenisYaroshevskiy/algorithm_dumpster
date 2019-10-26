@@ -17,6 +17,7 @@
 #ifndef ALGO_TYPE_FUNCTIONS_H
 #define ALGO_TYPE_FUNCTIONS_H
 
+#include <array>
 #include <iterator>
 #include <type_traits>
 
@@ -64,7 +65,7 @@ struct argument_type_impl {
 
 template <size_t N>
 constexpr auto uint_t_impl() {
-  if constexpr(N == 8) {
+  if constexpr (N == 8) {
     return type_t<std::uint8_t>{};
   } else if constexpr (N == 16) {
     return type_t<std::uint16_t>{};
@@ -124,6 +125,17 @@ using ArgumentType = typename detail::argument_type_impl<F>::type;
 
 template <size_t N>
 using uint_t = typename decltype(detail::uint_t_impl<N>())::type;
+
+inline constexpr std::array supported_uint_sizes = {
+    size_t{8},   //
+    size_t{16},  //
+    size_t{32},  //
+    size_t{64}   //
+#ifdef HAS_128_INTS
+    ,
+    size_t{128}  //
+#endif           // HAS_128_INTS
+};
 
 }  // namespace algo
 
