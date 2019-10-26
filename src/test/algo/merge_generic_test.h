@@ -80,7 +80,7 @@ struct merge_generic_test_impl {
 
   template <typename Merger>
   static void special_cases(Merger merger) {
-    std::vector<int> xc(1, 100);
+    std::vector<int> xc(100, 1);
     std::fill(xc.begin() + 30, xc.end(), 3);
     std::vector<int> yc{3};
     run_plain_test(xc, yc, merger);
