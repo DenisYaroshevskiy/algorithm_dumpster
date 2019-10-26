@@ -17,6 +17,7 @@
 #ifndef ALGO_SHUFFLE_BIASED_H
 #define ALGO_SHUFFLE_BIASED_H
 
+#include <algorithm>
 #include <random>
 
 #include "algo/type_functions.h"

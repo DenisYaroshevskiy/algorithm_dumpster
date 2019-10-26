@@ -21,6 +21,7 @@
 #include <iterator>
 #include <utility>
 
+#include <algorithm>
 #include <iostream>
 
 #include "algo/type_functions.h"
