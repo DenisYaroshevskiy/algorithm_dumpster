@@ -38,37 +38,51 @@ constexpr T accumulate(I f, I l, T x, Op op) {
 
 template <typename I, typename T>
 constexpr T accumulate(I f, I l, T x) {
-  return _uint_tuple::accumulate(f, l, x, std::plus<>{});
+  return _uint_tuple::accumulate(f, l, std::move(x), std::plus<>{});
 }
 
 constexpr size_t round_to_possible_size(size_t x) {
-  auto* found = algo::lower_bound(supported_uint_sizes.begin(),
-                                  supported_uint_sizes.end(), x);
-  if (found == supported_uint_sizes.end()) {
-    // Will cause a compile time error
-    throw std::range_error{"does not fit into an integer"};
-  }
-  return *found;
+  return *algo::lower_bound(supported_uint_sizes.begin(),
+                            supported_uint_sizes.end(), x);
 }
 
-template <size_t N>
-constexpr size_t select_size(std::array<size_t, N> sizes) {
-  return round_to_possible_size(
-    _uint_tuple::accumulate(sizes.begin(), sizes.end(), size_t{0})
-  );
-}
-
-template <size_t ... N>
-using selected_type = uint_t<select_size(std::array{N...})>;
+constexpr bool is_power_of_2(size_t x) { return !(x & (x - 1)); }
 
 }  // namespace _uint_tuple
 
-template <size_t... N>
+template <size_t... sizes>
 class uint_tuple {
+  static_assert((... + sizes) <= supported_uint_sizes.back());
+  static_assert((... && _uint_tuple::is_power_of_2(sizes)));
+
  public:
-  using storage_type = _uint_tuple::selected_type<N...>;
- private:
+  using storage_type =
+      uint_t<_uint_tuple::round_to_possible_size((... + sizes))>;
+
+  storage_type data_;
 };
+
+template <size_t idx, size_t... sizes,
+          typename Result = std::enable_if_t<(idx < sizeof...(sizes)),
+                                             uint_t<std::array{sizes...}[idx]>>>
+constexpr Result get_at(const uint_tuple<sizes...> t) {
+  constexpr auto arr = std::array{sizes...};
+  constexpr auto offset =
+      _uint_tuple::accumulate(arr.begin(), arr.begin() + idx, size_t{0});
+  return static_cast<Result>(t.data_ >> offset);
+}
+
+template <size_t idx, size_t... sizes,
+          typename Income = std::enable_if_t<(idx < sizeof...(sizes)),
+                                             uint_t<std::array{sizes...}[idx]>>>
+constexpr void set_at(uint_tuple<sizes...>& t, Income value) {
+  constexpr auto arr = std::array{sizes...};
+  constexpr Income mask = -1;
+  constexpr auto offset =
+      _uint_tuple::accumulate(arr.begin(), arr.begin() + idx, size_t{0});
+  t.data_ &= ~(static_cast<decltype(t.data_)>(mask) << offset);
+  t.data_ |= static_cast<decltype(t.data_)>(value) << offset;
+}
 
 }  // namespace algo
 
