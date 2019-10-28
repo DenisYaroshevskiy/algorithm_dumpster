@@ -56,23 +56,26 @@ TEST_CASE("algorithm.uint_tuple.get_at.type", "[algorithm]") {
 }
 
 TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
-  auto t = uint_tuple<8, 16, 32, 8>{};
+  auto t = uint_tuple<8, 16, 32, 4, 4>{};
   algo::set_at<0>(t, 5);
   algo::set_at<1>(t, 20);
   algo::set_at<2>(t, 80);
-  algo::set_at<3>(t, std::numeric_limits<uint8_t>::max());
+  algo::set_at<3>(t, 15);
+  algo::set_at<4>(t, std::numeric_limits<uint8_t>::max());
   REQUIRE(algo::get_at<0>(t) == 5);
   REQUIRE(algo::get_at<1>(t) == 20);
   REQUIRE(algo::get_at<2>(t) == 80);
-  REQUIRE(algo::get_at<3>(t) == std::numeric_limits<uint8_t>::max());
+  REQUIRE(algo::get_at<3>(t) == 15);
+  REQUIRE(algo::get_at<4>(t) == 15);
 }
 
 TEST_CASE("algorithm.uint_tuple.tuple_element", "[algorithm]") {
-  using tuple_t = uint_tuple<8, 16, 32, 8>;
+  using tuple_t = uint_tuple<8, 16, 32, 4, 4>;
   STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<0, tuple_t>, uint8_t>);
   STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<1, tuple_t>, uint16_t>);
   STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<2, tuple_t>, uint32_t>);
   STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<3, tuple_t>, uint8_t>);
+  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<4, tuple_t>, uint8_t>);
 
   STATIC_REQUIRE(
       std::is_same_v<std::tuple_element_t<0, const tuple_t>, const uint8_t>);
@@ -83,8 +86,8 @@ TEST_CASE("algorithm.uint_tuple.tuple_element", "[algorithm]") {
 }
 
 TEST_CASE("algorithm.uint_tuple.tuple_size", "[algorithm]") {
-  using tuple_t = uint_tuple<8, 16, 32, 8>;
-  STATIC_REQUIRE(std::tuple_size_v<tuple_t> == 4);
+  using tuple_t = uint_tuple<8, 16, 32, 4, 4>;
+  STATIC_REQUIRE(std::tuple_size_v<tuple_t> == 5);
   STATIC_REQUIRE(std::tuple_size_v<uint_tuple<>> == 0);
 }
 

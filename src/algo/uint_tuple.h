@@ -17,12 +17,13 @@
 #ifndef ALGO_UINT_TUPLE_H
 #define ALGO_UINT_TUPLE_H
 
-#include "algo/binary_search.h"
-#include "algo/type_functions.h"
-
 #include <array>
+#include <climits>
 #include <functional>
 #include <stdexcept>
+
+#include "algo/binary_search.h"
+#include "algo/type_functions.h"
 
 namespace algo {
 
@@ -56,14 +57,22 @@ constexpr size_t get_offset() {
   return _uint_tuple::accumulate(arr.begin(), arr.begin() + idx, size_t{0});
 }
 
-constexpr bool is_power_of_2(size_t x) { return !(x & (x - 1)); }
+template <typename Result, size_t size>
+constexpr Result generate_mask() {
+  if constexpr (sizeof(Result) * CHAR_BIT <= size) {
+    return -1;
+  } else {
+    return (Result{1} << size) - 1;
+  }
+}
 
 template <size_t idx, bool is_valid, size_t... sizes>
 struct tuple_element {};
 
 template <size_t idx, size_t... sizes>
 struct tuple_element<idx, true, sizes...> {
-  using type = uint_t<std::array{sizes...}[idx]>;
+  using type =
+      uint_t<_uint_tuple::round_to_possible_size(std::array{sizes...}[idx])>;
 };
 
 }  // namespace _uint_tuple
@@ -71,7 +80,6 @@ struct tuple_element<idx, true, sizes...> {
 template <size_t... sizes>
 class uint_tuple {
   static_assert((... + sizes) <= supported_uint_sizes.back());
-  static_assert((... && _uint_tuple::is_power_of_2(sizes)));
 
  public:
   using storage_type =
@@ -100,17 +108,25 @@ namespace algo {
 template <size_t idx, size_t... sizes>
 constexpr auto get_at(uint_tuple<sizes...> t)
     -> std::tuple_element_t<idx, uint_tuple<sizes...>> {
+  using storage_type = typename uint_tuple<sizes...>::storage_type;
+
+  constexpr auto bit_size = std::array{sizes...}[idx];
+  constexpr auto mask = _uint_tuple::generate_mask<storage_type, bit_size>();
+
   constexpr auto offset = _uint_tuple::get_offset<idx, sizes...>();
-  return t.data_ >> offset;
+  return (t.data_ >> offset) & mask;
 }
 
-template <size_t idx, size_t... sizes,
-          typename Income = std::tuple_element_t<idx, uint_tuple<sizes...>>>
-constexpr void set_at(uint_tuple<sizes...>& t, Income value) {
-  constexpr Income mask = -1;
+template <size_t idx, size_t... sizes>
+constexpr void set_at(uint_tuple<sizes...>& t,
+                      std::tuple_element_t<idx, uint_tuple<sizes...>> value) {
+  using storage_type = typename uint_tuple<sizes...>::storage_type;
+
+  constexpr auto bit_size = std::array{sizes...}[idx];
+  constexpr auto mask = _uint_tuple::generate_mask<storage_type, bit_size>();
+
   constexpr auto offset = _uint_tuple::get_offset<idx, sizes...>();
-  using storage_type = decltype(t.data_);
-  t.data_ &= ~(static_cast<storage_type>(mask) << offset);
+  t.data_ &= ~(mask << offset);
   t.data_ |= static_cast<storage_type>(value) << offset;
 }
 
