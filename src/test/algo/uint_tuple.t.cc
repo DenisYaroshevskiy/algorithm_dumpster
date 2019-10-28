@@ -83,11 +83,5 @@ TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
   }
 }
 
-TEST_CASE("algorithm.uint_tuple.tuple_size", "[algorithm]") {
-  using tuple_t = uint_tuple<8, 16, 32, 4, 4>;
-  STATIC_REQUIRE(std::tuple_size_v<tuple_t> == 5);
-  STATIC_REQUIRE(std::tuple_size_v<uint_tuple<>> == 0);
-}
-
 }  // namespace
 }  // namespace algo

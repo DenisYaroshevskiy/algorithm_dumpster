@@ -54,7 +54,7 @@ constexpr size_t round_to_possible_size(size_t x) {
 template <size_t idx, size_t... sizes>
 constexpr size_t get_offset() {
   auto arr = std::array{sizes...};
-  return _uint_tuple::accumulate(arr.begin(), arr.begin() + idx, size_t{0});
+  return _uint_tuple::accumulate(arr.begin() + idx + 1, arr.end(), size_t{0});
 }
 
 template <typename Result, size_t size>
@@ -67,24 +67,24 @@ constexpr Result generate_mask() {
 }
 
 template <size_t idx, bool is_valid, size_t... sizes>
-struct tuple_element_impl {};
+struct element_impl {};
 
 template <size_t idx, size_t... sizes>
-struct tuple_element_impl<idx, true, sizes...> {
+struct element_impl<idx, true, sizes...> {
   using type =
       uint_t<_uint_tuple::round_to_possible_size(std::array{sizes...}[idx])>;
 };
 
 template <size_t idx, typename Tuple>
-struct tuple_element;
+struct element;
 
 template <size_t idx, size_t... sizes>
-struct tuple_element<idx, algo::uint_tuple<sizes...>>
-    : algo::_uint_tuple::tuple_element_impl<idx, (idx < sizeof...(sizes)),
-                                       sizes...> {};
+struct element<idx, algo::uint_tuple<sizes...>>
+    : algo::_uint_tuple::element_impl<idx, (idx < sizeof...(sizes)), sizes...> {
+};
 
 template <size_t idx, typename Tuple>
-using tuple_element_t = typename tuple_element<idx, Tuple>::type;
+using element_t = typename element<idx, Tuple>::type;
 
 }  // namespace _uint_tuple
 
@@ -99,21 +99,9 @@ class uint_tuple {
   storage_type data_;
 };
 
-}  // namespace algo
-
-namespace std {
-
-template <size_t... sizes>
-struct tuple_size<algo::uint_tuple<sizes...>>
-    : std::integral_constant<size_t, sizeof...(sizes)> {};
-
-}  // namespace std
-
-namespace algo {
-
 template <size_t idx, size_t... sizes>
 constexpr auto get_at(uint_tuple<sizes...> t)
-    -> _uint_tuple::tuple_element_t<idx, uint_tuple<sizes...>> {
+    -> _uint_tuple::element_t<idx, uint_tuple<sizes...>> {
   using storage_type = typename uint_tuple<sizes...>::storage_type;
 
   constexpr auto bit_size = std::array{sizes...}[idx];
@@ -124,9 +112,8 @@ constexpr auto get_at(uint_tuple<sizes...> t)
 }
 
 template <size_t idx, size_t... sizes>
-constexpr void set_at(
-    uint_tuple<sizes...>& t,
-    _uint_tuple::tuple_element_t<idx, uint_tuple<sizes...>> value) {
+constexpr void set_at(uint_tuple<sizes...>& t,
+                      _uint_tuple::element_t<idx, uint_tuple<sizes...>> value) {
   using storage_type = typename uint_tuple<sizes...>::storage_type;
 
   constexpr auto bit_size = std::array{sizes...}[idx];
@@ -134,7 +121,7 @@ constexpr void set_at(
 
   constexpr auto offset = _uint_tuple::get_offset<idx, sizes...>();
   t.data_ &= ~(mask << offset);
-  t.data_ |= static_cast<storage_type>(value) << offset;
+  t.data_ |= (mask & static_cast<storage_type>(value)) << offset;
 }
 
 }  // namespace algo
