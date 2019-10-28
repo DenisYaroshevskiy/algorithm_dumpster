@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Denis Yaroshevskiy
+ * Copyright 2019 Oleg Fatkhiev, Denis Yaroshevskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include <array>
 #include <climits>
 #include <functional>
-#include <stdexcept>
 
 #include "algo/binary_search.h"
 #include "algo/type_functions.h"
@@ -28,7 +27,7 @@
 namespace algo {
 
 template <size_t... sizes>
-class uint_tuple;
+struct uint_tuple;
 
 namespace _uint_tuple {
 
@@ -56,6 +55,7 @@ struct bit_info_t {
   Mask mask;
   size_t offset;
 };
+
 template <typename Mask>
 bit_info_t(Mask, size_t)->bit_info_t<Mask>;
 
@@ -95,14 +95,15 @@ using element_t = typename element<idx, Tuple>::type;
 }  // namespace _uint_tuple
 
 template <size_t... sizes>
-class uint_tuple {
+struct uint_tuple {
+ private:
   static_assert((... + sizes) <= supported_uint_sizes.back());
 
  public:
   using storage_type =
       uint_t<_uint_tuple::round_to_possible_size((... + sizes))>;
 
-  storage_type data_;
+  storage_type data;
 };
 
 template <size_t idx, size_t... sizes>
@@ -112,7 +113,7 @@ constexpr auto get_at(uint_tuple<sizes...> t)
 
   constexpr auto bit_info =
       _uint_tuple::get_mask_and_offset<storage_type, idx, sizes...>();
-  return (t.data_ >> bit_info.offset) & bit_info.mask;
+  return (t.data >> bit_info.offset) & bit_info.mask;
 }
 
 template <size_t idx, size_t... sizes>
@@ -122,9 +123,9 @@ constexpr void set_at(uint_tuple<sizes...>& t,
 
   constexpr auto bit_info =
       _uint_tuple::get_mask_and_offset<storage_type, idx, sizes...>();
-  t.data_ &= ~(bit_info.mask << bit_info.offset);
-  t.data_ |= (bit_info.mask & static_cast<storage_type>(value))
-             << bit_info.offset;
+  t.data &= ~(bit_info.mask << bit_info.offset);
+  t.data |= (bit_info.mask & static_cast<storage_type>(value))
+            << bit_info.offset;
 }
 
 }  // namespace algo
