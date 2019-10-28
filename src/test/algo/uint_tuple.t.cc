@@ -23,9 +23,9 @@
 namespace algo {
 namespace {
 
-template <typename T, size_t ... N>
-constexpr void storage_type_test() {
-  static_assert(std::is_same_v<T, typename uint_tuple<N...>::storage_type>);
+template <typename T, size_t... N>
+void storage_type_test() {
+  STATIC_REQUIRE(std::is_same_v<T, typename uint_tuple<N...>::storage_type>);
 }
 
 TEST_CASE("algorithm.uint_tuple.type", "[algorithm]") {
@@ -45,6 +45,47 @@ TEST_CASE("algorithm.uint_tuple.type", "[algorithm]") {
 #ifdef HAS_128_INTS
   storage_type_test<algo::uint_t<128>, 64, 64>();
 #endif  // HAS_128_INTS
+}
+
+TEST_CASE("algorithm.uint_tuple.get_at.type", "[algorithm]") {
+  const auto t = uint_tuple<8, 16, 32, 8>{};
+  STATIC_REQUIRE(std::is_same_v<decltype(get_at<0>(t)), uint8_t>);
+  STATIC_REQUIRE(std::is_same_v<decltype(get_at<1>(t)), uint16_t>);
+  STATIC_REQUIRE(std::is_same_v<decltype(get_at<2>(t)), uint32_t>);
+  STATIC_REQUIRE(std::is_same_v<decltype(get_at<3>(t)), uint8_t>);
+}
+
+TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
+  auto t = uint_tuple<8, 16, 32, 8>{};
+  algo::set_at<0>(t, 5);
+  algo::set_at<1>(t, 20);
+  algo::set_at<2>(t, 80);
+  algo::set_at<3>(t, std::numeric_limits<uint8_t>::max());
+  REQUIRE(algo::get_at<0>(t) == 5);
+  REQUIRE(algo::get_at<1>(t) == 20);
+  REQUIRE(algo::get_at<2>(t) == 80);
+  REQUIRE(algo::get_at<3>(t) == std::numeric_limits<uint8_t>::max());
+}
+
+TEST_CASE("algorithm.uint_tuple.tuple_element", "[algorithm]") {
+  using tuple_t = uint_tuple<8, 16, 32, 8>;
+  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<0, tuple_t>, uint8_t>);
+  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<1, tuple_t>, uint16_t>);
+  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<2, tuple_t>, uint32_t>);
+  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<3, tuple_t>, uint8_t>);
+
+  STATIC_REQUIRE(
+      std::is_same_v<std::tuple_element_t<0, const tuple_t>, const uint8_t>);
+  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<1, volatile tuple_t>,
+                                volatile uint16_t>);
+  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<2, const volatile tuple_t>,
+                                const volatile uint32_t>);
+}
+
+TEST_CASE("algorithm.uint_tuple.tuple_size", "[algorithm]") {
+  using tuple_t = uint_tuple<8, 16, 32, 8>;
+  STATIC_REQUIRE(std::tuple_size_v<tuple_t> == 4);
+  STATIC_REQUIRE(std::tuple_size_v<uint_tuple<>> == 0);
 }
 
 }  // namespace
