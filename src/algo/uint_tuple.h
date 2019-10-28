@@ -60,20 +60,31 @@ constexpr size_t get_offset() {
 template <typename Result, size_t size>
 constexpr Result generate_mask() {
   if constexpr (sizeof(Result) * CHAR_BIT <= size) {
-    return -1;
+    return std::numeric_limits<Result>::max();
   } else {
     return (Result{1} << size) - 1;
   }
 }
 
 template <size_t idx, bool is_valid, size_t... sizes>
-struct tuple_element {};
+struct tuple_element_impl {};
 
 template <size_t idx, size_t... sizes>
-struct tuple_element<idx, true, sizes...> {
+struct tuple_element_impl<idx, true, sizes...> {
   using type =
       uint_t<_uint_tuple::round_to_possible_size(std::array{sizes...}[idx])>;
 };
+
+template <size_t idx, typename Tuple>
+struct tuple_element;
+
+template <size_t idx, size_t... sizes>
+struct tuple_element<idx, algo::uint_tuple<sizes...>>
+    : algo::_uint_tuple::tuple_element_impl<idx, (idx < sizeof...(sizes)),
+                                       sizes...> {};
+
+template <size_t idx, typename Tuple>
+using tuple_element_t = typename tuple_element<idx, Tuple>::type;
 
 }  // namespace _uint_tuple
 
@@ -92,11 +103,6 @@ class uint_tuple {
 
 namespace std {
 
-template <size_t idx, size_t... sizes>
-struct tuple_element<idx, algo::uint_tuple<sizes...>>
-    : algo::_uint_tuple::tuple_element<idx, (idx < sizeof...(sizes)),
-                                       sizes...> {};
-
 template <size_t... sizes>
 struct tuple_size<algo::uint_tuple<sizes...>>
     : std::integral_constant<size_t, sizeof...(sizes)> {};
@@ -107,7 +113,7 @@ namespace algo {
 
 template <size_t idx, size_t... sizes>
 constexpr auto get_at(uint_tuple<sizes...> t)
-    -> std::tuple_element_t<idx, uint_tuple<sizes...>> {
+    -> _uint_tuple::tuple_element_t<idx, uint_tuple<sizes...>> {
   using storage_type = typename uint_tuple<sizes...>::storage_type;
 
   constexpr auto bit_size = std::array{sizes...}[idx];
@@ -118,8 +124,9 @@ constexpr auto get_at(uint_tuple<sizes...> t)
 }
 
 template <size_t idx, size_t... sizes>
-constexpr void set_at(uint_tuple<sizes...>& t,
-                      std::tuple_element_t<idx, uint_tuple<sizes...>> value) {
+constexpr void set_at(
+    uint_tuple<sizes...>& t,
+    _uint_tuple::tuple_element_t<idx, uint_tuple<sizes...>> value) {
   using storage_type = typename uint_tuple<sizes...>::storage_type;
 
   constexpr auto bit_size = std::array{sizes...}[idx];
