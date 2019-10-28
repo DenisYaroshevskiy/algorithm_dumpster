@@ -25,6 +25,10 @@
 #include <stdexcept>
 
 namespace algo {
+
+template <size_t... sizes>
+class uint_tuple;
+
 namespace _uint_tuple {
 
 template <typename I, typename T, typename Op>
@@ -38,37 +42,77 @@ constexpr T accumulate(I f, I l, T x, Op op) {
 
 template <typename I, typename T>
 constexpr T accumulate(I f, I l, T x) {
-  return _uint_tuple::accumulate(f, l, x, std::plus<>{});
+  return _uint_tuple::accumulate(f, l, std::move(x), std::plus<>{});
 }
 
 constexpr size_t round_to_possible_size(size_t x) {
-  auto* found = algo::lower_bound(supported_uint_sizes.begin(),
-                                  supported_uint_sizes.end(), x);
-  if (found == supported_uint_sizes.end()) {
-    // Will cause a compile time error
-    throw std::range_error{"does not fit into an integer"};
-  }
-  return *found;
+  return *algo::lower_bound(supported_uint_sizes.begin(),
+                            supported_uint_sizes.end(), x);
 }
 
-template <size_t N>
-constexpr size_t select_size(std::array<size_t, N> sizes) {
-  return round_to_possible_size(
-    _uint_tuple::accumulate(sizes.begin(), sizes.end(), size_t{0})
-  );
+template <size_t idx, size_t... sizes>
+constexpr size_t get_offset() {
+  auto arr = std::array{sizes...};
+  return _uint_tuple::accumulate(arr.begin(), arr.begin() + idx, size_t{0});
 }
 
-template <size_t ... N>
-using selected_type = uint_t<select_size(std::array{N...})>;
+constexpr bool is_power_of_2(size_t x) { return !(x & (x - 1)); }
+
+template <size_t idx, bool is_valid, size_t... sizes>
+struct tuple_element {};
+
+template <size_t idx, size_t... sizes>
+struct tuple_element<idx, true, sizes...> {
+  using type = uint_t<std::array{sizes...}[idx]>;
+};
 
 }  // namespace _uint_tuple
 
-template <size_t... N>
+template <size_t... sizes>
 class uint_tuple {
+  static_assert((... + sizes) <= supported_uint_sizes.back());
+  static_assert((... && _uint_tuple::is_power_of_2(sizes)));
+
  public:
-  using storage_type = _uint_tuple::selected_type<N...>;
- private:
+  using storage_type =
+      uint_t<_uint_tuple::round_to_possible_size((... + sizes))>;
+
+  storage_type data_;
 };
+
+}  // namespace algo
+
+namespace std {
+
+template <size_t idx, size_t... sizes>
+struct tuple_element<idx, algo::uint_tuple<sizes...>>
+    : algo::_uint_tuple::tuple_element<idx, (idx < sizeof...(sizes)),
+                                       sizes...> {};
+
+template <size_t... sizes>
+struct tuple_size<algo::uint_tuple<sizes...>>
+    : std::integral_constant<size_t, sizeof...(sizes)> {};
+
+}  // namespace std
+
+namespace algo {
+
+template <size_t idx, size_t... sizes>
+constexpr auto get_at(uint_tuple<sizes...> t)
+    -> std::tuple_element_t<idx, uint_tuple<sizes...>> {
+  constexpr auto offset = _uint_tuple::get_offset<idx, sizes...>();
+  return t.data_ >> offset;
+}
+
+template <size_t idx, size_t... sizes,
+          typename Income = std::tuple_element_t<idx, uint_tuple<sizes...>>>
+constexpr void set_at(uint_tuple<sizes...>& t, Income value) {
+  constexpr Income mask = -1;
+  constexpr auto offset = _uint_tuple::get_offset<idx, sizes...>();
+  using storage_type = decltype(t.data_);
+  t.data_ &= ~(static_cast<storage_type>(mask) << offset);
+  t.data_ |= static_cast<storage_type>(value) << offset;
+}
 
 }  // namespace algo
 
