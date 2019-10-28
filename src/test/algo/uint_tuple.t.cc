@@ -56,33 +56,31 @@ TEST_CASE("algorithm.uint_tuple.get_at.type", "[algorithm]") {
 }
 
 TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
-  auto t = uint_tuple<8, 16, 32, 4, 4>{};
-  algo::set_at<0>(t, 5);
-  algo::set_at<1>(t, 20);
-  algo::set_at<2>(t, 80);
-  algo::set_at<3>(t, 15);
-  algo::set_at<4>(t, std::numeric_limits<uint8_t>::max());
-  REQUIRE(algo::get_at<0>(t) == 5);
-  REQUIRE(algo::get_at<1>(t) == 20);
-  REQUIRE(algo::get_at<2>(t) == 80);
-  REQUIRE(algo::get_at<3>(t) == 15);
-  REQUIRE(algo::get_at<4>(t) == 15);
-}
+  auto t = uint_tuple<8, 16, 32, 4, 1, 2>{};
+  set_at<0>(t, 5);
+  set_at<1>(t, 20);
+  set_at<2>(t, 80);
+  set_at<3>(t, 7);
+  set_at<4>(t, std::numeric_limits<uint8_t>::max());
+  set_at<5>(t, std::numeric_limits<uint8_t>::max());
+  REQUIRE(get_at<0>(t) == 5);
+  REQUIRE(get_at<1>(t) == 20);
+  REQUIRE(get_at<2>(t) == 80);
+  REQUIRE(get_at<3>(t) == 7);
+  REQUIRE(get_at<4>(t) == 1);
+  REQUIRE(get_at<5>(t) == 3);
 
-TEST_CASE("algorithm.uint_tuple.tuple_element", "[algorithm]") {
-  using tuple_t = uint_tuple<8, 16, 32, 4, 4>;
-  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<0, tuple_t>, uint8_t>);
-  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<1, tuple_t>, uint16_t>);
-  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<2, tuple_t>, uint32_t>);
-  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<3, tuple_t>, uint8_t>);
-  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<4, tuple_t>, uint8_t>);
-
-  STATIC_REQUIRE(
-      std::is_same_v<std::tuple_element_t<0, const tuple_t>, const uint8_t>);
-  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<1, volatile tuple_t>,
-                                volatile uint16_t>);
-  STATIC_REQUIRE(std::is_same_v<std::tuple_element_t<2, const volatile tuple_t>,
-                                const volatile uint32_t>);
+  SECTION("constexpr") {
+    auto sum = [](size_t a, size_t b, size_t c) {
+      auto t = uint_tuple<16, 32, 16>{};
+      set_at<0>(t, a);
+      set_at<1>(t, b);
+      set_at<2>(t, c);
+      return get_at<0>(t) + get_at<1>(t) + get_at<2>(t);
+    };
+    STATIC_REQUIRE(sum(1, 2, 3) == 6);
+    STATIC_REQUIRE(sum(8, 13, 21) == 42);
+  }
 }
 
 TEST_CASE("algorithm.uint_tuple.tuple_size", "[algorithm]") {
