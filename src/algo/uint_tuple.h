@@ -51,18 +51,24 @@ constexpr size_t round_to_possible_size(size_t x) {
                             supported_uint_sizes.end(), x);
 }
 
-template <size_t idx, size_t... sizes>
-constexpr size_t get_offset() {
-  auto arr = std::array{sizes...};
-  return _uint_tuple::accumulate(arr.begin() + idx + 1, arr.end(), size_t{0});
-}
+template <typename Mask>
+struct bit_info_t {
+  Mask mask;
+  size_t offset;
+};
+template <typename Mask>
+bit_info_t(Mask, size_t)->bit_info_t<Mask>;
 
-template <typename Result, size_t size>
-constexpr Result generate_mask() {
+template <typename Result, size_t idx, size_t... sizes>
+constexpr auto get_mask_and_offset() {
+  constexpr auto arr = std::array{sizes...};
+  auto offset =
+      _uint_tuple::accumulate(arr.begin() + idx + 1, arr.end(), size_t{0});
+  constexpr auto size = arr[idx];
   if constexpr (sizeof(Result) * CHAR_BIT <= size) {
-    return std::numeric_limits<Result>::max();
+    return bit_info_t{std::numeric_limits<Result>::max(), offset};
   } else {
-    return (Result{1} << size) - 1;
+    return bit_info_t{(Result{1} << size) - 1, offset};
   }
 }
 
@@ -104,11 +110,9 @@ constexpr auto get_at(uint_tuple<sizes...> t)
     -> _uint_tuple::element_t<idx, uint_tuple<sizes...>> {
   using storage_type = typename uint_tuple<sizes...>::storage_type;
 
-  constexpr auto bit_size = std::array{sizes...}[idx];
-  constexpr auto mask = _uint_tuple::generate_mask<storage_type, bit_size>();
-
-  constexpr auto offset = _uint_tuple::get_offset<idx, sizes...>();
-  return (t.data_ >> offset) & mask;
+  constexpr auto bit_info =
+      _uint_tuple::get_mask_and_offset<storage_type, idx, sizes...>();
+  return (t.data_ >> bit_info.offset) & bit_info.mask;
 }
 
 template <size_t idx, size_t... sizes>
@@ -116,12 +120,11 @@ constexpr void set_at(uint_tuple<sizes...>& t,
                       _uint_tuple::element_t<idx, uint_tuple<sizes...>> value) {
   using storage_type = typename uint_tuple<sizes...>::storage_type;
 
-  constexpr auto bit_size = std::array{sizes...}[idx];
-  constexpr auto mask = _uint_tuple::generate_mask<storage_type, bit_size>();
-
-  constexpr auto offset = _uint_tuple::get_offset<idx, sizes...>();
-  t.data_ &= ~(mask << offset);
-  t.data_ |= (mask & static_cast<storage_type>(value)) << offset;
+  constexpr auto bit_info =
+      _uint_tuple::get_mask_and_offset<storage_type, idx, sizes...>();
+  t.data_ &= ~(bit_info.mask << bit_info.offset);
+  t.data_ |= (bit_info.mask & static_cast<storage_type>(value))
+             << bit_info.offset;
 }
 
 }  // namespace algo
