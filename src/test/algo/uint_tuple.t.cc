@@ -28,6 +28,29 @@ void storage_type_test() {
   STATIC_REQUIRE(std::is_same_v<T, typename uint_tuple<N...>::storage_type>);
 }
 
+template <typename T, size_t... is, typename... Values>
+constexpr void set_at_all_impl(T& t, std::index_sequence<is...>, Values... vs) {
+  (set_at<is>(t, static_cast<std::make_unsigned_t<Values>>(vs)), ...);
+}
+
+template <size_t... sizes, typename... Values>
+constexpr void set_at_all(uint_tuple<sizes...>& t, Values... vs) {
+  set_at_all_impl(t, std::make_index_sequence<sizeof...(sizes)>{}, vs...);
+}
+
+template <typename T, size_t... is, typename... Values>
+void check_at_all_impl(T t, std::index_sequence<is...>,
+                                 Values... vs) {
+  auto require = [](bool b) { REQUIRE(b); };
+  (require(get_at<is>(t) == static_cast<std::make_unsigned_t<Values>>(vs)),
+   ...);
+}
+
+template <size_t... sizes, typename... Values>
+void check_at_all(uint_tuple<sizes...> t, Values... vs) {
+  check_at_all_impl(t, std::make_index_sequence<sizeof...(sizes)>{}, vs...);
+}
+
 TEST_CASE("algorithm.uint_tuple.type", "[algorithm]") {
   storage_type_test<uint8_t, 1>();
   storage_type_test<uint8_t, 4, 4>();
@@ -57,30 +80,77 @@ TEST_CASE("algorithm.uint_tuple.get_at.type", "[algorithm]") {
 
 TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
   auto t = uint_tuple<8, 16, 32, 4, 1, 2>{};
-  set_at<0>(t, 5);
-  set_at<1>(t, 20);
-  set_at<2>(t, 80);
-  set_at<3>(t, 7);
-  set_at<4>(t, std::numeric_limits<uint8_t>::max());
-  set_at<5>(t, std::numeric_limits<uint8_t>::max());
-  REQUIRE(get_at<0>(t) == 5);
-  REQUIRE(get_at<1>(t) == 20);
-  REQUIRE(get_at<2>(t) == 80);
-  REQUIRE(get_at<3>(t) == 7);
-  REQUIRE(get_at<4>(t) == 1);
-  REQUIRE(get_at<5>(t) == 3);
+  set_at_all(t, 5, 20, 80, 7, 1, 2);
+  check_at_all(t, 5, 20, 80, 7, 1, 2);
+
+  static constexpr auto mx = std::numeric_limits<uint64_t>::max();
+  set_at_all(t, mx, mx, mx, mx, mx, mx);
+  check_at_all(t, std::numeric_limits<uint8_t>::max(),
+               std::numeric_limits<uint16_t>::max(),
+               std::numeric_limits<uint32_t>::max(), (1 << 4) - 1, 1,
+               (1 << 2) - 1);
 
   SECTION("constexpr") {
     auto sum = [](size_t a, size_t b, size_t c) {
       auto t = uint_tuple<16, 32, 16>{};
-      set_at<0>(t, a);
-      set_at<1>(t, b);
-      set_at<2>(t, c);
+      set_at_all(t, a, b, c);
       return get_at<0>(t) + get_at<1>(t) + get_at<2>(t);
     };
     STATIC_REQUIRE(sum(1, 2, 3) == 6);
     STATIC_REQUIRE(sum(8, 13, 21) == 42);
   }
+}
+
+TEST_CASE("algorithm.uint_tuple.cmp", "[algorithm]") {
+  auto t = uint_tuple<8, 16, 32, 4, 1, 2>{};
+  set_at_all(t, 5, 20, 80, 7, 1, 2);
+  REQUIRE(t == t);
+  REQUIRE(t <= t);
+  REQUIRE(t >= t);
+  REQUIRE_FALSE(t != t);
+  REQUIRE_FALSE(t < t);
+  REQUIRE_FALSE(t > t);
+
+  auto t2 = t;
+  REQUIRE(t2 == t);
+  REQUIRE(t2 <= t);
+  REQUIRE(t2 >= t);
+  REQUIRE_FALSE(t2 != t);
+  REQUIRE_FALSE(t2 < t);
+  REQUIRE_FALSE(t2 > t);
+  REQUIRE(t == t2);
+  REQUIRE(t <= t2);
+  REQUIRE(t >= t2);
+  REQUIRE_FALSE(t != t2);
+  REQUIRE_FALSE(t < t2);
+  REQUIRE_FALSE(t > t2);
+
+  // Increasing t
+  set_at<3>(t, 10);
+  REQUIRE_FALSE(t == t2);
+  REQUIRE_FALSE(t <= t2);
+  REQUIRE(t >= t2);
+  REQUIRE(t != t2);
+  REQUIRE_FALSE(t < t2);
+  REQUIRE(t > t2);
+
+  // Increasing t2
+  set_at<2>(t2, 89);
+  REQUIRE_FALSE(t == t2);
+  REQUIRE(t <= t2);
+  REQUIRE_FALSE(t >= t2);
+  REQUIRE(t != t2);
+  REQUIRE(t < t2);
+  REQUIRE_FALSE(t > t2);
+
+  // Decreasing t2
+  set_at<1>(t2, 15);
+  REQUIRE_FALSE(t == t2);
+  REQUIRE_FALSE(t <= t2);
+  REQUIRE(t >= t2);
+  REQUIRE(t != t2);
+  REQUIRE_FALSE(t < t2);
+  REQUIRE(t > t2);
 }
 
 }  // namespace

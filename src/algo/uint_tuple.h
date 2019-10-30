@@ -56,9 +56,6 @@ struct bit_info_t {
   size_t offset;
 };
 
-template <typename Mask>
-bit_info_t(Mask, size_t)->bit_info_t<Mask>;
-
 template <typename Result, size_t idx, size_t... sizes>
 constexpr auto get_mask_and_offset() {
   constexpr auto arr = std::array{sizes...};
@@ -66,9 +63,9 @@ constexpr auto get_mask_and_offset() {
       _uint_tuple::accumulate(arr.begin() + idx + 1, arr.end(), size_t{0});
   constexpr auto size = arr[idx];
   if constexpr (sizeof(Result) * CHAR_BIT <= size) {
-    return bit_info_t{std::numeric_limits<Result>::max(), offset};
+    return bit_info_t<Result>{std::numeric_limits<Result>::max(), offset};
   } else {
-    return bit_info_t{(Result{1} << size) - 1, offset};
+    return bit_info_t<Result>{(Result{1} << size) - 1, offset};
   }
 }
 
@@ -102,6 +99,25 @@ struct uint_tuple {
  public:
   using storage_type =
       uint_t<_uint_tuple::round_to_possible_size((... + sizes))>;
+
+  friend bool operator<(uint_tuple lhs, uint_tuple rhs) {
+    return lhs.data < rhs.data;
+  }
+  friend bool operator<=(uint_tuple lhs, uint_tuple rhs) {
+    return lhs.data <= rhs.data;
+  }
+  friend bool operator>(uint_tuple lhs, uint_tuple rhs) {
+    return lhs.data > rhs.data;
+  }
+  friend bool operator>=(uint_tuple lhs, uint_tuple rhs) {
+    return lhs.data >= rhs.data;
+  }
+  friend bool operator==(uint_tuple lhs, uint_tuple rhs) {
+    return lhs.data == rhs.data;
+  }
+  friend bool operator!=(uint_tuple lhs, uint_tuple rhs) {
+    return lhs.data != rhs.data;
+  }
 
   storage_type data;
 };
