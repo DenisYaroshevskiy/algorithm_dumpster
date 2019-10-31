@@ -1,0 +1,1 @@
+python3 scripts/run_benchmark_folder.py data/plots/zip_to_pair_bit_size_base.json build/src/bench_runnable/zip_to_pair_bit_size_ignore_1000 data

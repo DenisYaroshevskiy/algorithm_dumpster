@@ -1,0 +1,20 @@
+{
+  "base": "data/plots/zip_to_pair_bit_size_base.json",
+  "general": {
+    "title": "zip to pair bit size ignore 1000"
+  },
+  "measurements": [
+    {
+      "name": "use_pair",
+      "url": "data/zip_to_pair_bit_size_ignore_1000/use_pair.json"
+    },
+    {
+      "name": "use_uint_tuple_second_first",
+      "url": "data/zip_to_pair_bit_size_ignore_1000/use_uint_tuple_second_first.json"
+    },
+    {
+      "name": "use_uint_tuple_first_second",
+      "url": "data/zip_to_pair_bit_size_ignore_1000/use_uint_tuple_first_second.json"
+    }
+  ]
+}

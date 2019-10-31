@@ -1,0 +1,66 @@
+{
+  "context": {
+    "date": "2019-10-31 01:34:59",
+    "executable": "build/src/bench_runnable/zip_to_pair_bit_size_ignore_1000/use_pair",
+    "num_cpus": 4,
+    "mhz_per_cpu": 1800,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 3145728000,
+        "num_sharing": 4
+      }
+    ],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/8",
+      "iterations": 8268563,
+      "real_time": 8.3240256742331084e+01,
+      "cpu_time": 8.3088439913924589e+01,
+      "time_unit": "ns"
+    },
+    {
+      "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/16",
+      "iterations": 4216486,
+      "real_time": 1.6561118073131919e+02,
+      "cpu_time": 1.6531775511646427e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/32",
+      "iterations": 2089746,
+      "real_time": 3.3498568773008429e+02,
+      "cpu_time": 3.3438465727413762e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/64",
+      "iterations": 1956362,
+      "real_time": 3.5763566864974797e+02,
+      "cpu_time": 3.5701930419830262e+02,
+      "time_unit": "ns"
+    }
+  ]
+}

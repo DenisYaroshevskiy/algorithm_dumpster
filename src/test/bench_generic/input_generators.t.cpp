@@ -32,6 +32,15 @@ TEST_CASE("bench.input_generators.generate_random_vector", "[bench]") {
   REQUIRE(res == std::vector(inputs.begin(), inputs.end()));
 }
 
+template <size_t size>
+void uint_t_generate_sorted_vector_test() {
+  std::array inputs = {0, 2, 4};
+  auto src = [&, pos = 0]() mutable { return inputs[pos++]; };
+
+  auto res = generate_sorted_vector<algo::uint_t<size>>(inputs.size(), src);
+  REQUIRE(res == std::vector<algo::uint_t<size>>{0, 2, 4});
+}
+
 TEST_CASE("bench.input_generators.generate_sorted_vector", "[bench]") {
   {
     std::array inputs = {0, 5, 2, 2, 1};
@@ -67,6 +76,11 @@ TEST_CASE("bench.input_generators.generate_sorted_vector", "[bench]") {
     REQUIRE(res[1].data == 2);
     REQUIRE(res[2].data == 4);
   }
+
+  uint_t_generate_sorted_vector_test<8>();
+  uint_t_generate_sorted_vector_test<16>();
+  uint_t_generate_sorted_vector_test<32>();
+  uint_t_generate_sorted_vector_test<64>();
 }
 
 TEST_CASE("bench.input_generators.generate_unique_sorted_vector", "[bench]") {
@@ -114,7 +128,8 @@ TEST_CASE("bench.input_generators.nth_vector_permutation", "[bench]") {
 
 TEST_CASE("bench.input_generators.shuffled_vector", "[bench]") {
   auto run = [](int percentage) {
-    return shuffled_vector(100u, percentage, [](size_t size){ return sorted_vector<int>(size); });
+    return shuffled_vector(
+        100u, percentage, [](size_t size) { return sorted_vector<int>(size); });
   };
 
   {
