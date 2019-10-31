@@ -544,6 +544,7 @@ This was to measure wether a different codegen for uint_tuple vs std::pair is be
 On my machine - noticebaly better.
 
 This benchmark on Quick-bench: http://quick-bench.com/aDq3iN3dpi9VWQc8XSd6o7Hlzl4
+Bug about suboptimal codegen: https://bugs.llvm.org/show_bug.cgi?id=43864
 
 ## Test
 
