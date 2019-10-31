@@ -429,8 +429,7 @@ Repeat the same operation multiple types without the loop.
 
 _implemented by Oleg Fatkhiev(@ofats)_
 
-_TODO: comparison functions_ <br>
-_TODO: benchmarks_ <br>
+_TODO: benchmarks for comparison functions_ <br>
 _TODO: warn or fail on using bigger type_ <br>
 _TODO: report to clang slow codegen for pair bug_ <br>
 
@@ -441,10 +440,12 @@ Also possibility to pack data sometimes can be very useful.
 Thanks to Philip Trettner for help with paddings and comparisons.
 Some inspiration from [Andrew Alexandrescu's talk, Writing Quick Code in C++, Quickly](https://youtu.be/ea5DiCg8HOY) - about Tudor Bosman's bitfield stuff.
 
-Looked at the codegen for shifts vs pairs and structs.<br/>
-Clang generates identical code for the simplest case.
-For the set 2 uints vs a pair, clang generates different code (shitfs + 1 store anstead of two stores and this is faster according to my measurements - see zip_to_pair benchmark)
-https://gcc.godbolt.org/z/YfdnZo
+
+Tried seters/getters in a pair (same bit size for both) using uint_tuple and std::pair<br/>
+Mostly identical code, except when setting two integers simoteniously.<br/>
+In this case, uint_tuple is significantly faster - see zip_to_pair benchmark.<br/>
+Reported this to clang: https://bugs.llvm.org/show_bug.cgi?id=43864 <br/>
+Godbolt to play around: https://gcc.godbolt.org/z/YfdnZo
 
 
 ## Bench (generic/runnable)
@@ -543,8 +544,7 @@ Pairs are of the same uint type for both elements.<br/>
 This was to measure wether a different codegen for uint_tuple vs std::pair is better or worse.<br/>
 On my machine - noticebaly better.
 
-This benchmark on Quick-bench: http://quick-bench.com/aDq3iN3dpi9VWQc8XSd6o7Hlzl4
-Bug about suboptimal codegen: https://bugs.llvm.org/show_bug.cgi?id=43864
+This benchmark on Quick-bench: http://quick-bench.com/aDq3iN3dpi9VWQc8XSd6o7Hlzl4<br/>
 
 ## Test
 
