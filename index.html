@@ -16,6 +16,8 @@
   <a href="#lower_bounds">lower bounds</a>
   <a href="#merges">merges</a>
   <a href="#sorts">sorts</a>
+  <a href="#uint_tuple">uint_tuple</a>
+
 
   <a name="apply_rearrangments"></a>
   <h2><a href="#apply_rearrangments">Apply rearrangments</a></h2>
@@ -100,4 +102,18 @@
       'data/sort_size_{}_100/description.json',
       ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair', 'noinline_int']);
   </script>
+
+  <a name="uint_tuple"></a>
+  <h2><a href="#uint_tuple">Uint tuple</a></h2>
+
+  <h3>Zip to pair</h3>
+  Zip to pair doesn't super well fit into my current visualization framework.<br/>
+  It measures how much faster it is to populate a uint_tuple&lt;x,x&gt; compared to std::pair.<br/>
+  I believe this to be a clang codegen bug.<br/><br/>
+
+  <div id='uint_tuple_1000'></div>
+  <script>visualizeBecnhmarksForTypes('uint_tuple_1000',
+      'data/zip_to_pair_bit_size_{}_1000/description.json', ['ignore']);
+  </script>
+
 </body>

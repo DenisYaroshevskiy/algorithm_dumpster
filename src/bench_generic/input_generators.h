@@ -32,6 +32,7 @@
 #include "algo/memoized_function.h"
 #include "algo/nth_permutation.h"
 #include "algo/shuffle_biased.h"
+#include "algo/type_functions.h"
 #include "bench_generic/fake_url.h"
 #include "bench_generic/noinline_int.h"
 
@@ -41,22 +42,16 @@ using std_int64_t = std::int64_t;
 
 using fake_url_pair = std::pair<fake_url, fake_url>;
 
-template <typename>
-struct int_to_t;
-
-template <>
-struct int_to_t<int> {
-  int operator()(int x) const { return x; }
+template <typename T>
+struct int_to_t {
+  std::enable_if_t<std::is_integral_v<T>, T> operator()(int x) const {
+    return x;
+  }
 };
 
 template <>
 struct int_to_t<double> {
   double operator()(int x) const { return 1.0 / x; }
-};
-
-template <>
-struct int_to_t<std_int64_t> {
-  std_int64_t operator()(int x) const { return x; }
 };
 
 template <>
@@ -73,9 +68,7 @@ struct int_to_t<fake_url_pair> {
 
 template <>
 struct int_to_t<noinline_int> {
-  noinline_int operator()(int x) const {
-    return noinline_int{x};
-  }
+  noinline_int operator()(int x) const { return noinline_int{x}; }
 };
 
 namespace detail {
@@ -141,6 +134,21 @@ std::vector<T> sorted_vector(size_t size) {
   });
 
   return gen(size);
+}
+
+template <typename T>
+std::pair<std::vector<T>, std::vector<T>> two_random_vectors(size_t x_size,
+                                                             size_t y_size) {
+  using namespace detail;
+
+  static auto gen = algo::memoized_function<std::pair<size_t, size_t>>(
+      [](std::pair<size_t, size_t> sizes) {
+        auto src = uniform_src(sizes.first + sizes.second);
+        return std::make_pair(generate_random_vector<T>(sizes.first, src),
+                              generate_random_vector<T>(sizes.second, src));
+      });
+
+  return gen({x_size, y_size});
 }
 
 template <typename T>

@@ -54,6 +54,14 @@ inline void set_5_size_increases(benchmark::internal::Benchmark* b) {
   }
 }
 
+template <size_t total_size>
+inline void set_every_int_size(benchmark::internal::Benchmark* b) {
+  b->Args({static_cast<int>(total_size), 8});
+  b->Args({static_cast<int>(total_size), 16});
+  b->Args({static_cast<int>(total_size), 32});
+  b->Args({static_cast<int>(total_size), 64});
+}
+
 }  // namespace bench
 
 #endif  // BENCH_SET_PARAMETERS_H

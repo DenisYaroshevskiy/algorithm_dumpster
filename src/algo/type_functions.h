@@ -18,6 +18,7 @@
 #define ALGO_TYPE_FUNCTIONS_H
 
 #include <array>
+#include <climits>
 #include <iterator>
 #include <type_traits>
 
@@ -32,7 +33,7 @@ struct type_t {
 
 struct null_t {};
 
-namespace detail {
+namespace _type_functions {
 
 template <typename I>
 struct is_move_iterator : std::false_type {};
@@ -84,7 +85,7 @@ constexpr auto uint_t_impl() {
   }
 }
 
-}  // namespace detail
+}  // namespace _type_functions
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;
@@ -114,17 +115,17 @@ constexpr bool RandomAccessIterator =
     std::is_base_of_v<std::random_access_iterator_tag, IteratorCategory<I>>;
 
 template <typename I>
-constexpr bool MoveIterator = detail::is_move_iterator<I>::value;
+constexpr bool MoveIterator = _type_functions::is_move_iterator<I>::value;
 
 template <typename I>
-constexpr bool ReverseIterator = detail::is_reverse_iterator<I>::value;
+constexpr bool ReverseIterator = _type_functions::is_reverse_iterator<I>::value;
 
 template <typename F>
 // require UnaryCallable<F>
-using ArgumentType = typename detail::argument_type_impl<F>::type;
+using ArgumentType = typename _type_functions::argument_type_impl<F>::type;
 
 template <size_t N>
-using uint_t = typename decltype(detail::uint_t_impl<N>())::type;
+using uint_t = typename decltype(_type_functions::uint_t_impl<N>())::type;
 
 inline constexpr std::array supported_uint_sizes = {
     size_t{8},   //
@@ -136,6 +137,16 @@ inline constexpr std::array supported_uint_sizes = {
     size_t{128}  //
 #endif           // HAS_128_INTS
 };
+
+template <typename T>
+constexpr auto uint_bit_size() -> std::enable_if_t<std::is_unsigned_v<T>, size_t> {
+  auto* f = supported_uint_sizes.begin();
+  while (f != supported_uint_sizes.end()) {
+    if (*f == sizeof(T) * CHAR_BIT) return *f;
+    ++f;
+  }
+  throw null_t{};  // compile time assert
+}
 
 }  // namespace algo
 

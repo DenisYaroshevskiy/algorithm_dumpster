@@ -412,6 +412,7 @@ In many respects, this is my crack at the last task in the <br/>
 `Pointer`<br/>
 `Reference` <br/>
 `uint_t` <br/>
+`uint_bit_size` <br/>
 `ValueType`
 
 Collection of basic template magic stuff.
@@ -428,10 +429,10 @@ Repeat the same operation multiple types without the loop.
 
 _implemented by Oleg Fatkhiev(@ofats)_
 
-_TODO: comparison functions_
-_TODO: benchmarks_
-_TODO: codegen is not there yet_
-_TODO: warn or fail on using bigger type_
+_TODO: comparison functions_ <br>
+_TODO: benchmarks_ <br>
+_TODO: warn or fail on using bigger type_ <br>
+_TODO: report to clang slow codegen for pair bug_ <br>
 
 A tuple that stores unsigned numbers into a single unsgined integer of an appropritate size.<br/>
 The main benefit is the abitlity to compare them with one machine instruction.
@@ -440,12 +441,11 @@ Also possibility to pack data sometimes can be very useful.
 Thanks to Philip Trettner for help with paddings and comparisons.
 Some inspiration from [Andrew Alexandrescu's talk, Writing Quick Code in C++, Quickly](https://youtu.be/ea5DiCg8HOY) - about Tudor Bosman's bitfield stuff.
 
-Looked at the codegen for shifts vs manually selecting elements in the struct.<br/>
-Clang generates identical code for the simplest case. I'm impressed.
-https://gcc.godbolt.org/z/C1d0MO
+Looked at the codegen for shifts vs pairs and structs.<br/>
+Clang generates identical code for the simplest case.
+For the set 2 uints vs a pair, clang generates different code (shitfs + 1 store anstead of two stores and this is faster according to my measurements - see zip_to_pair benchmark)
+https://gcc.godbolt.org/z/YfdnZo
 
-For two ints it still does not. Which requires measurements, but ideally it means
- that I can use bit shifts and write portable and efficient code.
 
 ## Bench (generic/runnable)
 
@@ -529,6 +529,19 @@ Merge with small - benchmarks merge of a big first range with a small second one
 `sort_int_vec`
 
 Benchmarking sort like algorithms.
+
+### zip_to_pair
+
+`use_pair`<br/>
+`use_uint_tuple_first_second`<br/>
+`use_uint_tuple_second_first`<br/>
+`zip_to_pair_common`<br/>
+`zip_to_pair_bit_size`
+
+Benchmarking popluating a number of elemts into a vector of pairs using different types of pairs.<br/>
+Pairs are of the same uint type for both elements.<br/>
+This was to measure wether a different codegen for uint_tuple vs std::pair is better or worse.<br/>
+On my machine - noticebaly better.
 
 ## Test
 

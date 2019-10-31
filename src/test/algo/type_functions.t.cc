@@ -82,5 +82,15 @@ TEST_CASE("algorithm.uint_t", "[algorithm]") {
   (void)assert_no_such_uint_t<10>{};
 }
 
+TEST_CASE("algorithm.uint_bit_size", "[algorithm]") {
+  static_assert(uint_bit_size<std::uint8_t>() == 8);
+  static_assert(uint_bit_size<std::uint16_t>() == 16);
+  static_assert(uint_bit_size<std::uint32_t>() == 32);
+  static_assert(uint_bit_size<std::uint64_t>() == 64);
+#ifdef HAS_128_INTS
+  static_assert(uint_bit_size<uint_t<128>>() == 128);
+#endif
+}
+
 }  // namespace
 }  // namespace algo

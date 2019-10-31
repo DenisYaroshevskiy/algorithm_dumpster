@@ -145,3 +145,9 @@ add_apply_rearrangement_benchmarks(apply_rearrangment fake_url 1000)
 add_apply_rearrangement_benchmarks(apply_rearrangment fake_url_pair 1000)
 
 add_counting_benchmark(apply_rearrangment_1000_counting)
+
+# Uint tuple ##########################
+
+add_benchmark(zip_to_pair_bit_size use_pair ignore  1000)
+add_benchmark(zip_to_pair_bit_size use_uint_tuple_first_second ignore 1000)
+add_benchmark(zip_to_pair_bit_size use_uint_tuple_second_first ignore 1000)
