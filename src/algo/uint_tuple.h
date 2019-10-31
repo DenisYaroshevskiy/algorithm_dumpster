@@ -89,6 +89,9 @@ struct element<idx, algo::uint_tuple<sizes...>>
 template <size_t idx, typename Tuple>
 using element_t = typename element<idx, Tuple>::type;
 
+template <typename Tuple, size_t... ids, typename... Args>
+constexpr void construct(Tuple& t, std::index_sequence<ids...>, Args... args);
+
 }  // namespace _uint_tuple
 
 template <size_t... sizes>
@@ -100,14 +103,38 @@ struct uint_tuple {
   using storage_type =
       uint_t<_uint_tuple::round_to_possible_size((... + sizes))>;
 
-  friend bool operator==(uint_tuple x, uint_tuple y) {
+  constexpr uint_tuple() noexcept = default;
+
+  template <typename... Ts,
+            typename = std::enable_if_t<
+                (std::is_convertible_v<
+                     Ts, uint_t<_uint_tuple::round_to_possible_size(sizes)>> &&
+                 ...)>>
+  constexpr uint_tuple(const std::tuple<Ts...>& t) : data(0) {
+    std::apply(
+        [this](auto... args) {
+          _uint_tuple::construct(*this, std::index_sequence_for<Ts...>{},
+                                 args...);
+        },
+        t);
+  }
+
+  friend constexpr bool operator==(uint_tuple x, uint_tuple y) {
     return x.data == y.data;
   }
-  friend bool operator!=(uint_tuple x, uint_tuple y) { return !(x == y); }
-  friend bool operator<(uint_tuple x, uint_tuple y) { return x.data < y.data; }
-  friend bool operator<=(uint_tuple x, uint_tuple y) { return !(y < x); }
-  friend bool operator>(uint_tuple x, uint_tuple y) { return y < x; }
-  friend bool operator>=(uint_tuple x, uint_tuple y) { return !(x < y); }
+  friend constexpr bool operator!=(uint_tuple x, uint_tuple y) {
+    return !(x == y);
+  }
+  friend constexpr bool operator<(uint_tuple x, uint_tuple y) {
+    return x.data < y.data;
+  }
+  friend constexpr bool operator<=(uint_tuple x, uint_tuple y) {
+    return !(y < x);
+  }
+  friend constexpr bool operator>(uint_tuple x, uint_tuple y) { return y < x; }
+  friend constexpr bool operator>=(uint_tuple x, uint_tuple y) {
+    return !(x < y);
+  }
 
   storage_type data;
 };
@@ -133,6 +160,15 @@ constexpr void set_at(uint_tuple<sizes...>& t,
   t.data |= (bit_info.mask & static_cast<storage_type>(value))
             << bit_info.offset;
 }
+
+namespace _uint_tuple {
+
+template <typename Tuple, size_t... ids, typename... Args>
+constexpr void construct(Tuple& t, std::index_sequence<ids...>, Args... args) {
+  (..., set_at<ids>(t, args));
+}
+
+}  // namespace _uint_tuple
 
 }  // namespace algo
 
