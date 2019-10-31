@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-#include "algo/uint_tuple.h"
-
 #include <type_traits>
 
+#include "algo/uint_tuple.h"
 #include "test/catch.h"
 
 namespace algo {
@@ -29,21 +28,9 @@ void storage_type_test() {
 }
 
 template <typename T, size_t... is, typename... Values>
-constexpr void set_at_all_impl(T& t, std::index_sequence<is...>, Values... vs) {
-  (set_at<is>(t, static_cast<std::make_unsigned_t<Values>>(vs)), ...);
-}
-
-template <size_t... sizes, typename... Values>
-constexpr void set_at_all(uint_tuple<sizes...>& t, Values... vs) {
-  set_at_all_impl(t, std::make_index_sequence<sizeof...(sizes)>{}, vs...);
-}
-
-template <typename T, size_t... is, typename... Values>
-void check_at_all_impl(T t, std::index_sequence<is...>,
-                                 Values... vs) {
+void check_at_all_impl(T t, std::index_sequence<is...>, Values... vs) {
   auto require = [](bool b) { REQUIRE(b); };
-  (require(get_at<is>(t) == static_cast<std::make_unsigned_t<Values>>(vs)),
-   ...);
+  (require(get_at<is>(t) == vs), ...);
 }
 
 template <size_t... sizes, typename... Values>
@@ -79,21 +66,20 @@ TEST_CASE("algorithm.uint_tuple.get_at.type", "[algorithm]") {
 }
 
 TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
-  auto t = uint_tuple<8, 16, 32, 4, 1, 2>{};
-  set_at_all(t, 5, 20, 80, 7, 1, 2);
-  check_at_all(t, 5, 20, 80, 7, 1, 2);
+  using tuple_t = uint_tuple<8, 16, 32, 4, 1, 2>;
+  tuple_t t = std::tuple{5u, 20u, 80u, 7u, 1u, 2u};
+  check_at_all(t, 5u, 20u, 80u, 7u, 1u, 2u);
 
   static constexpr auto mx = std::numeric_limits<uint64_t>::max();
-  set_at_all(t, mx, mx, mx, mx, mx, mx);
+  t = std::tuple{mx, mx, mx, mx, mx, mx};
   check_at_all(t, std::numeric_limits<uint8_t>::max(),
                std::numeric_limits<uint16_t>::max(),
-               std::numeric_limits<uint32_t>::max(), (1 << 4) - 1, 1,
-               (1 << 2) - 1);
+               std::numeric_limits<uint32_t>::max(), (1u << 4) - 1, 1u,
+               (1u << 2) - 1);
 
   SECTION("constexpr") {
     auto sum = [](size_t a, size_t b, size_t c) {
-      auto t = uint_tuple<16, 32, 16>{};
-      set_at_all(t, a, b, c);
+      uint_tuple<16, 32, 16> t = std::tuple{a, b, c};
       return get_at<0>(t) + get_at<1>(t) + get_at<2>(t);
     };
     STATIC_REQUIRE(sum(1, 2, 3) == 6);
@@ -102,8 +88,8 @@ TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
 }
 
 TEST_CASE("algorithm.uint_tuple.cmp", "[algorithm]") {
-  auto t = uint_tuple<8, 16, 32, 4, 1, 2>{};
-  set_at_all(t, 5, 20, 80, 7, 1, 2);
+  using tuple_t = uint_tuple<8, 16, 32, 4, 1, 2>;
+  tuple_t t = std::tuple{5u, 20u, 80u, 7u, 1u, 2u};
   REQUIRE(t == t);
   REQUIRE(t <= t);
   REQUIRE(t >= t);
