@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+#include "algo/uint_tuple.h"
+
 #include <type_traits>
 
-#include "algo/uint_tuple.h"
 #include "test/catch.h"
 
 namespace algo {
@@ -67,11 +68,11 @@ TEST_CASE("algorithm.uint_tuple.get_at.type", "[algorithm]") {
 
 TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
   using tuple_t = uint_tuple<8, 16, 32, 4, 1, 2>;
-  tuple_t t = std::tuple{5u, 20u, 80u, 7u, 1u, 2u};
+  auto t = tuple_t{5u, 20u, 80u, 7u, 1u, 2u};
   check_at_all(t, 5u, 20u, 80u, 7u, 1u, 2u);
 
   static constexpr auto mx = std::numeric_limits<uint64_t>::max();
-  t = std::tuple{mx, mx, mx, mx, mx, mx};
+  t = tuple_t{mx, mx, mx, mx, mx, mx};
   check_at_all(t, std::numeric_limits<uint8_t>::max(),
                std::numeric_limits<uint16_t>::max(),
                std::numeric_limits<uint32_t>::max(), (1u << 4) - 1, 1u,
@@ -79,7 +80,7 @@ TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
 
   SECTION("constexpr") {
     auto sum = [](size_t a, size_t b, size_t c) {
-      uint_tuple<16, 32, 16> t = std::tuple{a, b, c};
+      auto t = uint_tuple<16, 32, 16>{a, b, c};
       return get_at<0>(t) + get_at<1>(t) + get_at<2>(t);
     };
     STATIC_REQUIRE(sum(1, 2, 3) == 6);
@@ -89,7 +90,7 @@ TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
 
 TEST_CASE("algorithm.uint_tuple.cmp", "[algorithm]") {
   using tuple_t = uint_tuple<8, 16, 32, 4, 1, 2>;
-  tuple_t t = std::tuple{5u, 20u, 80u, 7u, 1u, 2u};
+  auto t = tuple_t{5u, 20u, 80u, 7u, 1u, 2u};
   REQUIRE(t == t);
   REQUIRE(t <= t);
   REQUIRE(t >= t);
