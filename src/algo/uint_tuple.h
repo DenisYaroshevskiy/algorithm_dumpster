@@ -100,24 +100,14 @@ struct uint_tuple {
   using storage_type =
       uint_t<_uint_tuple::round_to_possible_size((... + sizes))>;
 
-  friend bool operator<(uint_tuple lhs, uint_tuple rhs) {
-    return lhs.data < rhs.data;
+  friend bool operator==(uint_tuple x, uint_tuple y) {
+    return x.data == y.data;
   }
-  friend bool operator<=(uint_tuple lhs, uint_tuple rhs) {
-    return lhs.data <= rhs.data;
-  }
-  friend bool operator>(uint_tuple lhs, uint_tuple rhs) {
-    return lhs.data > rhs.data;
-  }
-  friend bool operator>=(uint_tuple lhs, uint_tuple rhs) {
-    return lhs.data >= rhs.data;
-  }
-  friend bool operator==(uint_tuple lhs, uint_tuple rhs) {
-    return lhs.data == rhs.data;
-  }
-  friend bool operator!=(uint_tuple lhs, uint_tuple rhs) {
-    return lhs.data != rhs.data;
-  }
+  friend bool operator!=(uint_tuple x, uint_tuple y) { return !(x == y); }
+  friend bool operator<(uint_tuple x, uint_tuple y) { return x.data < y.data; }
+  friend bool operator<=(uint_tuple x, uint_tuple y) { return !(y < x); }
+  friend bool operator>(uint_tuple x, uint_tuple y) { return y < x; }
+  friend bool operator>=(uint_tuple x, uint_tuple y) { return !(x < y); }
 
   storage_type data;
 };
