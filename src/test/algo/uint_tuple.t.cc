@@ -121,5 +121,12 @@ TEST_CASE("algorithm.uint_tuple.lexicographical_cmp", "[algorithm]") {
   REQUIRE(pair_t{0, 1} < pair_t{1, 0});
 }
 
+TEST_CASE("algorithm.uint_tuple.hash", "[algorithm]") {
+  using tuple_t = uint_tuple<32, 16, 32>;
+  auto t = tuple_t{13, 21, 42};
+  auto hs = std::hash<tuple_t>{}(t);
+  REQUIRE(std::hash<tuple_t>{}(t) == hs);  // stability
+}
+
 }  // namespace
 }  // namespace algo
