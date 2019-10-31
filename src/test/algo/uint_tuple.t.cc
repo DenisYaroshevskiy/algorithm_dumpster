@@ -115,26 +115,10 @@ TEST_CASE("algorithm.uint_tuple.cmp.regular", "[algorithm]") {
 
 TEST_CASE("algorithm.uint_tuple.lexicographical_cmp", "[algorithm]") {
   using pair_t = uint_tuple<8, 8>;
-  auto x = pair_t{0, 0};
-  auto y = pair_t{0, 0};
-
-  REQUIRE(x == y);
-
-  // Increasing x, x == {1, 1}
-  set_at<0>(x, 1);
-  set_at<1>(x, 1);
-
-  REQUIRE(x > y);
-
-  // Increasing y, y == {2, 0}
-  set_at<0>(y, 2);
-
-  REQUIRE(x < y);
-
-  // Decreasing y, y = {1, 0}
-  set_at<0>(y, 1);
-
-  REQUIRE(x > y);
+  REQUIRE(pair_t{0, 0} < pair_t{0, 1});
+  REQUIRE(pair_t{1, 0} > pair_t{0, 1});
+  REQUIRE(pair_t{1, 0} < pair_t{1, 1});
+  REQUIRE(pair_t{0, 1} < pair_t{1, 0});
 }
 
 }  // namespace
