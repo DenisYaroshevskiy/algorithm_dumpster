@@ -110,13 +110,8 @@ struct uint_tuple {
                 (std::is_convertible_v<
                      Ts, uint_t<_uint_tuple::round_to_possible_size(sizes)>> &&
                  ...)>>
-  constexpr uint_tuple(const std::tuple<Ts...>& t) : data(0) {
-    std::apply(
-        [this](auto... args) {
-          _uint_tuple::construct(*this, std::index_sequence_for<Ts...>{},
-                                 args...);
-        },
-        t);
+  constexpr explicit uint_tuple(Ts... ts) : data(0) {
+    _uint_tuple::construct(*this, std::index_sequence_for<Ts...>{}, ts...);
   }
 
   friend constexpr bool operator==(uint_tuple x, uint_tuple y) {
