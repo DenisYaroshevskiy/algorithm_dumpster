@@ -543,6 +543,8 @@ Pairs are of the same uint type for both elements.<br/>
 This was to measure wether a different codegen for uint_tuple vs std::pair is better or worse.<br/>
 On my machine - noticebaly better.
 
+This benchmark on Quick-bench: http://quick-bench.com/aDq3iN3dpi9VWQc8XSd6o7Hlzl4
+
 ## Test
 
 Tests for everything. Has a few general purpose test utilities though.
