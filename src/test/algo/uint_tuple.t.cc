@@ -88,56 +88,53 @@ TEST_CASE("algorithm.uint_tuple.get_at,set_at", "[algorithm]") {
   }
 }
 
-TEST_CASE("algorithm.uint_tuple.cmp", "[algorithm]") {
-  using tuple_t = uint_tuple<8, 16, 32, 4, 1, 2>;
-  auto t = tuple_t{5u, 20u, 80u, 7u, 1u, 2u};
-  REQUIRE(t == t);
-  REQUIRE(t <= t);
-  REQUIRE(t >= t);
-  REQUIRE_FALSE(t != t);
-  REQUIRE_FALSE(t < t);
-  REQUIRE_FALSE(t > t);
+TEST_CASE("algorithm.uint_tuple.cmp.regular", "[algorithm]") {
+  using pair_t = uint_tuple<8, 8>;
+  auto x = pair_t{0, 0};
+  REQUIRE(x == x);
+  REQUIRE(x <= x);
+  REQUIRE(x >= x);
+  REQUIRE_FALSE(x != x);
+  REQUIRE_FALSE(x < x);
+  REQUIRE_FALSE(x > x);
 
-  auto t2 = t;
-  REQUIRE(t2 == t);
-  REQUIRE(t2 <= t);
-  REQUIRE(t2 >= t);
-  REQUIRE_FALSE(t2 != t);
-  REQUIRE_FALSE(t2 < t);
-  REQUIRE_FALSE(t2 > t);
-  REQUIRE(t == t2);
-  REQUIRE(t <= t2);
-  REQUIRE(t >= t2);
-  REQUIRE_FALSE(t != t2);
-  REQUIRE_FALSE(t < t2);
-  REQUIRE_FALSE(t > t2);
+  auto y = x;
+  REQUIRE(y == x);
+  REQUIRE(y <= x);
+  REQUIRE(y >= x);
+  REQUIRE_FALSE(y != x);
+  REQUIRE_FALSE(y < x);
+  REQUIRE_FALSE(y > x);
+  REQUIRE(x == y);
+  REQUIRE(x <= y);
+  REQUIRE(x >= y);
+  REQUIRE_FALSE(x != y);
+  REQUIRE_FALSE(x < y);
+  REQUIRE_FALSE(x > y);
+}
 
-  // Increasing t
-  set_at<3>(t, 10);
-  REQUIRE_FALSE(t == t2);
-  REQUIRE_FALSE(t <= t2);
-  REQUIRE(t >= t2);
-  REQUIRE(t != t2);
-  REQUIRE_FALSE(t < t2);
-  REQUIRE(t > t2);
+TEST_CASE("algorithm.uint_tuple.lexicographical_cmp", "[algorithm]") {
+  using pair_t = uint_tuple<8, 8>;
+  auto x = pair_t{0, 0};
+  auto y = pair_t{0, 0};
 
-  // Increasing t2
-  set_at<2>(t2, 89);
-  REQUIRE_FALSE(t == t2);
-  REQUIRE(t <= t2);
-  REQUIRE_FALSE(t >= t2);
-  REQUIRE(t != t2);
-  REQUIRE(t < t2);
-  REQUIRE_FALSE(t > t2);
+  REQUIRE(x == y);
 
-  // Decreasing t2
-  set_at<1>(t2, 15);
-  REQUIRE_FALSE(t == t2);
-  REQUIRE_FALSE(t <= t2);
-  REQUIRE(t >= t2);
-  REQUIRE(t != t2);
-  REQUIRE_FALSE(t < t2);
-  REQUIRE(t > t2);
+  // Increasing x, x == {1, 1}
+  set_at<0>(x, 1);
+  set_at<1>(x, 1);
+
+  REQUIRE(x > y);
+
+  // Increasing y, y == {2, 0}
+  set_at<0>(y, 2);
+
+  REQUIRE(x < y);
+
+  // Decreasing y, y = {1, 0}
+  set_at<0>(y, 1);
+
+  REQUIRE(x > y);
 }
 
 }  // namespace
