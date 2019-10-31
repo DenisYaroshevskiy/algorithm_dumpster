@@ -167,4 +167,16 @@ constexpr void construct(Tuple& t, std::index_sequence<ids...>, Args... args) {
 
 }  // namespace algo
 
+namespace std {
+
+template <size_t... sizes>
+struct hash<algo::uint_tuple<sizes...>> {
+  size_t operator()(algo::uint_tuple<sizes...> t) const noexcept {
+    return std::hash<typename algo::uint_tuple<sizes...>::storage_type>{}(
+        t.data);
+  }
+};
+
+}  // namespace std
+
 #endif  // ALGO_UINT_TUPLE_H
