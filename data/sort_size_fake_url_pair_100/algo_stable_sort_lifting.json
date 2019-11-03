@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2019-11-03 20:37:33",
+    "date": "2019-11-03 21:34:48",
     "executable": "build/src/bench_runnable/sort_size_fake_url_pair_100/algo_stable_sort_lifting",
     "num_cpus": 4,
     "mhz_per_cpu": 1800,
@@ -36,37 +36,37 @@
   "benchmarks": [
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/1",
-      "iterations": 46354,
-      "real_time": 1.5008251499342248e+04,
-      "cpu_time": 1.4983280838762565e+04,
+      "iterations": 46010,
+      "real_time": 1.5152930014991840e+04,
+      "cpu_time": 1.5121343186263855e+04,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/10",
-      "iterations": 2649,
-      "real_time": 2.6358940203571477e+05,
-      "cpu_time": 2.6312193280483194e+05,
+      "iterations": 2655,
+      "real_time": 2.6168023540178864e+05,
+      "cpu_time": 2.6126930320150658e+05,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/100",
-      "iterations": 185,
-      "real_time": 3.7780485729485550e+06,
-      "cpu_time": 3.7715189189189170e+06,
+      "iterations": 186,
+      "real_time": 3.7641650322707053e+06,
+      "cpu_time": 3.7581021505376338e+06,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/1000",
       "iterations": 12,
-      "real_time": 5.8915929500168808e+07,
-      "cpu_time": 5.8790750000000000e+07,
+      "real_time": 5.8445914585414968e+07,
+      "cpu_time": 5.8320166666666687e+07,
       "time_unit": "ns"
     },
     {
       "name": "sort_vec_size<SELECTED_ALGORITHM, SELECTED_TYPE>/100/10000",
       "iterations": 1,
-      "real_time": 1.0551100549928378e+09,
-      "cpu_time": 1.0528329999999988e+09,
+      "real_time": 1.0467376720043831e+09,
+      "cpu_time": 1.0445940000000000e+09,
       "time_unit": "ns"
     }
   ]
