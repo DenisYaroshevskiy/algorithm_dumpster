@@ -33,62 +33,107 @@
 #include "algo/nth_permutation.h"
 #include "algo/shuffle_biased.h"
 #include "algo/type_functions.h"
+#include "algo/uint_tuple.h"
 #include "bench_generic/fake_url.h"
 #include "bench_generic/noinline_int.h"
 
 namespace bench {
 
+using uint32 = std::uint32_t;
+using uint64 = std::uint64_t;
+
 using std_int64_t = std::int64_t;
 
 using fake_url_pair = std::pair<fake_url, fake_url>;
 
+using uint_std_pair32 = std::pair<std::uint32_t, std::uint32_t>;
+using uint_std_pair64 = std::pair<std::uint64_t, std::uint64_t>;
+
+using uint_tuple_pair32 = algo::uint_tuple<32, 32>;
+using uint_tuple_pair64 = algo::uint_tuple<64, 64>;
+
+struct use_pair {
+  template <size_t size>
+  using type = std::pair<algo::uint_t<size>, algo::uint_t<size>>;
+
+  template <typename T, typename U>
+  constexpr auto operator()(T x, U y) const {
+    return std::pair{x, y};
+  }
+};
+
+struct use_uint_tuple {
+  template <size_t size>
+  using type = algo::uint_tuple<size, size>;
+
+  template <typename T, typename U>
+  constexpr auto operator()(T x, U y) const {
+    using pair =
+        algo::uint_tuple<algo::uint_bit_size<T>(), algo::uint_bit_size<U>()>;
+    return pair{x, y};
+  }
+};
+
 template <typename T>
-struct int_to_t {
-  std::enable_if_t<std::is_integral_v<T>, T> operator()(int x) const {
-    return x;
+struct generate_t {
+  static constexpr bool is_pair = std::is_same_v<T, fake_url_pair> ||
+                                  std::is_same_v<T, uint_std_pair32> ||
+                                  std::is_same_v<T, uint_std_pair64> ||
+                                  std::is_same_v<T, uint_tuple_pair32> ||
+                                  std::is_same_v<T, uint_tuple_pair64>;
+
+  template <typename Src>
+  constexpr auto operator()(Src& src) const {
+    if constexpr (is_pair) {
+      return T{src(), src()};
+    } else {
+      return static_cast<T>(src());
+    }
   }
 };
 
 template <>
-struct int_to_t<double> {
-  double operator()(int x) const { return 1.0 / x; }
-};
-
-template <>
-struct int_to_t<fake_url> {
-  fake_url operator()(int x) const { return fake_url(x); }
-};
-
-template <>
-struct int_to_t<fake_url_pair> {
-  fake_url_pair operator()(int x) const {
-    return std::make_pair(fake_url(x), fake_url(x));
+struct generate_t<double> {
+  template <typename Src>
+  double operator()(Src& src) const {
+    return 1.0 / src();
   }
 };
 
 template <>
-struct int_to_t<noinline_int> {
-  noinline_int operator()(int x) const { return noinline_int{x}; }
+struct generate_t<fake_url> {
+  template <typename Src>
+  fake_url operator()(Src& src) const {
+    return fake_url(src());
+  }
+};
+
+template <>
+struct generate_t<noinline_int> {
+  template <typename Src>
+  noinline_int operator()(Src& src) const {
+    return noinline_int{src()};
+  }
 };
 
 namespace detail {
 
 template <typename T, typename Src>
 auto generate_unique_sorted_vector(size_t size, Src src) {
-  const int_to_t<T> to_t;
+  const generate_t<T> make_t;
   std::set<T> values;
   while (values.size() < size) {
-    values.insert(to_t(src()));
+    values.insert(make_t(src));
   }
   return std::vector<T>(values.begin(), values.end());
 }
 
 template <typename T, typename Src>
 auto generate_random_vector(size_t size, Src src) {
-  const int_to_t<T> to_t;
+  const generate_t<T> make_t;
 
   std::vector<T> res(size);
-  std::generate(res.begin(), res.end(), [&] { return to_t(src()); });
+  std::generate(res.begin(), res.end(), [&] { return make_t(src); });
 
   return res;
 }

@@ -29,42 +29,6 @@
 
 namespace bench {
 
-struct use_pair {
-  template <size_t size>
-  using type = std::pair<algo::uint_t<size>, algo::uint_t<size>>;
-
-  template <typename T, typename U>
-  constexpr auto operator()(T x, U y) const {
-    return std::pair{x, y};
-  }
-};
-
-struct use_uint_tuple_first_second {
-  template <size_t size>
-  using type = algo::uint_tuple<size, size>;
-
-  template <typename T, typename U>
-  constexpr auto operator()(T x, U y) const {
-    algo::uint_tuple<algo::uint_bit_size<T>(), algo::uint_bit_size<U>()> res;
-    algo::set_at<0>(res, x);
-    algo::set_at<1>(res, y);
-    return res;
-  }
-};
-
-struct use_uint_tuple_second_first {
-  template <size_t size>
-  using type = algo::uint_tuple<size, size>;
-
-  template <typename T, typename U>
-  constexpr auto operator()(T x, U y) const {
-    algo::uint_tuple<algo::uint_bit_size<T>(), algo::uint_bit_size<U>()> res;
-    algo::set_at<1>(res, y);
-    algo::set_at<0>(res, x);
-    return res;
-  }
-};
-
 template <typename Converter, typename N, typename T>
 BENCH_DECL_ATTRIBUTES void zip_to_pair_common(benchmark::State& state,
                                               const std::vector<N>& xs,

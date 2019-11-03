@@ -149,5 +149,17 @@ add_counting_benchmark(apply_rearrangment_1000_counting)
 # Uint tuple ##########################
 
 add_benchmark(zip_to_pair_bit_size use_pair ignore  1000)
-add_benchmark(zip_to_pair_bit_size use_uint_tuple_first_second ignore 1000)
-add_benchmark(zip_to_pair_bit_size use_uint_tuple_second_first ignore 1000)
+add_benchmark(zip_to_pair_bit_size use_uint_tuple ignore 1000)
+
+function(add_sort_types_benchmarks name type size)
+  foreach(alg uint32
+              uint64
+              uint_std_pair32
+              uint_std_pair64
+              uint_tuple_pair32
+              uint_tuple_pair64)
+    add_benchmark(${name} ${alg} ${type} ${size})
+  endforeach()
+endfunction()
+
+add_sort_types_benchmarks(sort_type std_sort 1000)

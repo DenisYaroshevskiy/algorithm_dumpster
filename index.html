@@ -116,4 +116,17 @@
       'data/zip_to_pair_bit_size_{}_1000/description.json', ['ignore']);
   </script>
 
+  <h3>Sorting uint tuples</h3>
+  The main point of using uint_tuple is comparing with one integer comparison.<br/>
+  Results are consistent with expectation: comparing 2 numbers is 1.5 times slower than comparing 1 (for random numbers)<br/>
+  (Either first number is less => 1 comparison, or second is less => 2 comparisons, which happens in roughly half the cases). <br/>
+  What's unexpected for me is that 128 bits and 64 bits have the same speed - <br/>
+  this possibly indicates a problem and needs further looking into.<br/>
+  Note: this benchmark doesn't subtract the baseline from sorting - hard to do baselines for different types.<br/><br/>
+
+  <div id='sort_type_1000'></div>
+  <script>visualizeBecnhmarksForTypes('sort_type_1000',
+      'data/sort_type_{}_1000/description.json', ['std_sort']);
+  </script>
+
 </body>
