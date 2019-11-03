@@ -41,6 +41,15 @@ void uint_t_generate_sorted_vector_test() {
   REQUIRE(res == std::vector<algo::uint_t<size>>{0, 2, 4});
 }
 
+template <typename UintPair>
+void uint_pair_generate_sorted_vector_test() {
+  std::array inputs = {0, 1, 2, 3, 4, 5};
+  auto src = [&, pos = 0]() mutable { return inputs[pos++]; };
+
+  auto res = generate_sorted_vector<UintPair>(inputs.size() / 2, src);
+  REQUIRE(res == std::vector{UintPair{0, 1}, UintPair{2, 3}, UintPair{4, 5}});
+}
+
 TEST_CASE("bench.input_generators.generate_sorted_vector", "[bench]") {
   {
     std::array inputs = {0, 5, 2, 2, 1};
@@ -81,6 +90,11 @@ TEST_CASE("bench.input_generators.generate_sorted_vector", "[bench]") {
   uint_t_generate_sorted_vector_test<16>();
   uint_t_generate_sorted_vector_test<32>();
   uint_t_generate_sorted_vector_test<64>();
+
+  uint_pair_generate_sorted_vector_test<uint_std_pair32>();
+  uint_pair_generate_sorted_vector_test<uint_std_pair64>();
+  uint_pair_generate_sorted_vector_test<uint_tuple_pair32>();
+  uint_pair_generate_sorted_vector_test<uint_tuple_pair64>();
 }
 
 TEST_CASE("bench.input_generators.generate_unique_sorted_vector", "[bench]") {

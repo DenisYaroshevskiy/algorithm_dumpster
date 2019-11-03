@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2019-10-31 01:34:59",
+    "date": "2019-11-03 20:43:59",
     "executable": "build/src/bench_runnable/zip_to_pair_bit_size_ignore_1000/use_pair",
     "num_cpus": 4,
     "mhz_per_cpu": 1800,
@@ -36,30 +36,30 @@
   "benchmarks": [
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/8",
-      "iterations": 8268563,
-      "real_time": 8.3240256742331084e+01,
-      "cpu_time": 8.3088439913924589e+01,
+      "iterations": 8392480,
+      "real_time": 8.3199517184658916e+01,
+      "cpu_time": 8.3076158656320885e+01,
       "time_unit": "ns"
     },
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/16",
-      "iterations": 4216486,
-      "real_time": 1.6561118073131919e+02,
-      "cpu_time": 1.6531775511646427e+02,
+      "iterations": 4207666,
+      "real_time": 1.6563150259541555e+02,
+      "cpu_time": 1.6540571423682394e+02,
       "time_unit": "ns"
     },
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/32",
-      "iterations": 2089746,
-      "real_time": 3.3498568773008429e+02,
-      "cpu_time": 3.3438465727413762e+02,
+      "iterations": 2092638,
+      "real_time": 3.3424215177004083e+02,
+      "cpu_time": 3.3382840223679392e+02,
       "time_unit": "ns"
     },
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/64",
-      "iterations": 1956362,
-      "real_time": 3.5763566864974797e+02,
-      "cpu_time": 3.5701930419830262e+02,
+      "iterations": 1862812,
+      "real_time": 3.5846081783585942e+02,
+      "cpu_time": 3.5786703113357657e+02,
       "time_unit": "ns"
     }
   ]

@@ -62,14 +62,31 @@
     }
   },
   "uint_tuple": {
-    "use_uint_tuple_first_second" : {
-      "display_name" : "uint_tuple (write first then second)"
+    "uint_std_pair32" : {
+      "display_name": "std::pair<std::uint32_t, std::uint32_t>"
     },
-    "use_uint_tuple_second_first" : {
-      "display_name" : "uint_tuple (write second then first)"
+    "uint_std_pair64" : {
+      "display_name": "std::pair<std::uint64_t, std::uint64_t>"
     },
-    "use_pair" : {
-      "display_name" : "std::pair"
+    "uint_tuple_pair32": {
+      "display_name" : "algo::uint_tuple<32, 32>"
+    },
+    "uint_tuple_pair64": {
+      "display_name" : "algo::uint_tuple<64, 64>"
+    },
+    "uint32" : {
+      "display_name" : "std::uint32_t"
+    },
+    "uint64" : {
+      "display_name" : "std::uint64_t"
+    }
+  },
+  "use_uint_tuple": {
+    "use_pair": {
+      "display_name": "std::pair"
+    },
+    "use_uint_tuple": {
+      "display_name": "algo::uint_tuple"
     }
   }
 }

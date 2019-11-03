@@ -1,0 +1,32 @@
+{
+  "base": "data/plots/sort_type_base.json",
+  "general": {
+    "title": "sort type std sort 1000"
+  },
+  "measurements": [
+    {
+      "name": "uint_std_pair32",
+      "url": "data/sort_type_std_sort_1000/uint_std_pair32.json"
+    },
+    {
+      "name": "uint_tuple_pair64",
+      "url": "data/sort_type_std_sort_1000/uint_tuple_pair64.json"
+    },
+    {
+      "name": "uint64",
+      "url": "data/sort_type_std_sort_1000/uint64.json"
+    },
+    {
+      "name": "uint_tuple_pair32",
+      "url": "data/sort_type_std_sort_1000/uint_tuple_pair32.json"
+    },
+    {
+      "name": "uint32",
+      "url": "data/sort_type_std_sort_1000/uint32.json"
+    },
+    {
+      "name": "uint_std_pair64",
+      "url": "data/sort_type_std_sort_1000/uint_std_pair64.json"
+    }
+  ]
+}

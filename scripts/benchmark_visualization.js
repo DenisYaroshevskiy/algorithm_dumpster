@@ -22,6 +22,7 @@ const predefinedStyles = [
     ["rgb(255, 0, 0)", "dash"],
     ["rgb(50, 50, 0)", "dashdot"],
     ["rgb(55, 200, 191)", "solid"],
+    ["rgb(170, 120, 95)", "dot"],
 ];
 
 function zipArrays(arr1, arr2) {
