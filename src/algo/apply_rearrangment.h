@@ -28,7 +28,7 @@ namespace algo {
 namespace detail {
 
 template <typename II>
-// require RandomAccessIteator<II> && Position<ValueType<II>
+// require RandomAccessIterator<II> && Position<ValueType<II>
 constexpr void cycle_from_position(II f, II cur, ValueType<II> base,
                                    ValueType<II> marker) {
   using N = DifferenceType<II>;
@@ -55,7 +55,7 @@ constexpr void cycle_from_position(II f, II cur, ValueType<II> base,
 }
 
 template <typename II>
-// require RandomAccessIteator<II> && Position<ValueType<II>
+// require RandomAccessIterator<II> && Position<ValueType<II>
 constexpr void cycle_from_position_no_marker(II f, II cur, ValueType<II> base) {
   using N = DifferenceType<II>;
   using I = ValueType<II>;
@@ -106,12 +106,13 @@ constexpr void apply_rearrangment_move(II f, II l, O o) {
 }
 
 template <typename II>
-// require RandomAccessIteator<II> && Position<ValueType<II>
-auto apply_rearrangment(II f, II l, ValueType<II> base, ValueType<II> marker) {
-  // precondition: iterators from *f to *l are a permutation
-  //               of an increasing iterator sequence
-  //               and pos returns number of an element in that
-  //               orignal sequence.
+// require RandomAccessIterator<II> && Position<ValueType<II>
+constexpr void apply_rearrangment(II f, II l, ValueType<II> base,
+                                  ValueType<II> marker) {
+  // precondition: positions from a range that f to l inducates
+  //               are a permutation of a position sequence.
+  //               base is the first position in that sequence.
+  //               find(f, l, marker) == l
   II cur = f;
   while (cur != l) {
     detail::cycle_from_position(f, cur, base, marker);
@@ -120,8 +121,8 @@ auto apply_rearrangment(II f, II l, ValueType<II> base, ValueType<II> marker) {
 }
 
 template <typename II>
-// require RandomAccessIteator<II> && Position<ValueType<II>
-constexpr auto apply_rearrangment_no_marker(II f, II l, ValueType<II> base) {
+// require RandomAccessIterator<II> && Position<ValueType<II>
+constexpr void apply_rearrangment_no_marker(II f, II l, ValueType<II> base) {
   II cur = f;
   while (cur != l) {
     detail::cycle_from_position_no_marker(f, cur, base);
