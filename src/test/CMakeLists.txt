@@ -14,8 +14,6 @@
 # limitations under the License.
 #
 
-#include_directories(../)
-
 add_executable(tests)
 
 target_sources(tests PRIVATE
@@ -40,7 +38,9 @@ target_sources(tests PRIVATE
                algo/positions.t.cc
                algo/quadratic_sort.t.cc
                algo/shuffle_biased.t.cc
+               algo/simd.t.cc
                algo/stable_sort.t.cc
+               algo/strlen.t.cc
                algo/type_functions.t.cc
                algo/uint_tuple.t.cc
                algo/unroll.t.cc
@@ -48,9 +48,10 @@ target_sources(tests PRIVATE
                bench_generic/input_generators.t.cpp
                catch_main.cc)
 target_compile_options(tests PRIVATE
-                       -Werror -Wall -Wextra -Wpedantic -O2 -g
+                       -Werror -Wall -Wextra -Wpedantic -O1 -g
                        -fsanitize=address -fno-omit-frame-pointer
-                       --std=c++17)
+                       --std=c++17
+                       -march=native)
 
 target_link_options(tests PRIVATE -fsanitize=address)
 set_target_properties(tests PROPERTIES CXX_STANDARD 17)

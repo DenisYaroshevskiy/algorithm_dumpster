@@ -524,6 +524,16 @@ Benchmarking lower_bound like algotihmms.<br>
 Benchmarking merge like algorithms.
 Merge with small - benchmarks merge of a big first range with a small second one.
 
+### simd
+
+`simd<std::int8_t, 16>` <br/>
+
+A very cut down simd wrapper library based on: https://github.com/ospray/tsimd that I <br/>
+feel in as I need. I couldn't use an existing wrapper library, looked at tsimd and VC - <br/>
+one doesn't support bytes and I'd like to do bytes, the other needs gcc.
+
+Will see how this works out for me, ideally I'd like to do C string library functions. <br/>
+
 ### sort
 
 `sort_common`<br/>
