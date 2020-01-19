@@ -526,13 +526,29 @@ Merge with small - benchmarks merge of a big first range with a small second one
 
 ### simd
 
-`simd<std::int8_t, 16>` <br/>
+`simd<std::int8_t, 16>` <br/><br/>
+
+`all_non_zero`<br/>
+`blend_n_from_high/blend_n_from_low` <br/>
+`fill` <br/>
+`load` <br/>
+`pairwise_equal` <br/>
+`pick_min/pick_max` <br/>
+`store` <br/>
 
 A very cut down simd wrapper library based on: https://github.com/ospray/tsimd that I <br/>
 feel in as I need. I couldn't use an existing wrapper library, looked at tsimd and VC - <br/>
 one doesn't support bytes and I'd like to do bytes, the other needs gcc.
 
 Will see how this works out for me, ideally I'd like to do C string library functions. <br/>
+
+`blend_n_from_*` is not an intrinsic unfortunatly, I had to do some jumping with <br/> precomputed masks. Idea is we have register a [ A A A A ] and register b [ B B B B ]. <br/>
+I'd like to make register [ A B B B ]. There is an intrinsic to do that, like `_mm_alignr_epi8`<br/>
+but it requires a compile time constant as a parametr. From low/high controls wether we count <br/>
+from the left of x or from the right, not too sure I got that correct. <br/>
+One more thing is that because we have N elements => we have N + 1 positions, totally fine to <br/>
+pass the pack width - will just get all of the second register. <br/>
+
 
 ### sort
 

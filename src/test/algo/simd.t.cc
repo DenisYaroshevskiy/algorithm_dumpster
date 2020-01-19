@@ -26,7 +26,7 @@
 namespace algo {
 namespace {
 
-TEST_CASE("algo.simd.int8_t.set/load/equal", "[algo, simd]") {
+TEST_CASE("algo.simd.set/load/equal", "[algo, simd]") {
   simd<std::int8_t, 16> x, y;
 
   x.fill(5);
@@ -41,7 +41,7 @@ TEST_CASE("algo.simd.int8_t.set/load/equal", "[algo, simd]") {
   REQUIRE(x != y);
 }
 
-TEST_CASE("algo.simd.int8_t.pick_min/pick_max", "[algo, simd]") {
+TEST_CASE("algo.simd.pick_min/pick_max", "[algo, simd]") {
   simd<std::int8_t, 16> x, y;
 
   x.fill(5);
@@ -49,6 +49,49 @@ TEST_CASE("algo.simd.int8_t.pick_min/pick_max", "[algo, simd]") {
 
   REQUIRE(x == pick_min(x, y));
   REQUIRE(y == pick_max(x, y));
+}
+
+TEST_CASE("algo.simd.blend_n_from_high/from_low", "[algo, simd]") {
+  simd<std::int8_t, 16> x, y;
+
+  x.fill(5);
+  y.fill(6);
+
+  alignas(16) std::array<std::int8_t, 16> expected;
+  alignas(16) std::array<std::int8_t, 16> actual;
+
+  expected.fill(5);
+
+  for (size_t i = 0;; ++i) {
+    blend_n_from_high(x, y, i).store(actual.data());
+    REQUIRE(expected == actual);
+
+    if (i == 16) break;
+    expected[i] = 6;
+  }
+
+  expected.fill(5);
+
+  for (size_t i = 0;; ++i) {
+    blend_n_from_low(x, y, i).store(actual.data());
+    REQUIRE(expected == actual);
+
+    if (i == 16) break;
+    expected[15 - i] = 6;
+  }
+
+  // Double check special cases:
+  expected.fill(6);
+  blend_n_from_low(x, y, 16).store(actual.data());
+  REQUIRE(expected == actual);
+  blend_n_from_high(x, y, 16).store(actual.data());
+  REQUIRE(expected == actual);
+
+  expected.fill(5);
+  blend_n_from_low(x, y, 0).store(actual.data());
+  REQUIRE(expected == actual);
+  blend_n_from_high(x, y, 0).store(actual.data());
+  REQUIRE(expected == actual);
 }
 
 }  // namespace
