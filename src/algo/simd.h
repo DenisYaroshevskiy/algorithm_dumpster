@@ -113,11 +113,13 @@ Simd blend_n_from_low(const Simd& x, const Simd& y, int n) {
   return blend_n_from_high(y, x, Simd::width - n);
 }
 
-/*
 template <typename Simd>
 Simd load_unaligned_with_filler(const typename Simd::type* addr,
                                 typename Simd::type filler) {
-  const auto* aligned_addr = addr & ~(1 - alignment);
+  constexpr std::uintptr_t mask = ~(Simd::alignment - 1);
+
+  const auto* aligned_addr = reinterpret_cast<decltype(addr)>(
+      reinterpret_cast<std::uintptr_t>(addr) & mask);
 
   Simd res;
   res.load(aligned_addr);
@@ -125,13 +127,8 @@ Simd load_unaligned_with_filler(const typename Simd::type* addr,
   Simd filler_v;
   filler_v.fill(filler);
 
-  typename Simd::vbool mask;
-  mask.fill(0xF);
-  mask.data >> (addr - aligned_addr);
-
-  _mm_blendv_epi8(data, )
+  return blend_n_from_high(res, filler_v, addr - aligned_addr);
 }
-*/
 
 }  // namespace algo
 

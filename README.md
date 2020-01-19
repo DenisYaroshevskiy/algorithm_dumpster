@@ -526,12 +526,13 @@ Merge with small - benchmarks merge of a big first range with a small second one
 
 ### simd
 
-`simd<std::int8_t, 16>` <br/><br/>
+`simd<std::int8_t, 16>` <br/>
 
 `all_non_zero`<br/>
 `blend_n_from_high/blend_n_from_low` <br/>
 `fill` <br/>
 `load` <br/>
+`load_unaligned_with_filler` <br/>
 `pairwise_equal` <br/>
 `pick_min/pick_max` <br/>
 `store` <br/>
@@ -549,6 +550,12 @@ from the left of x or from the right, not too sure I got that correct. <br/>
 One more thing is that because we have N elements => we have N + 1 positions, totally fine to <br/>
 pass the pack width - will just get all of the second register. <br/>
 
+`load_unaligned_with_filler` is based on the idea from `strlen`, see more <br/>
+here: https://stackoverflow.com/questions/25566302/vectorized-strlen-getting-away-with-reading-unallocated-memory<br/>
+Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strlen.s.auto.html<br/>
+We are allowed to read within one page on x86, even if that's outside our allocated <br/>
+memory. So if our pointer is let's say ...20 we can read from ...16. The first 4 elements <br/>
+are going to be filled in with `filler` passed in.
 
 ### sort
 

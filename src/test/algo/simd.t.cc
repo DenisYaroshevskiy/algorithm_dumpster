@@ -94,5 +94,35 @@ TEST_CASE("algo.simd.blend_n_from_high/from_low", "[algo, simd]") {
   REQUIRE(expected == actual);
 }
 
+TEST_CASE("algo.simd.load_unaligned_with_filler", "[algo, simd]") {
+  alignas(16) std::array<std::int8_t, 32> in;
+  in.fill(5);
+
+  std::array<std::int8_t, 16> expected;
+  expected.fill(5);
+
+  std::array<std::int8_t, 16> actual;
+
+  auto do_load_at = [&](std::size_t i) {
+    load_unaligned_with_filler<simd<std::int8_t, 16>>(&in[i], 6).store(
+        actual.data());
+  };
+
+  do_load_at(0);
+  REQUIRE(expected == actual);
+
+  do_load_at(1);
+  expected[0] = 6;
+  REQUIRE(expected == actual);
+
+  expected.fill(5);
+
+  for (std::size_t i = 0; i != 16; ++i) {
+    do_load_at(i);
+    REQUIRE(expected == actual);
+    expected[i] = 6;
+  }
+}
+
 }  // namespace
 }  // namespace algo
