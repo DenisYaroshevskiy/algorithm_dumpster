@@ -589,6 +589,37 @@ On my machine - noticebaly better.
 
 This benchmark on Quick-bench: http://quick-bench.com/aDq3iN3dpi9VWQc8XSd6o7Hlzl4<br/>
 
+## Simd
+
+A very cut down simd wrapper library based on: https://github.com/ospray/tsimd that I <br/>
+feel in as I need. I couldn't use an existing wrapper library, looked at tsimd and VC - <br/>
+one doesn't support bytes and I'd like to do bytes, the other needs gcc.
+
+Everything Intel specific, I work with at least AVX2.
+
+Will see how this works out for me, I'd like to do simd optimized algorithms.
+
+### register
+
+`register_i<bits>` <br/>
+
+`alignment` <br/>
+`bit_width` <br/>
+`byte_width` <br/>
+
+`corresponding_default_array` <br/>
+
+...
+copied intrinsics
+
+A very very lowlevel abstruction on top of intel intrinsics: https://software.intel.com/sites/landingpage/IntrinsicsGuide <br/>
+The only thing it allows is for the user to template over bit width.
+
+So - instead of `_mm_load_si128` or `_mm256_store_si256` we can `load_s(const register_i<128>)` <br/>
+
+Also some type traits. No idea if I like `corresponding_default_array` or if it even make sence, until I adapted more types.
+
+
 ## Test
 
 Tests for everything. Has a few general purpose test utilities though.
