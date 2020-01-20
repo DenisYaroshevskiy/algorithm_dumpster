@@ -71,7 +71,10 @@ struct simd<std::int8_t, 16> {
   static constexpr size_t width = 16;
   static constexpr std::size_t alignment = alignof(__m128i);
 
-  void load(const std::int8_t* addr) { std::memcpy(&data, addr, sizeof(data)); }
+  __attribute__((no_sanitize_address))
+  void load(const std::int8_t* addr) {
+    data = _mm_load_si128(reinterpret_cast<const __m128i*>(addr));
+  }
   void store(std::int8_t* addr) { std::memcpy(addr, &data, sizeof(data)); }
   void fill(std::int8_t x) { data = _mm_set1_epi8(x); }
   void fill_0() { data = _mm_setzero_si128(); }

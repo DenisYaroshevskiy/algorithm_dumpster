@@ -15,3 +15,28 @@
  */
 
 #include "algo/strlen.h"
+
+#include <string>
+
+#include "test/catch.h"
+
+namespace algo {
+namespace {
+
+TEST_CASE("algo.simd.strings.strlen", "[algo, simd, strings]") {
+  REQUIRE(algo::strlen("a") == 1);
+  REQUIRE(algo::strlen("") == 0);
+
+  {
+    std::string s(18, 'a');
+    REQUIRE(algo::strlen(s.c_str()) == 18);
+  }
+
+  {
+    std::string s(73, 'a');
+    REQUIRE(algo::strlen(s.c_str()) == 73);
+  }
+}
+
+}  // namespace
+}  // namespace algo
