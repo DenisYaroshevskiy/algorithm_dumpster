@@ -124,5 +124,48 @@ TEST_CASE("algo.simd.load_unaligned_with_filler", "[algo, simd]") {
   }
 }
 
+TEST_CASE("algo.simd.have_pairwise_equal_elements", "[algo, simd]") {
+  simd<std::int8_t, 16> x, y;
+
+  alignas(16) std::array<std::int8_t, 16> x_arr;
+  alignas(16) std::array<std::int8_t, 16> y_arr;
+
+  auto run = [&] {
+    x.load(x_arr.data());
+    y.load(y_arr.data());
+    return any_pairwise_equal(x, y);
+  };
+
+  x_arr.fill(0);
+  y_arr.fill(1);
+
+  REQUIRE(!run());
+
+  y_arr[3] = 0;
+
+  REQUIRE(run());
+}
+
+TEST_CASE("algo.simd.first_pairwise_equal", "[algo, simd]") {
+   simd<std::int8_t, 16> x, y;
+
+  alignas(16) std::array<std::int8_t, 16> x_arr;
+  alignas(16) std::array<std::int8_t, 16> y_arr;
+
+  auto run = [&] {
+    x.load(x_arr.data());
+    y.load(y_arr.data());
+    return first_pairwise_equal(x, y);
+  };
+
+  x_arr.fill(0);
+  y_arr.fill(0);
+
+  for (size_t i = 0; i != 16; ++i) {
+    REQUIRE(run() == i);
+    y_arr[i] = 1;
+  }
+}
+
 }  // namespace
 }  // namespace algo

@@ -74,6 +74,7 @@ struct simd<std::int8_t, 16> {
   void load(const std::int8_t* addr) { std::memcpy(&data, addr, sizeof(data)); }
   void store(std::int8_t* addr) { std::memcpy(addr, &data, sizeof(data)); }
   void fill(std::int8_t x) { data = _mm_set1_epi8(x); }
+  void fill_0() { data = _mm_setzero_si128(); }
 
   friend simd pick_min(const simd& x, const simd& y) {
     return simd{_mm_min_epi8(x.data, y.data)};
@@ -89,6 +90,12 @@ struct simd<std::int8_t, 16> {
 
   friend bool all_non_zero(const simd& x) {
     return _mm_movemask_epi8(x.data) == 0xffff;
+  }
+
+  friend bool all_zero(const simd& x) { return _mm_movemask_epi8(x.data) == 0; }
+
+  friend int first_pairwise_equal(const simd& x, const simd& y) {
+    return __builtin_ctz(_mm_movemask_epi8(pairwise_equal(x, y).data));
   }
 
   friend bool operator==(const simd& x, const simd& y) {
@@ -128,6 +135,11 @@ Simd load_unaligned_with_filler(const typename Simd::type* addr,
   filler_v.fill(filler);
 
   return blend_n_from_high(res, filler_v, addr - aligned_addr);
+}
+
+template <typename Simd>
+bool any_pairwise_equal(const Simd& x, const Simd& y) {
+  return !all_zero(pairwise_equal(x, y));
 }
 
 }  // namespace algo
