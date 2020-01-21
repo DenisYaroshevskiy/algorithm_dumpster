@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include "simd/register.h"
+#include "simd/mm.h"
 
 #include <array>
 #include <type_traits>
 
 #include "test/catch.h"
 
-namespace simd {
+namespace mm {
 namespace {
 
 template <typename T>
@@ -56,16 +56,19 @@ TEST_CASE("simd.register.sizes", "[simd]") {
   {
     STATIC_REQUIRE(bit_width<register_i<128>>() == 128);
     STATIC_REQUIRE(bit_width<register_i<256>>() == 256);
+    STATIC_REQUIRE(bit_width<register_i<512>>() == 512);
   }
 
   {
     STATIC_REQUIRE(byte_width<register_i<128>>() == 16);
     STATIC_REQUIRE(byte_width<register_i<256>>() == 32);
+    STATIC_REQUIRE(byte_width<register_i<512>>() == 64);
   }
 
   {
     STATIC_REQUIRE(alignment<register_i<128>>() == 16);
     STATIC_REQUIRE(alignment<register_i<256>>() == 32);
+    STATIC_REQUIRE(byte_width<register_i<512>>() == 64);
   }
 }
 
@@ -124,7 +127,7 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
   }
 
   SECTION("min/max") {
-    if constexpr (algo::bit_size<scalar_t>() < 64) {
+    if constexpr (sizeof(scalar_t) < 8) {
       scalar_t small = -1;
       scalar_t large = 1;
       if (!std::is_signed_v<scalar_t>) {
@@ -156,4 +159,4 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
 }
 
 }  // namespace
-}  // namespace simd
+}  // namespace mm

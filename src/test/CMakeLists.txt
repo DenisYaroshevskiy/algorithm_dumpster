@@ -46,7 +46,7 @@ target_sources(tests PRIVATE
                algo/unroll.t.cc
                bench_generic/counting_benchmark.t.cc
                bench_generic/input_generators.t.cc
-               simd/register.t.cc
+               simd/mm.t.cc
                catch_main.cc)
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -O1 -g
