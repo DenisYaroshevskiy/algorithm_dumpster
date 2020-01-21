@@ -65,12 +65,27 @@ TEST_CASE("algorithm.argument_type", "[algorithm]") {
 }
 
 template <size_t N, typename = void>
+struct assert_no_such_int_t {};
+
+template <size_t N>
+struct assert_no_such_int_t<N, std::void_t<int_t<N>>>;
+
+template <size_t N, typename = void>
 struct assert_no_such_uint_t {};
 
 template <size_t N>
 struct assert_no_such_uint_t<N, std::void_t<uint_t<N>>>;
 
-TEST_CASE("algorithm.uint_t", "[algorithm]") {
+
+TEST_CASE("algorithm.int/uint_t", "[algorithm]") {
+  is_same_test(int_t<8>{}, std::int8_t{});
+  is_same_test(int_t<16>{}, std::int16_t{});
+  is_same_test(int_t<32>{}, std::int32_t{});
+  is_same_test(int_t<64>{}, std::int64_t{});
+#ifdef HAS_128_INTS
+  is_same_test(int_t<128>{}, __int128_t{});
+#endif
+
   is_same_test(uint_t<8>{}, std::uint8_t{});
   is_same_test(uint_t<16>{}, std::uint16_t{});
   is_same_test(uint_t<32>{}, std::uint32_t{});
@@ -79,16 +94,25 @@ TEST_CASE("algorithm.uint_t", "[algorithm]") {
   is_same_test(uint_t<128>{}, __uint128_t{});
 #endif
 
+  (void)assert_no_such_int_t<10>{};
   (void)assert_no_such_uint_t<10>{};
 }
 
-TEST_CASE("algorithm.uint_bit_size", "[algorithm]") {
-  static_assert(uint_bit_size<std::uint8_t>() == 8);
-  static_assert(uint_bit_size<std::uint16_t>() == 16);
-  static_assert(uint_bit_size<std::uint32_t>() == 32);
-  static_assert(uint_bit_size<std::uint64_t>() == 64);
+TEST_CASE("algorithm.bit_size", "[algorithm]") {
+  static_assert(bit_size<std::int8_t>() == 8);
+  static_assert(bit_size<std::int16_t>() == 16);
+  static_assert(bit_size<std::int32_t>() == 32);
+  static_assert(bit_size<std::int64_t>() == 64);
 #ifdef HAS_128_INTS
-  static_assert(uint_bit_size<uint_t<128>>() == 128);
+  static_assert(bit_size<int_t<128>>() == 128);
+#endif
+
+  static_assert(bit_size<std::uint8_t>() == 8);
+  static_assert(bit_size<std::uint16_t>() == 16);
+  static_assert(bit_size<std::uint32_t>() == 32);
+  static_assert(bit_size<std::uint64_t>() == 64);
+#ifdef HAS_128_INTS
+  static_assert(bit_size<uint_t<128>>() == 128);
 #endif
 }
 

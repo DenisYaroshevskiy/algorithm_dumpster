@@ -70,13 +70,6 @@ constexpr size_t alignment() {
   return alignof(Register);
 }
 
-// arrays ---------------------------------------------
-
-template <typename Register, size_t element_bit_size>
-using corresponding_default_array =
-    std::array<algo::uint_t<element_bit_size>,
-               bit_width<Register>() / element_bit_size>;
-
 // load aligned ----------------------------------------------------
 
 inline register_i<128> load_s(const register_i<128>* addr) {
@@ -95,6 +88,33 @@ inline void store_s(register_i<128>* addr, register_i<128> x) {
 
 inline void store_s(register_i<256>* addr, register_i<256> x) {
   _mm256_store_si256(addr, x);
+}
+
+// set --------------------------------------------------------------
+
+template <size_t register_width, typename T>
+inline auto set1(T a) {
+  static constexpr size_t t_width = algo::bit_size<T>();
+
+  if constexpr (register_width == 128) {
+    // clang-format off
+    if constexpr      (t_width == 8)  return _mm_set1_epi8(a);
+    else if constexpr (t_width == 16) return _mm_set1_epi16(a);
+    else if constexpr (t_width == 32) return _mm_set1_epi32(a);
+    else if constexpr (t_width == 64) return _mm_set1_epi64x(a);
+    else                              return algo::null_t{};
+    // clang-format on
+  } else if constexpr (register_width == 256) {
+    // clang-format off
+    if constexpr      (t_width == 8)  return _mm256_set1_epi8(a);
+    else if constexpr (t_width == 16) return _mm256_set1_epi16(a);
+    else if constexpr (t_width == 32) return _mm256_set1_epi32(a);
+    else if constexpr (t_width == 64) return _mm256_set1_epi64x(a);
+    else                              return algo::null_t{};
+    // clang-format on
+  } else {
+    return algo::null_t{};
+  }
 }
 
 }  // namespace simd

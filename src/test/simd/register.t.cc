@@ -27,6 +27,26 @@ namespace {
 template <typename T>
 void is_same_test(T, T) {}
 
+template <typename Register, typename T>
+using type_array = std::array<T, byte_width<Register>() / sizeof(T)>;
+
+template <typename Register>
+using byte_array = type_array<Register, std::byte>;
+
+// Workaroud for catch template product.
+
+template <typename T>
+struct test_128 {
+  static constexpr size_t width = 128;
+  using scalar_t = T;
+};
+
+template <typename T>
+struct test_256 {
+  static constexpr size_t width = 256;
+  using scalar_t = T;
+};
+
 TEST_CASE("simd.register.type", "[simd]") {
   is_same_test(register_i<128>{}, __m128i{});
   is_same_test(register_i<256>{}, __m256i{});
@@ -49,31 +69,47 @@ TEST_CASE("simd.register.sizes", "[simd]") {
   }
 }
 
-TEST_CASE("simg.register.arrays", "[simd]") {
-  is_same_test(corresponding_default_array<register_i<128>, 8>{},
-               std::array<uint8_t, 16>{});
-
-  is_same_test(corresponding_default_array<register_i<256>, 8>{},
-               std::array<uint8_t, 32>{});
-}
-
-TEMPLATE_TEST_CASE("simd.register.no_sign.operations", "[simd]",  //
+TEMPLATE_TEST_CASE("simd.register.just_bytes", "[simd]",  //
                    register_i<128>, register_i<256>) {
   using reg_t = TestType;
 
-  using default_array_8 = corresponding_default_array<reg_t, 8>;
+  alignas(alignment<reg_t>()) byte_array<reg_t> a, b;
 
-  alignas(alignment<reg_t>()) default_array_8 a, b;
-
-  a.fill(1);
-  b.fill(2);
+  a.fill(std::byte{1});
+  b.fill(std::byte{2});
 
   auto* a_casted = reinterpret_cast<reg_t*>(a.data());
   auto* b_casted = reinterpret_cast<reg_t*>(b.data());
 
-  SECTION("load/store aligned") {
+  SECTION("load_s/store_s") {
     reg_t loaded_a = load_s(a_casted);
     store_s(b_casted, loaded_a);
+    REQUIRE(a == b);
+  }
+}
+
+TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
+                           (test_128, test_256),              //
+                           (std::int8_t, std::int16_t,        //
+                            std::int32_t, std::int64_t,       //
+                            std::uint8_t, std::uint16_t,      //
+                            std::uint32_t, std::uint64_t)) {  //
+  using reg_t = register_i<TestType::width>;
+  using scalar_t = typename TestType::scalar_t;
+
+  alignas(alignment<reg_t>()) type_array<reg_t, scalar_t> a, b;
+
+  a.fill(scalar_t{1});
+  b.fill(scalar_t{2});
+
+  auto* a_casted = reinterpret_cast<reg_t*>(a.data());
+  auto* b_casted = reinterpret_cast<reg_t*>(b.data());
+
+  (void)a_casted;
+
+  SECTION("set1") {
+    reg_t filled = set1<bit_width<reg_t>()>(scalar_t{1});
+    store_s(b_casted, filled);
     REQUIRE(a == b);
   }
 }

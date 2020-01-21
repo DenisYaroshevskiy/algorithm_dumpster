@@ -69,7 +69,7 @@ struct use_uint_tuple {
   template <typename T, typename U>
   constexpr auto operator()(T x, U y) const {
     using pair =
-        algo::uint_tuple<algo::uint_bit_size<T>(), algo::uint_bit_size<U>()>;
+        algo::uint_tuple<algo::bit_size<T>(), algo::bit_size<U>()>;
     return pair{x, y};
   }
 };

@@ -85,6 +85,27 @@ constexpr auto uint_t_impl() {
   }
 }
 
+template <size_t N>
+constexpr auto int_t_impl() {
+  if constexpr (N == 8) {
+    return type_t<std::int8_t>{};
+  } else if constexpr (N == 16) {
+    return type_t<std::int16_t>{};
+  } else if constexpr (N == 32) {
+    return type_t<std::int32_t>{};
+  } else if constexpr (N == 64) {
+    return type_t<std::int64_t>{};
+  }
+#ifdef HAS_128_INTS
+  else if constexpr (N == 128) {
+    return type_t<__int128_t>{};
+  }
+#endif  // HAS_128_INTS
+  else {
+    return null_t{};
+  }
+}
+
 }  // namespace _type_functions
 
 template <typename I>
@@ -125,6 +146,9 @@ template <typename F>
 using ArgumentType = typename _type_functions::argument_type_impl<F>::type;
 
 template <size_t N>
+using int_t = typename decltype(_type_functions::int_t_impl<N>())::type;
+
+template <size_t N>
 using uint_t = typename decltype(_type_functions::uint_t_impl<N>())::type;
 
 inline constexpr std::array supported_uint_sizes = {
@@ -138,14 +162,11 @@ inline constexpr std::array supported_uint_sizes = {
 #endif           // HAS_128_INTS
 };
 
+inline constexpr std::array supported_int_sizes = supported_uint_sizes;
+
 template <typename T>
-constexpr auto uint_bit_size() -> std::enable_if_t<std::is_unsigned_v<T>, size_t> {
-  auto* f = supported_uint_sizes.begin();
-  while (f != supported_uint_sizes.end()) {
-    if (*f == sizeof(T) * CHAR_BIT) return *f;
-    ++f;
-  }
-  throw null_t{};  // compile time assert
+constexpr std::size_t bit_size() {
+  return sizeof(T) * 8;
 }
 
 }  // namespace algo

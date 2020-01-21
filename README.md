@@ -448,6 +448,7 @@ In many respects, this is my crack at the last task in the <br/>
 ### type functions
 
 `ArgumentType` <br/>
+`bit_size` <br/>
 `DifferenceType`<br/>
 `ForwardIterator`/`BidirectionalIterator`/`RandomAccessIterator` <br/>
 `IteratorCategory` <br/>
@@ -455,7 +456,6 @@ In many respects, this is my crack at the last task in the <br/>
 `Pointer`<br/>
 `Reference` <br/>
 `uint_t` <br/>
-`uint_bit_size` <br/>
 `ValueType`
 
 Collection of basic template magic stuff.
