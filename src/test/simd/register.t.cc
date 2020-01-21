@@ -106,13 +106,14 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
   using reg_t = register_i<TestType::width>;
   using scalar_t = typename TestType::scalar_t;
 
-  alignas(alignment<reg_t>()) type_array<reg_t, scalar_t> a, b;
+  alignas(alignment<reg_t>()) type_array<reg_t, scalar_t> a, b, c;
 
   a.fill(scalar_t{1});
   b.fill(scalar_t{2});
 
   auto* a_casted = reinterpret_cast<reg_t*>(a.data());
   auto* b_casted = reinterpret_cast<reg_t*>(b.data());
+  auto* c_casted = reinterpret_cast<reg_t*>(c.data());
 
   (void)a_casted;
 
@@ -120,6 +121,37 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
     reg_t filled = set1<bit_width<reg_t>()>(scalar_t{1});
     store(b_casted, filled);
     REQUIRE(a == b);
+  }
+
+  SECTION("min/max") {
+    if constexpr (algo::bit_size<scalar_t>() < 64) {
+      scalar_t small = -1;
+      scalar_t large = 1;
+      if (!std::is_signed_v<scalar_t>) {
+        std::swap(small, large);
+      }
+
+      for (size_t i = 0; i != a.size(); i += 2) {
+        a[i] = small;
+        a[i + 1] = large;
+        b[i] = large;
+        b[i + 1] = small;
+      }
+
+      reg_t x = load(a_casted);
+      reg_t y = load(b_casted);
+      reg_t min_v = min<scalar_t>(x, y);
+      reg_t max_v = max<scalar_t>(x, y);
+
+      a.fill(small);
+      b.fill(large);
+
+      store(c_casted, min_v);
+      REQUIRE(a == c);
+
+      store(c_casted, max_v);
+      REQUIRE(b == c);
+    }
   }
 }
 

@@ -120,9 +120,88 @@ inline auto set1(T a) {
 // Does not exist for floats.
 template <size_t register_width>
 inline auto setzero() {
-  if constexpr (register_width == 128) return _mm_setzero_si128();
-  else if constexpr (register_width == 256) return _mm256_setzero_si256();
-  else return algo::null_t{};
+  if constexpr (register_width == 128)
+    return _mm_setzero_si128();
+  else if constexpr (register_width == 256)
+    return _mm256_setzero_si256();
+  else
+    return algo::null_t{};
+}
+
+// min/max ---------------------------------------------------------
+
+template <typename T, typename Register>
+inline auto min(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+
+  if constexpr (register_width == 128) {
+    // clang-format off
+    if constexpr      (std::is_same_v<T, std::int8_t>)  return _mm_min_epi8(a, b);
+    else if constexpr (std::is_same_v<T, std::int16_t>) return _mm_min_epi16(a, b);
+    else if constexpr (std::is_same_v<T, std::int32_t>) return _mm_min_epi32(a, b);
+
+    else
+
+    if constexpr      (std::is_same_v<T, std::uint8_t>)  return _mm_min_epu8(a, b);
+    else if constexpr (std::is_same_v<T, std::uint16_t>) return _mm_min_epu16(a, b);
+    else if constexpr (std::is_same_v<T, std::uint32_t>) return _mm_min_epu32(a, b);
+
+    else return algo::null_t{};
+    // clang-format on
+  } else if constexpr (register_width == 256) {
+    // clang-format off
+    if constexpr      (std::is_same_v<T, std::int8_t>)  return _mm256_min_epi8(a, b);
+    else if constexpr (std::is_same_v<T, std::int16_t>) return _mm256_min_epi16(a, b);
+    else if constexpr (std::is_same_v<T, std::int32_t>) return _mm256_min_epi32(a, b);
+
+    else
+
+    if constexpr      (std::is_same_v<T, std::uint8_t>)  return _mm256_min_epu8(a, b);
+    else if constexpr (std::is_same_v<T, std::uint16_t>) return _mm256_min_epu16(a, b);
+    else if constexpr (std::is_same_v<T, std::uint32_t>) return _mm256_min_epu32(a, b);
+
+    else return algo::null_t{};
+    // clang-format on
+  } else {
+    return algo::null_t{};
+  }
+}
+
+template <typename T, typename Register>
+inline auto max(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+
+  if constexpr (register_width == 128) {
+    // clang-format off
+    if constexpr      (std::is_same_v<T, std::int8_t>)  return _mm_max_epi8(a, b);
+    else if constexpr (std::is_same_v<T, std::int16_t>) return _mm_max_epi16(a, b);
+    else if constexpr (std::is_same_v<T, std::int32_t>) return _mm_max_epi32(a, b);
+
+    else
+
+    if constexpr      (std::is_same_v<T, std::uint8_t>)  return _mm_max_epu8(a, b);
+    else if constexpr (std::is_same_v<T, std::uint16_t>) return _mm_max_epu16(a, b);
+    else if constexpr (std::is_same_v<T, std::uint32_t>) return _mm_max_epu32(a, b);
+
+    else return algo::null_t{};
+    // clang-format on
+  } else if constexpr (register_width == 256) {
+    // clang-format off
+    if constexpr      (std::is_same_v<T, std::int8_t>)  return _mm256_max_epi8(a, b);
+    else if constexpr (std::is_same_v<T, std::int16_t>) return _mm256_max_epi16(a, b);
+    else if constexpr (std::is_same_v<T, std::int32_t>) return _mm256_max_epi32(a, b);
+
+    else
+
+    if constexpr      (std::is_same_v<T, std::uint8_t>)  return _mm256_max_epu8(a, b);
+    else if constexpr (std::is_same_v<T, std::uint16_t>) return _mm256_max_epu16(a, b);
+    else if constexpr (std::is_same_v<T, std::uint32_t>) return _mm256_max_epu32(a, b);
+
+    else return algo::null_t{};
+    // clang-format on
+  } else {
+    return algo::null_t{};
+  }
 }
 
 }  // namespace simd
