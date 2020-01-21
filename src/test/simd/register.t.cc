@@ -81,9 +81,18 @@ TEMPLATE_TEST_CASE("simd.register.just_bytes", "[simd]",  //
   auto* a_casted = reinterpret_cast<reg_t*>(a.data());
   auto* b_casted = reinterpret_cast<reg_t*>(b.data());
 
-  SECTION("load_s/store_s") {
-    reg_t loaded_a = load_s(a_casted);
-    store_s(b_casted, loaded_a);
+  SECTION("load/store") {
+    reg_t loaded_a = load(a_casted);
+    store(b_casted, loaded_a);
+    REQUIRE(a == b);
+  }
+
+  SECTION("setzero") {
+    a.fill(std::byte{0});
+
+    reg_t to_store = setzero<bit_width<reg_t>()>();
+    store(b_casted, to_store);
+
     REQUIRE(a == b);
   }
 }
@@ -109,7 +118,7 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
 
   SECTION("set1") {
     reg_t filled = set1<bit_width<reg_t>()>(scalar_t{1});
-    store_s(b_casted, filled);
+    store(b_casted, filled);
     REQUIRE(a == b);
   }
 }

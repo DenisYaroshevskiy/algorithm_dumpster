@@ -72,21 +72,21 @@ constexpr size_t alignment() {
 
 // load aligned ----------------------------------------------------
 
-inline register_i<128> load_s(const register_i<128>* addr) {
+inline register_i<128> load(const register_i<128>* addr) {
   return _mm_load_si128(addr);
 }
 
-inline register_i<256> load_s(const register_i<256>* addr) {
+inline register_i<256> load(const register_i<256>* addr) {
   return _mm256_load_si256(addr);
 }
 
 // store aligned ----------------------------------------------------
 
-inline void store_s(register_i<128>* addr, register_i<128> x) {
+inline void store(register_i<128>* addr, register_i<128> x) {
   _mm_store_si128(addr, x);
 }
 
-inline void store_s(register_i<256>* addr, register_i<256> x) {
+inline void store(register_i<256>* addr, register_i<256> x) {
   _mm256_store_si256(addr, x);
 }
 
@@ -115,6 +115,14 @@ inline auto set1(T a) {
   } else {
     return algo::null_t{};
   }
+}
+
+// Does not exist for floats.
+template <size_t register_width>
+inline auto setzero() {
+  if constexpr (register_width == 128) return _mm_setzero_si128();
+  else if constexpr (register_width == 256) return _mm256_setzero_si256();
+  else return algo::null_t{};
 }
 
 }  // namespace simd
