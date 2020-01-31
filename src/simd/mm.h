@@ -269,6 +269,40 @@ inline auto max(Register a, Register b) {
     return error_t{};
 }
 
+// comparisons -----------------------------
+
+template <typename T, typename Register>
+inline auto cmpeq(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr size_t t_width = sizeof(T) * 8;
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_cmpeq_epi8(a, b);
+  else if constexpr (register_width == 128 && t_width == 16)
+    return _mm_cmpeq_epi16(a, b);
+  else if constexpr (register_width == 128 && t_width == 32)
+    return _mm_cmpeq_epi32(a, b);
+  else if constexpr (register_width == 128 && t_width == 64)
+    return _mm_cmpeq_epi64(a, b);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_cmpeq_epi8(a, b);
+  else if constexpr (register_width == 256 && t_width == 16)
+    return _mm256_cmpeq_epi16(a, b);
+  else if constexpr (register_width == 256 && t_width == 32)
+    return _mm256_cmpeq_epi32(a, b);
+  else if constexpr (register_width == 256 && t_width == 64)
+    return _mm256_cmpeq_epi64(a, b);
+  else if constexpr (register_width == 512 && t_width == 8)
+    return _mm512_cmpeq_epi8(a, b);
+  else if constexpr (register_width == 512 && t_width == 16)
+    return _mm512_cmpeq_epi16(a, b);
+  else if constexpr (register_width == 512 && t_width == 32)
+    return _mm512_cmpeq_epi32(a, b);
+  else if constexpr (register_width == 512 && t_width == 64)
+    return _mm512_cmpeq_epi64(a, b);
+  else
+    return error_t{};
+}
+
 }  // namespace mm
 
 #endif  // SIMD_MM_H_

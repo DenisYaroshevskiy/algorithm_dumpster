@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-#include "simd/mm.h"
-
 #include <array>
 #include <type_traits>
 
+#include "simd/mm.h"
 #include "test/catch.h"
 
 namespace mm {
@@ -108,8 +107,10 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
                             std::uint32_t, std::uint64_t)) {  //
   using reg_t = register_i<TestType::width>;
   using scalar_t = typename TestType::scalar_t;
+  constexpr scalar_t FF =
+      std::numeric_limits<std::make_unsigned_t<scalar_t>>::max();
 
-  alignas(alignment<reg_t>()) type_array<reg_t, scalar_t> a, b, c;
+  alignas(alignment<reg_t>()) type_array<reg_t, scalar_t> a, b, c, d;
 
   a.fill(scalar_t{1});
   b.fill(scalar_t{2});
@@ -117,8 +118,9 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
   auto* a_casted = reinterpret_cast<reg_t*>(a.data());
   auto* b_casted = reinterpret_cast<reg_t*>(b.data());
   auto* c_casted = reinterpret_cast<reg_t*>(c.data());
+  auto* d_casted = reinterpret_cast<reg_t*>(d.data());
 
-  (void)a_casted;
+  (void)d_casted;
 
   SECTION("set1") {
     reg_t filled = set1<bit_width<reg_t>()>(scalar_t{1});
@@ -155,6 +157,32 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
       store(c_casted, max_v);
       REQUIRE(b == c);
     }
+  }
+
+  SECTION("cmpeq") {
+    auto run = [&] {
+      reg_t x = load(a_casted);
+      reg_t y = load(b_casted);
+
+      reg_t res = cmpeq<scalar_t>(x, y);
+
+      store(c_casted, res);
+
+      REQUIRE(c == d);
+    };
+
+    d.fill(0);
+    run();
+
+    b = a;
+    d.fill(FF);
+    run();
+
+    for (size_t i = 0; i != a.size(); i += 2) {
+      b[i] += 1;
+      d[i] = 0;
+    }
+    run();
   }
 }
 

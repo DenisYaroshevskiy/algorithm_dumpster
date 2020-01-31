@@ -126,17 +126,35 @@ def instantiateJustRegister(template):
     return '\n'.join([template.format(size, name) for size, name in widthNamePairs])
 
 
-def instantiateRegisterIntWidth(template, include64=False):
-  intWidth = [8, 16, 32]
-  if include64:
-    intWidth.append(64)
+def instantiateRegisterIntWidth(template, include64=True):
+    intWidth = [8, 16, 32]
+    if include64:
+        intWidth.append(64)
 
-  product = list(itertools.product(widthNamePairs, intWidth))
-  flatten = list(itertools.chain(product))
+    product = list(itertools.product(widthNamePairs, intWidth))
+    flatten = list(itertools.chain(product))
 
-  return '\n'.join(
-    [template.format(rsize, name, tsize) for (rsize, name), tsize in flatten]
-  )
+    return '\n'.join(
+        [template.format(rsize, name, tsize)
+         for (rsize, name), tsize in flatten]
+    )
+
+
+def instantiateIfConstexprPattern_justRegister(condition, action):
+    pattern = 'if constexpr (' + condition + ')' + action + 'else'
+    return instantiateJustRegister(pattern) + '  return error_t{}; }\n'
+
+
+def instantiateIfConstexprPattern_intWidth(condition, action):
+    pattern = 'if constexpr (' + condition + ')' + action + 'else'
+    return instantiateRegisterIntWidth(pattern) + '  return error_t{}; }\n'
+
+
+def instantiateIfConstexprPattern_intWidth_twice(condition1, action1, condition2, action2):
+    pattern = 'if constexpr (' + condition1 + ')' + action1 + 'else '
+    pattern += 'if constexpr (' + condition2 + ')' + action2 + 'else'
+    return instantiateRegisterIntWidth(pattern) + '  return error_t{}; }\n'
+
 
 # Actual work ================================================
 
@@ -225,18 +243,10 @@ def set0():
 template <size_t register_width>
 inline auto setzero() {
 '''
+    return res + instantiateIfConstexprPattern_justRegister(
+        'register_width == {0}',
+        'return _mm{1}_setzero_si{0}();')
 
-    pattern='''if constexpr (register_width == {0})
-    return _mm{1}_setzero_si{0}();
-  else'''
-
-    res += instantiateJustRegister(pattern)
-
-    res +='''
-  return error_t{};
-}
-'''
-    return res
 
 def set1():
     res = '''
@@ -246,19 +256,13 @@ inline auto set1(T a) {
 
 '''
 
-    pattern='''if constexpr (register_width == {0} && t_width == {2})
-    return _mm{1}_set1_epi{2}(a);
-  else'''
-
-    res += instantiateRegisterIntWidth(pattern, include64=True)
-
-    res +='''
-  return error_t{};
-}
-'''
-    return res
+    return res + instantiateIfConstexprPattern_intWidth(
+        'register_width == {0} && t_width == {2}',
+        'return _mm{1}_set1_epi{2}(a);'
+    )
 
 # Min/Max ===========================================
+
 
 def min():
     res = '''
@@ -267,20 +271,14 @@ inline auto min(Register a, Register b) {
   static constexpr size_t register_width = bit_width<Register>();
 
 '''
-    pattern = '''if constexpr (register_width == {0}
-    && std::is_same_v<T, std::int{2}_t>) return _mm{1}_min_epi{2}(a, b);
-  else if constexpr (register_width == {0}
-    && std::is_same_v<T, std::uint{2}_t>) return _mm{1}_min_epu{2}(a, b);
-  else'''
 
-    res += instantiateRegisterIntWidth(pattern, include64=True)
+    return res + instantiateIfConstexprPattern_intWidth_twice(
+        'register_width == {0} && std::is_same_v<T, std::int{2}_t>',
+        'return _mm{1}_min_epi{2}(a, b);',
+        'register_width == {0} && std::is_same_v<T, std::uint{2}_t>',
+        'return _mm{1}_min_epu{2}(a, b);'
+    )
 
-    res +='''
-  return error_t{};
-}
-'''
-
-    return res
 
 def max():
     res = '''
@@ -289,20 +287,30 @@ inline auto max(Register a, Register b) {
   static constexpr size_t register_width = bit_width<Register>();
 
 '''
-    pattern = '''if constexpr (register_width == {0}
-    && std::is_same_v<T, std::int{2}_t>) return _mm{1}_max_epi{2}(a, b);
-  else if constexpr (register_width == {0}
-    && std::is_same_v<T, std::uint{2}_t>) return _mm{1}_max_epu{2}(a, b);
-  else'''
 
-    res += instantiateRegisterIntWidth(pattern, include64=True)
+    return res + instantiateIfConstexprPattern_intWidth_twice(
+        'register_width == {0} && std::is_same_v<T, std::int{2}_t>',
+        'return _mm{1}_max_epi{2}(a, b);',
+        'register_width == {0} && std::is_same_v<T, std::uint{2}_t>',
+        'return _mm{1}_max_epu{2}(a, b);'
+    )
 
-    res +='''
-  return error_t{};
-}
+# Comparisons ==========================================
+
+
+def cmpeq():
+    res = '''
+  template <typename T, typename Register>
+  inline auto cmpeq(Register a, Register b) {
+    static constexpr size_t register_width = bit_width<Register>();
+    static constexpr size_t t_width = sizeof(T) * 8;
 '''
 
-    return res
+    return res + instantiateIfConstexprPattern_intWidth(
+        'register_width == {0} && t_width == {2}',
+        'return _mm{1}_cmpeq_epi{2}(a, b);'
+    )
+
 
 def generateMainCode():
     res = ''
@@ -324,15 +332,19 @@ def generateMainCode():
     res += min()
     res += max()
 
+    res += section('comparisons')
+    res += cmpeq()
+
     return res
 
 
 # Fixups ================================
 
 def fixUp(res):
-  return res.replace('set1_epi64', 'set1_epi64x')
+    return res.replace('set1_epi64', 'set1_epi64x')
 
 # Driver ==================================
+
 
 def generateCode():
     res = prefixComments()
