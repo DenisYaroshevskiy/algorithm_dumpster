@@ -312,6 +312,24 @@ def cmpeq():
     )
 
 
+# Movemask =============================================
+
+def movemask():
+  return '''
+  template <typename T, typename Register>
+  inline auto movemask(Register a) {
+    static constexpr size_t register_width = bit_width<Register>();
+    static constexpr size_t t_width = sizeof(T) * 8;
+
+    if constexpr (register_width == 128 && t_width == 8)
+      return _mm_movemask_epi8(a);
+    else if constexpr (register_width == 256 && t_width == 8)
+      return _mm256_movemask_epi8(a);
+    else return error_t{ };
+  }
+'''
+
+
 def generateMainCode():
     res = ''
     res += section('register_i')
@@ -334,6 +352,9 @@ def generateMainCode():
 
     res += section('comparisons')
     res += cmpeq()
+
+    res += section('movemask')
+    res += movemask()
 
     return res
 

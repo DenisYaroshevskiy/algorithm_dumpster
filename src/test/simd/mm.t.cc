@@ -46,12 +46,12 @@ struct test_256 {
   using scalar_t = T;
 };
 
-TEST_CASE("simd.register.type", "[simd]") {
+TEST_CASE("simd.mm.type", "[simd]") {
   is_same_test(register_i<128>{}, __m128i{});
   is_same_test(register_i<256>{}, __m256i{});
 }
 
-TEST_CASE("simd.register.sizes", "[simd]") {
+TEST_CASE("simd.mm.sizes", "[simd]") {
   {
     STATIC_REQUIRE(bit_width<register_i<128>>() == 128);
     STATIC_REQUIRE(bit_width<register_i<256>>() == 256);
@@ -71,7 +71,7 @@ TEST_CASE("simd.register.sizes", "[simd]") {
   }
 }
 
-TEMPLATE_TEST_CASE("simd.register.just_bytes", "[simd]",  //
+TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
                    register_i<128>, register_i<256>) {
   using reg_t = TestType;
 
@@ -99,7 +99,7 @@ TEMPLATE_TEST_CASE("simd.register.just_bytes", "[simd]",  //
   }
 }
 
-TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
+TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
                            (test_128, test_256),              //
                            (std::int8_t, std::int16_t,        //
                             std::int32_t, std::int64_t,       //
@@ -183,6 +183,28 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.register.ints", "[simd]",    //
       d[i] = 0;
     }
     run();
+  }
+}
+
+TEST_CASE("simd.mm.movemask", "[simd]") {
+  {
+    auto x = setzero<128>();
+    REQUIRE(movemask<std::int8_t>(x) == 0);
+    REQUIRE(movemask<std::uint8_t>(x) == 0);
+
+    x = set1<128>(std::uint8_t{0xFF});
+    REQUIRE(movemask<std::int8_t>(x) == 0xFFFF);
+    REQUIRE(movemask<std::uint8_t>(x) == 0xFFFF);
+  }
+
+  {
+    auto x = setzero<256>();
+    REQUIRE(movemask<std::int8_t>(x) == 0);
+    REQUIRE(movemask<std::uint8_t>(x) == 0);
+
+    x = set1<256>(std::uint8_t{0xFF});
+    REQUIRE(movemask<std::int8_t>(x) == 0xFFFFFFFF);
+    REQUIRE(movemask<std::uint8_t>(x) == 0xFFFFFFFF);
   }
 }
 
