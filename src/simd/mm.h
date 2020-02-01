@@ -96,6 +96,21 @@ inline register_i<512> load(const register_i<512>* addr) {
   return _mm512_load_si512(addr);
 }
 
+__attribute__((no_sanitize_address)) inline register_i<128> load_ignore_asan(
+    const register_i<128>* addr) {
+  return _mm_load_si128(addr);
+}
+
+__attribute__((no_sanitize_address)) inline register_i<256> load_ignore_asan(
+    const register_i<256>* addr) {
+  return _mm256_load_si256(addr);
+}
+
+__attribute__((no_sanitize_address)) inline register_i<512> load_ignore_asan(
+    const register_i<512>* addr) {
+  return _mm512_load_si512(addr);
+}
+
 inline void store(register_i<128>* addr, register_i<128> a) {
   _mm_store_si128(addr, a);
 }

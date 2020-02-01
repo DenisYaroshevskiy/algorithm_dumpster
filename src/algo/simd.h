@@ -17,17 +17,13 @@
 #ifndef COMPILER_SIMD_H
 #define COMPILER_SIMD_H
 
-#ifndef __AVX2__
-#error "No AVX2 support"
-#endif
-
-#include <immintrin.h>
-
 #include <array>
 #include <cstdint>
 #include <cstring>
 #include <limits>
 #include <type_traits>
+
+#include "simd/mm.h"
 
 namespace algo {
 namespace _simd {
@@ -59,46 +55,47 @@ struct simd;
 
 template <>
 struct simd<std::int8_t, 16> {
-  __m128i data;
+  using reg_t = mm::register_i<128>;
+  reg_t data;
 
   simd() = default;
-  explicit simd(__m128i data) : data(data) {}
+  explicit simd(reg_t data) : data(data) {}
 
   using type = std::int8_t;
   using vbool = simd;
   using array = std::array<std::int8_t, 16>;
 
-  static constexpr size_t width = 16;
-  static constexpr std::size_t alignment = alignof(__m128i);
+  static constexpr size_t width = mm::byte_width<reg_t>();
+  static constexpr std::size_t alignment = mm::alignment<reg_t>();
 
-  __attribute__((no_sanitize_address))
   void load(const std::int8_t* addr) {
-    data = _mm_load_si128(reinterpret_cast<const __m128i*>(addr));
+    data = mm::load_ignore_asan(reinterpret_cast<const reg_t*>(addr));
   }
-  void store(std::int8_t* addr) { std::memcpy(addr, &data, sizeof(data)); }
-  void fill(std::int8_t x) { data = _mm_set1_epi8(x); }
-  void fill_0() { data = _mm_setzero_si128(); }
+  void store(std::int8_t* addr) {
+    mm::store(reinterpret_cast<reg_t*>(addr), data); }
+  void fill(std::int8_t x) { data = mm::set1<mm::bit_width<reg_t>()>(x); }
+  void fill_0() { data = mm::setzero<mm::bit_width<reg_t>()>(); }
 
   friend simd pick_min(const simd& x, const simd& y) {
-    return simd{_mm_min_epi8(x.data, y.data)};
+    return simd{mm::min<type>(x.data, y.data)};
   }
 
   friend simd pick_max(const simd& x, const simd& y) {
-    return simd{_mm_max_epi8(x.data, y.data)};
+    return simd{mm::max<type>(x.data, y.data)};
   }
 
   friend vbool pairwise_equal(const simd& x, const simd& y) {
-    return vbool{_mm_cmpeq_epi8(x.data, y.data)};
+    return vbool{mm::cmpeq<type>(x.data, y.data)};
   }
 
   friend bool all_non_zero(const simd& x) {
-    return _mm_movemask_epi8(x.data) == 0xffff;
+    return mm::movemask<type>(x.data) == 0xffff;
   }
 
-  friend bool all_zero(const simd& x) { return _mm_movemask_epi8(x.data) == 0; }
+  friend bool all_zero(const simd& x) { return mm::movemask<type>(x.data) == 0; }
 
   friend int first_pairwise_equal(const simd& x, const simd& y) {
-    return __builtin_ctz(_mm_movemask_epi8(pairwise_equal(x, y).data));
+    return __builtin_ctz(mm::movemask<type>(pairwise_equal(x, y).data));
   }
 
   friend bool operator==(const simd& x, const simd& y) {
@@ -115,7 +112,7 @@ Simd blend_n_from_high(const Simd& x, const Simd& y, int n) {
   vbool mask;
   mask.load(_simd::first_n_mask<vbool>[n].data());
 
-  return Simd{_mm_blendv_epi8(x.data, y.data, mask.data)};
+  return Simd{mm::blendv<typename Simd::type>(x.data, y.data, mask.data)};
 }
 
 template <typename Simd>
