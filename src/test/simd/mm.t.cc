@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
+#include "simd/mm.h"
+
 #include <array>
 #include <type_traits>
 
-#include "simd/mm.h"
 #include "test/catch.h"
 
 namespace mm {

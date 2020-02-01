@@ -620,6 +620,39 @@ So - instead of `_mm_load_si128` or `_mm256_store_si256` we can `mm::load(const 
 
 Also some type traits to just tell how many bits the register have etc.
 
+### mm_operations_generator
+
+python script to generate mm.h
+
+### pack
+
+`pack<T, W>`
+`register_t<pack>`
+`vbool_t<pack>`
+
+`equal_full(pack, pack)`
+`equal_pairwise(pack, pack)`
+`operator==/!=/</>/<=/>=`
+
+`load<pack_width>(const T*)`
+
+A simd::pack of integer values, incapsulating `mm::register`.<br/>
+The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
+
+There are some type functions on top like `register_t` to get the `mm` register and `vbool_t` to get the correcsponding simd mask type.
+
+Some simd wrappers support direct `operator[]` to access specific elements. I decided against it for now because I think that I want loads/stores to memory to be explicit.
+
+`operator==/!=/</>/<=/>=`
+
+Many simd wrappers chose to implement these to return `vbool`. I don't think<br/>
+that this works works well with the rest of C++ ecosystem - so operators work the same<br/>
+as for containers. There are `pairwise` versions of similar operations when you need them.
+
+`load/store`
+
+Default load, store require aligned pointers.
+
 ## Test
 
 Tests for everything. Has a few general purpose test utilities though.
