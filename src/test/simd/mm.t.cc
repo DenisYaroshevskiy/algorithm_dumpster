@@ -74,14 +74,17 @@ TEST_CASE("simd.mm.sizes", "[simd]") {
 TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
                    register_i<128>, register_i<256>) {
   using reg_t = TestType;
+  constexpr size_t width = bit_width<reg_t>();
 
-  alignas(alignment<reg_t>()) byte_array<reg_t> a, b;
+  alignas(alignment<reg_t>()) byte_array<reg_t> a, b, c, d;
 
   a.fill(std::byte{1});
   b.fill(std::byte{2});
 
   auto* a_casted = reinterpret_cast<reg_t*>(a.data());
   auto* b_casted = reinterpret_cast<reg_t*>(b.data());
+  auto* c_casted = reinterpret_cast<reg_t*>(c.data());
+  auto* d_casted = reinterpret_cast<reg_t*>(d.data());
 
   SECTION("load/store") {
     reg_t loaded_a = load(a_casted);
@@ -96,6 +99,44 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
     store(b_casted, to_store);
 
     REQUIRE(a == b);
+  }
+
+  SECTION("movemask") {
+    auto x = setzero<width>();
+    REQUIRE(movemask<std::int8_t>(x) == 0);
+    REQUIRE(movemask<std::uint8_t>(x) == 0);
+
+    x = set1<bit_width<reg_t>()>(std::uint8_t{0xFF});
+
+    constexpr int byte_width = width / 8;
+    constexpr int enough_ones = static_cast<int>((1l << byte_width) - 1);
+
+    REQUIRE(movemask<std::int8_t>(x) == enough_ones);
+    REQUIRE(movemask<std::uint8_t>(x) == enough_ones);
+  }
+
+  SECTION("blendv") {
+    auto run = [&] {
+      reg_t loaded_a = load(a_casted);
+      reg_t loaded_b = load(b_casted);
+      reg_t loaded_c = load(c_casted);
+
+      store(d_casted, blendv<std::int8_t>(loaded_a, loaded_b, loaded_c));
+      for (size_t i = 0; i < d.size(); ++i) {
+        if (c[i] == std::byte{0xFF})
+          REQUIRE(d[i] == b[i]);
+        else
+          REQUIRE(d[i] == a[i]);
+      }
+    };
+
+    c.fill(std::byte{0});
+    run();
+    c.fill(std::byte{0xFF});
+
+    c[0] = std::byte{0};
+    c[5] = std::byte{0};
+    run();
   }
 }
 
@@ -183,28 +224,6 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
       d[i] = 0;
     }
     run();
-  }
-}
-
-TEST_CASE("simd.mm.movemask", "[simd]") {
-  {
-    auto x = setzero<128>();
-    REQUIRE(movemask<std::int8_t>(x) == 0);
-    REQUIRE(movemask<std::uint8_t>(x) == 0);
-
-    x = set1<128>(std::uint8_t{0xFF});
-    REQUIRE(movemask<std::int8_t>(x) == 0xFFFF);
-    REQUIRE(movemask<std::uint8_t>(x) == 0xFFFF);
-  }
-
-  {
-    auto x = setzero<256>();
-    REQUIRE(movemask<std::int8_t>(x) == 0);
-    REQUIRE(movemask<std::uint8_t>(x) == 0);
-
-    x = set1<256>(std::uint8_t{0xFF});
-    REQUIRE(movemask<std::int8_t>(x) == 0xFFFFFFFF);
-    REQUIRE(movemask<std::uint8_t>(x) == 0xFFFFFFFF);
   }
 }
 

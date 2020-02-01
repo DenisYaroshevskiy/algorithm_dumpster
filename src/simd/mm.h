@@ -318,6 +318,19 @@ inline auto movemask(Register a) {
     return error_t{};
 }
 
+template <typename T, typename Register>
+inline auto blendv(Register a, Register b, Register mask) {
+  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr size_t t_width = sizeof(T) * 8;
+
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_blendv_epi8(a, b, mask);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_blendv_epi8(a, b, mask);
+  else
+    return error_t{};
+}
+
 }  // namespace mm
 
 #endif  // SIMD_MM_H_
