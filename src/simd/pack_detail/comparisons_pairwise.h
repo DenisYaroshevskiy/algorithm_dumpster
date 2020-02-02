@@ -41,8 +41,7 @@ vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 
     using reg_t = register_t<pack<T, W>>;
 
-    const reg_t convertion_mask =
-        mm::set1<sizeof(T) * W * 8>(set_highest_4_bits<T>());
+    const reg_t convertion_mask = mm::set1<reg_t>(set_highest_4_bits<T>());
 
     const reg_t x_as_signed = mm::add<T>(x.reg, convertion_mask);
     const reg_t y_as_signed = mm::add<T>(y.reg, convertion_mask);

@@ -126,8 +126,9 @@ inline void store(register_i<512>* addr, register_i<512> a) {
 // set one value everywhere ----------------
 
 // Does not exist for floats.
-template <size_t register_width>
+template <typename Register>
 inline auto setzero() {
+  static constexpr size_t register_width = bit_width<Register>();
   if constexpr (register_width == 128)
     return _mm_setzero_si128();
   else if constexpr (register_width == 256)
@@ -138,9 +139,10 @@ inline auto setzero() {
     return error_t{};
 }
 
-template <size_t register_width, typename T>
+template <typename Register, typename T>
 inline auto set1(T a) {
-  static constexpr size_t t_width = sizeof(T) * 8;
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
 
   if constexpr (register_width == 128 && t_width == 8)
     return _mm_set1_epi8(a);

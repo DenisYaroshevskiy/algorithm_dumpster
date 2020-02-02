@@ -250,8 +250,9 @@ inline void store(register_i<{0}>* addr, register_i<{0}> a) {{
 def set0():
     res = '''
 // Does not exist for floats.
-template <size_t register_width>
+template <typename Register>
 inline auto setzero() {
+  static constexpr size_t register_width = bit_width<Register>();
 '''
     return res + instantiateIfConstexprPattern_justRegister(
         'register_width == {0}',
@@ -260,9 +261,10 @@ inline auto setzero() {
 
 def set1():
     res = '''
-template <size_t register_width, typename T>
+template <typename Register, typename T>
 inline auto set1(T a) {
-  static constexpr size_t t_width = sizeof(T) * 8;
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
 
 '''
 

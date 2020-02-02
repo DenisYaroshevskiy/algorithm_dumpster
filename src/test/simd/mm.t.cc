@@ -95,18 +95,18 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
   SECTION("setzero") {
     a.fill(std::byte{0});
 
-    reg_t to_store = setzero<bit_width<reg_t>()>();
+    reg_t to_store = setzero<reg_t>();
     store(b_casted, to_store);
 
     REQUIRE(a == b);
   }
 
   SECTION("movemask") {
-    auto x = setzero<width>();
+    auto x = setzero<reg_t>();
     REQUIRE(movemask<std::int8_t>(x) == 0);
     REQUIRE(movemask<std::uint8_t>(x) == 0);
 
-    x = set1<bit_width<reg_t>()>(std::uint8_t{0xFF});
+    x = set1<reg_t>(std::uint8_t{0xFF});
 
     constexpr int byte_width = width / 8;
     constexpr int enough_ones = static_cast<int>((1l << byte_width) - 1);
@@ -164,7 +164,7 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
   (void)d_casted;
 
   SECTION("set1") {
-    reg_t filled = set1<bit_width<reg_t>()>(scalar_t{1});
+    reg_t filled = set1<reg_t>(scalar_t{1});
     store(b_casted, filled);
     REQUIRE(a == b);
   }

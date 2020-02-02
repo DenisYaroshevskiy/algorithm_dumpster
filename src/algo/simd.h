@@ -73,8 +73,8 @@ struct simd<std::int8_t, 16> {
   }
   void store(std::int8_t* addr) {
     mm::store(reinterpret_cast<reg_t*>(addr), data); }
-  void fill(std::int8_t x) { data = mm::set1<mm::bit_width<reg_t>()>(x); }
-  void fill_0() { data = mm::setzero<mm::bit_width<reg_t>()>(); }
+  void fill(std::int8_t x) { data = mm::set1<reg_t>(x); }
+  void fill_0() { data = mm::setzero<reg_t>(); }
 
   friend simd pick_min(const simd& x, const simd& y) {
     return simd{mm::min<type>(x.data, y.data)};
