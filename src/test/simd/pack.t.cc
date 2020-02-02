@@ -59,7 +59,7 @@ TEST_CASE("simd.pack.types.vbool_t", "[simd]") {
   is_same_test(pack<std::uint8_t, 16>{}, vbool_t<pack<std::int8_t, 16>>{});
   is_same_test(pack<std::uint8_t, 16>{}, vbool_t<pack<std::uint8_t, 16>>{});
   is_same_test(pack<std::uint16_t, 16>{}, vbool_t<pack<std::uint16_t, 16>>{});
-  is_same_test(pack<std::uintptr_t, 4>{}, vbool_t<pack<const int*, 4>>{});
+  is_same_test(pack<std::uint64_t, 4>{}, vbool_t<pack<const int*, 4>>{});
 }
 
 TEMPLATE_TEST_CASE("simd.pack.size/alignment", "[simd]", ALL_TEST_PACKS) {

@@ -31,7 +31,7 @@ vbool_t<pack<T, W>> equal_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 
 template <typename T, std::size_t W>
 vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  if constexpr (std::is_signed_v<T> || std::is_pointer_v<T>) {
+  if constexpr (asif_signed_v<T>) {
     return vbool_t<pack<T, W>>{mm::cmpgt<T>(x.reg, y.reg)};
   } else {
     // https://stackoverflow.com/a/33173643/5021064
@@ -46,7 +46,8 @@ vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
     using casted = std::conditional_t<std::is_same_v<T, uintptr_t>,
                                       std::int64_t, std::make_signed_t<T>>;
 
-    return vbool_t<pack<T, W>>{mm::cmpgt<casted>(x_as_signed, y_as_signed)};
+    return greater_pairwise(pack<casted, W>{x_as_signed},
+                            pack<casted, W>{y_as_signed});
   }
 }
 

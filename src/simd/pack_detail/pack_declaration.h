@@ -28,7 +28,11 @@ namespace _pack_declaration {
 template <typename T>
 auto select_vbool_scalar_type() {
   if constexpr (std::is_pointer_v<T>) {
-    return std::uintptr_t{};
+    static_assert(sizeof(T) == sizeof(std::uint64_t));
+    return std::uint64_t{};
+  } else if constexpr (std::is_same_v<T, std::uintptr_t>) {
+    static_assert(sizeof(T) == sizeof(std::uint64_t));
+    return std::uint64_t{};
   } else {
     return std::make_unsigned_t<T>{};
   }
@@ -64,6 +68,9 @@ using scalar_t = typename Pack::value_type;
 
 template <typename Pack>
 constexpr std::size_t size_v = Pack::size();
+
+template <typename T>
+constexpr bool asif_signed_v = std::is_signed_v<T> || std::is_pointer_v<T>;
 
 }  // namespace simd
 
