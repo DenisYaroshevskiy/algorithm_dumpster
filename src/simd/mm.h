@@ -318,6 +318,38 @@ inline auto cmpeq(Register a, Register b) {
     return error_t{};
 }
 
+// Instruction is not avaliable for unsigned ints.
+template <typename T, typename Register>
+inline auto cmpgt(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128 && std::is_same_v<T, std::int8_t>)
+    return _mm_cmpgt_epi8(a, b);
+  else if constexpr (register_width == 128 && std::is_same_v<T, std::int16_t>)
+    return _mm_cmpgt_epi16(a, b);
+  else if constexpr (register_width == 128 && std::is_same_v<T, std::int32_t>)
+    return _mm_cmpgt_epi32(a, b);
+  else if constexpr (register_width == 128 && std::is_same_v<T, std::int64_t>)
+    return _mm_cmpgt_epi64(a, b);
+  else if constexpr (register_width == 256 && std::is_same_v<T, std::int8_t>)
+    return _mm256_cmpgt_epi8(a, b);
+  else if constexpr (register_width == 256 && std::is_same_v<T, std::int16_t>)
+    return _mm256_cmpgt_epi16(a, b);
+  else if constexpr (register_width == 256 && std::is_same_v<T, std::int32_t>)
+    return _mm256_cmpgt_epi32(a, b);
+  else if constexpr (register_width == 256 && std::is_same_v<T, std::int64_t>)
+    return _mm256_cmpgt_epi64(a, b);
+  else if constexpr (register_width == 512 && std::is_same_v<T, std::int8_t>)
+    return _mm512_cmpgt_epi8(a, b);
+  else if constexpr (register_width == 512 && std::is_same_v<T, std::int16_t>)
+    return _mm512_cmpgt_epi16(a, b);
+  else if constexpr (register_width == 512 && std::is_same_v<T, std::int32_t>)
+    return _mm512_cmpgt_epi32(a, b);
+  else if constexpr (register_width == 512 && std::is_same_v<T, std::int64_t>)
+    return _mm512_cmpgt_epi64(a, b);
+  else
+    return error_t{};
+}
+
 // movemask --------------------------------
 
 template <typename T, typename Register>

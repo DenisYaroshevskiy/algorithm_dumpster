@@ -321,6 +321,19 @@ def cmpeq():
         'return _mm{1}_cmpeq_epi{2}(a, b);'
     )
 
+def cmpgt():
+    res = '''
+  // Instruction is not avaliable for unsigned ints.
+  template <typename T, typename Register>
+  inline auto cmpgt(Register a, Register b) {
+    static constexpr size_t register_width = bit_width<Register>();
+'''
+
+    return res + instantiateIfConstexprPattern_intWidth(
+        'register_width == {0} && std::is_same_v<T, std::int{2}_t>',
+        'return _mm{1}_cmpgt_epi{2}(a, b);'
+    )
+
 
 # byte mask =============================================
 
@@ -377,6 +390,7 @@ def generateMainCode():
 
     res += section('comparisons')
     res += cmpeq()
+    res += cmpgt()
 
     res += section('movemask')
     res += movemask()

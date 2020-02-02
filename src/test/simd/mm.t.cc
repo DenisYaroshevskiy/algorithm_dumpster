@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-#include "simd/mm.h"
-
 #include <array>
 #include <type_traits>
 
+#include "simd/mm.h"
 #include "test/catch.h"
 
 namespace mm {
@@ -226,7 +225,34 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
     }
     run();
   }
+
+  SECTION("cmpgt") {
+    if constexpr (std::is_signed_v<scalar_t>) {
+      auto run = [&] {
+        reg_t x = load(a_casted);
+        reg_t y = load(b_casted);
+
+        reg_t res = cmpgt<scalar_t>(x, y);
+
+        store(c_casted, res);
+
+        REQUIRE(c == d);
+      };
+
+      d.fill(0);
+      run();
+
+      std::swap(a, b);
+      d.fill(FF);
+
+      run();
+
+      b[1] = a[1];
+      d[1] = 0;
+      run();
+    }
+  }
 }
 
 }  // namespace
-}  // namespace mm
+}  // namespace
