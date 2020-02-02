@@ -18,6 +18,7 @@
 #define SIMD_PACK_H_
 
 #include "simd/pack_detail/comparisons.h"
+#include "simd/pack_detail/comparisons_pairwise.h"
 
 #include "simd/pack_detail/load.h"
 #include "simd/pack_detail/store.h"

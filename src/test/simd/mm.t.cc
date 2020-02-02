@@ -252,6 +252,38 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
       run();
     }
   }
+
+  SECTION("add") {
+    auto run = [&] {
+      reg_t x = load(a_casted);
+      reg_t y = load(b_casted);
+
+      reg_t res = add<scalar_t>(x, y);
+
+      store(c_casted, res);
+
+      REQUIRE(c == d);
+    };
+
+    d.fill(3);
+    run();
+  }
+
+  SECTION("sub") {
+    auto run = [&] {
+      reg_t x = load(a_casted);
+      reg_t y = load(b_casted);
+
+      reg_t res = sub<scalar_t>(y, x);
+
+      store(c_casted, res);
+
+      REQUIRE(c == d);
+    };
+
+    d.fill(1);
+    run();
+  }
 }
 
 }  // namespace

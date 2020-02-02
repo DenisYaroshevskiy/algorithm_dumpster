@@ -18,11 +18,10 @@
 #define SIMD_PACK_DETAIL_COMPARISONS_H
 
 #include "simd/bits.h"
+#include "simd/pack_detail/comparisons_pairwise.h"
 #include "simd/pack_detail/masks.h"
 #include "simd/pack_detail/minmax_pairwise.h"
 #include "simd/pack_detail/pack_declaration.h"
-
-#include <iostream>
 
 namespace simd {
 namespace _comparisons {
@@ -33,11 +32,6 @@ std::uint32_t movemask(Reg x) {
 }
 
 }  // namespace _comparisons
-
-template <typename T, std::size_t W>
-vbool_t<pack<T, W>> equal_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return vbool_t<pack<T, W>>{mm::cmpeq<T>(x.reg, y.reg)};
-}
 
 template <typename T, size_t W>
 bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
@@ -52,18 +46,6 @@ bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
 
   return mmask == set_lower_n_bits(sizeof(pack<T, W>));
 }
-
-/*
-template <typename T, std::size_t W>
-vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  if constexpr (std::is_signed_v<T>) {
-    return vbool_t<pack<T, W>> { mm::cmpgt<T>(x.reg, y.reg); };
-  } else if constexpr (sizeof(T) < 8) {
-    pack<T, W> pick_max = max_pairwise(x, y);
-    return not(equal_pairwise(y, pick_max));
-  }
-}
-*/
 
 template <typename T, std::size_t W>
 bool less_lexicographical(const pack<T, W>& x, const pack<T, W>& y) {

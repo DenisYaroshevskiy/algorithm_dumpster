@@ -335,6 +335,35 @@ def cmpgt():
     )
 
 
+# Addition/Subtraction ==================================
+
+def add():
+    res = '''
+  template <typename T, typename Register>
+  inline auto add(Register a, Register b) {
+    static constexpr size_t register_width = bit_width<Register>();
+    static constexpr size_t t_width = sizeof(T) * 8;
+'''
+
+    return res + instantiateIfConstexprPattern_intWidth(
+        'register_width == {0} && t_width == {2}',
+        'return _mm{1}_add_epi{2}(a, b);'
+    )
+
+def sub():
+    res = '''
+  template <typename T, typename Register>
+  inline auto sub(Register a, Register b) {
+    static constexpr size_t register_width = bit_width<Register>();
+    static constexpr size_t t_width = sizeof(T) * 8;
+'''
+
+    return res + instantiateIfConstexprPattern_intWidth(
+        'register_width == {0} && t_width == {2}',
+        'return _mm{1}_sub_epi{2}(a, b);'
+    )
+
+
 # byte mask =============================================
 
 def movemask():
@@ -391,6 +420,10 @@ def generateMainCode():
     res += section('comparisons')
     res += cmpeq()
     res += cmpgt()
+
+    res += section('add/sub')
+    res += add()
+    res += sub()
 
     res += section('movemask')
     res += movemask()

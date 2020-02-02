@@ -20,10 +20,13 @@
 
 namespace simd {
 
-TEST_CASE("lsb_less", "[simd]") {
+TEST_CASE("bits.lsb_less", "[simd]") {
   REQUIRE_FALSE(lsb_less(0u, 0u));
   REQUIRE_FALSE(lsb_less(1u, 1u));
+
   REQUIRE(lsb_less(0u, 1u));  // 0000 0001
+  REQUIRE_FALSE(lsb_less(1u, 0u));  // 0000 0001
+
   REQUIRE(lsb_less(2u, 1u));  // 0010 0001
   REQUIRE(lsb_less(1u, 3u));  // 0001 0011
   REQUIRE(lsb_less(4u, 1u));  // 0100 0001
@@ -31,11 +34,18 @@ TEST_CASE("lsb_less", "[simd]") {
   REQUIRE(lsb_less(5u, 3u));  // 0101 0011
 }
 
-TEST_CASE("set_lower_n_bits", "[simd]") {
+TEST_CASE("bits.set_lower_n_bits", "[simd]") {
   REQUIRE(0 == set_lower_n_bits(0));
   REQUIRE(1 == set_lower_n_bits(1));
   REQUIRE(3 == set_lower_n_bits(2));
   REQUIRE(0xffffffff == set_lower_n_bits(32));
+}
+
+TEST_CASE("bits.set_highest_4_bits", "[simd]") {
+  REQUIRE(0x80 == set_highest_4_bits<std::uint8_t>());
+  REQUIRE(0x8000 == set_highest_4_bits<std::uint16_t>());
+  REQUIRE(0x8000'0000 == set_highest_4_bits<std::uint32_t>());
+  REQUIRE(0x8000'0000'0000'0000 == set_highest_4_bits<std::uint64_t>());
 }
 
 }  // namespace simd

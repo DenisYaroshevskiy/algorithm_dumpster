@@ -602,14 +602,18 @@ Will see how this works out for me, I'd like to do simd optimized algorithms.
 ### bits
 
 `count_trailing_zeros`<br/>
+`lsb` <br/>
 `lsb_less` <br/>
 `set_lower_n_bits` <br/>
+`set_highest_4_bits` <br/>
 
 Some bit maniputation for regular integers.
 
 `lsb_less` - pretend that the more significant bits are less significant<br/>
 and do comparison that way.
 
+`set_highest_4_bits` - helper to do comparisons for unsigned numbers<br/>
+using signed ariphmetic.
 
 ### mm
 
@@ -642,8 +646,10 @@ python script to generate mm.h
 `register_t<pack>`<br/>
 `vbool_t<pack>`<br/>
 
-`equal_full(pack, pack)`<br/>
 `equal_pairwise(pack, pack)`<br/>
+`greater_pairwise(pack, pack)` <br/>
+
+`equal_full(pack, pack)`<br/>
 `less_lexicographical(pack, pack)`<br/>
 `operator==/!=/</>/<=/>=`
 

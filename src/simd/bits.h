@@ -18,11 +18,17 @@
 #define SIMD_PACK_DETAIL_BITS_H_
 
 #include <cstdint>
+#include <type_traits>
 
 namespace simd {
 
 inline std::int32_t count_trailing_zeros(std::uint32_t x) {
   return __builtin_ctz(x);
+}
+
+// https://stackoverflow.com/questions/18806481/how-can-i-get-the-position-of-the-least-significant-bit-in-a-number
+inline std::uint32_t lsb(std::uint32_t x) {
+  return x & -x;
 }
 
 // Like a regular < but a less significant bit is treated as
@@ -36,7 +42,7 @@ inline bool lsb_less(std::uint32_t x, std::uint32_t y) {
   if (y == 0) return false;
   if (x == 0) return true;
 
-  return count_trailing_zeros(x) > count_trailing_zeros(y);
+  return lsb(x) > lsb(y);
 }
 
 constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
@@ -44,6 +50,18 @@ constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
   res <<= n;
   res -= 1;
   return static_cast<std::uint32_t>(res);
+}
+
+template <typename N>
+constexpr N set_highest_4_bits() {
+  N res = 0x80;
+  res <<= (sizeof(N) - 1) * 8;
+  return res;
+}
+
+template <typename N>
+constexpr N all_ones() {
+  return ~N{0};
 }
 
 }  // namespace simd

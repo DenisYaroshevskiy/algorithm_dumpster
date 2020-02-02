@@ -350,6 +350,72 @@ inline auto cmpgt(Register a, Register b) {
     return error_t{};
 }
 
+// add/sub ---------------------------------
+
+template <typename T, typename Register>
+inline auto add(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr size_t t_width = sizeof(T) * 8;
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_add_epi8(a, b);
+  else if constexpr (register_width == 128 && t_width == 16)
+    return _mm_add_epi16(a, b);
+  else if constexpr (register_width == 128 && t_width == 32)
+    return _mm_add_epi32(a, b);
+  else if constexpr (register_width == 128 && t_width == 64)
+    return _mm_add_epi64(a, b);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_add_epi8(a, b);
+  else if constexpr (register_width == 256 && t_width == 16)
+    return _mm256_add_epi16(a, b);
+  else if constexpr (register_width == 256 && t_width == 32)
+    return _mm256_add_epi32(a, b);
+  else if constexpr (register_width == 256 && t_width == 64)
+    return _mm256_add_epi64(a, b);
+  else if constexpr (register_width == 512 && t_width == 8)
+    return _mm512_add_epi8(a, b);
+  else if constexpr (register_width == 512 && t_width == 16)
+    return _mm512_add_epi16(a, b);
+  else if constexpr (register_width == 512 && t_width == 32)
+    return _mm512_add_epi32(a, b);
+  else if constexpr (register_width == 512 && t_width == 64)
+    return _mm512_add_epi64(a, b);
+  else
+    return error_t{};
+}
+
+template <typename T, typename Register>
+inline auto sub(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr size_t t_width = sizeof(T) * 8;
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_sub_epi8(a, b);
+  else if constexpr (register_width == 128 && t_width == 16)
+    return _mm_sub_epi16(a, b);
+  else if constexpr (register_width == 128 && t_width == 32)
+    return _mm_sub_epi32(a, b);
+  else if constexpr (register_width == 128 && t_width == 64)
+    return _mm_sub_epi64(a, b);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_sub_epi8(a, b);
+  else if constexpr (register_width == 256 && t_width == 16)
+    return _mm256_sub_epi16(a, b);
+  else if constexpr (register_width == 256 && t_width == 32)
+    return _mm256_sub_epi32(a, b);
+  else if constexpr (register_width == 256 && t_width == 64)
+    return _mm256_sub_epi64(a, b);
+  else if constexpr (register_width == 512 && t_width == 8)
+    return _mm512_sub_epi8(a, b);
+  else if constexpr (register_width == 512 && t_width == 16)
+    return _mm512_sub_epi16(a, b);
+  else if constexpr (register_width == 512 && t_width == 32)
+    return _mm512_sub_epi32(a, b);
+  else if constexpr (register_width == 512 && t_width == 64)
+    return _mm512_sub_epi64(a, b);
+  else
+    return error_t{};
+}
+
 // movemask --------------------------------
 
 template <typename T, typename Register>

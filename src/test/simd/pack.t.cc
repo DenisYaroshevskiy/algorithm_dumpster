@@ -70,7 +70,7 @@ TEMPLATE_TEST_CASE("simd.pack.size/alignment", "[simd]", ALL_TEST_PACKS) {
   STATIC_REQUIRE(alignof(pack_t) == mm::alignment<reg_t>());
 }
 
-TEMPLATE_TEST_CASE("simd.pack.basic", "[simd]", ALL_TEST_PACKS) {
+TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
   using pack_t = TestType;
   using scalar = scalar_t<pack_t>;
   constexpr size_t size = size_v<pack_t>;
@@ -126,6 +126,74 @@ TEMPLATE_TEST_CASE("simd.pack.basic", "[simd]", ALL_TEST_PACKS) {
       b[1] = big_v;
       run();
     }
+  }
+}
+
+TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using vbool = vbool_t<pack_t>;
+
+  using scalar = scalar_t<pack_t>;
+  using bool_t = scalar_t<vbool>;
+
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> a, b;
+  alignas(vbool) std::array<bool_t, size> expected, actual;
+
+  const scalar small_v = (scalar)0;
+  const scalar big_v = (scalar)(1);
+
+  a.fill(small_v);
+  b.fill(big_v);
+
+  const bool_t false_ = 0, true_ = all_ones<bool_t>();
+
+  SECTION("equal_pairwise") {
+      auto run = [&] {
+        auto x = load<size>(a.data());
+        auto y = load<size>(b.data());
+
+        store(actual.data(), equal_pairwise(x, y));
+        REQUIRE(expected == actual);
+      };
+
+      expected.fill(false_);
+      run();
+
+      b = a;
+      expected.fill(true_);
+      run();
+
+      b[1] = big_v;
+      expected[1] = false_;
+      run();
+  }
+
+  SECTION("greater_pairwise") {
+      auto run = [&] {
+        auto x = load<size>(a.data());
+        auto y = load<size>(b.data());
+
+        store(actual.data(), greater_pairwise(x, y));
+        REQUIRE(expected == actual);
+      };
+
+      expected.fill(false_);
+      run();
+
+      std::swap(a, b);
+      expected.fill(true_);
+      run();
+
+      a.fill(small_v);
+      b.fill(small_v);
+      expected.fill(false_);
+      run();
+
+      a[1] = big_v;
+      expected[1] = true_;
+      run();
   }
 }
 
