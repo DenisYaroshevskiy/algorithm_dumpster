@@ -67,6 +67,7 @@ def prefixCode():
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 namespace mm {
 
@@ -74,6 +75,14 @@ struct error_t { };
 
 template <typename T>
 struct type_t { using type = T; };
+
+// Helper to support pointers and more isoteric things like std::uintptr_t.
+template <typename T, typename Int>
+constexpr bool is_equivalent() {
+  if (sizeof(T) != sizeof(Int)) return false;
+  if (std::is_signed_v<Int>) return std::is_signed_v<T> || std::is_pointer_v<T>;
+  return !std::is_signed_v<T>;
+}
 '''
 
 
@@ -285,9 +294,9 @@ inline auto min(Register a, Register b) {
 '''
 
     return res + instantiateIfConstexprPattern_intWidth_twice(
-        'register_width == {0} && std::is_same_v<T, std::int{2}_t>',
+        'register_width == {0} && is_equivalent<T, std::int{2}_t>()',
         'return _mm{1}_min_epi{2}(a, b);',
-        'register_width == {0} && std::is_same_v<T, std::uint{2}_t>',
+        'register_width == {0} && is_equivalent<T, std::uint{2}_t>()',
         'return _mm{1}_min_epu{2}(a, b);'
     )
 
@@ -301,9 +310,9 @@ inline auto max(Register a, Register b) {
 '''
 
     return res + instantiateIfConstexprPattern_intWidth_twice(
-        'register_width == {0} && std::is_same_v<T, std::int{2}_t>',
+        'register_width == {0} && is_equivalent<T, std::int{2}_t>()',
         'return _mm{1}_max_epi{2}(a, b);',
-        'register_width == {0} && std::is_same_v<T, std::uint{2}_t>',
+        'register_width == {0} && is_equivalent<T, std::uint{2}_t>()',
         'return _mm{1}_max_epu{2}(a, b);'
     )
 
@@ -332,7 +341,7 @@ def cmpgt():
 '''
 
     return res + instantiateIfConstexprPattern_intWidth(
-        'register_width == {0} && std::is_same_v<T, std::int{2}_t>',
+        'register_width == {0} && is_equivalent<T, std::int{2}_t>()',
         'return _mm{1}_cmpgt_epi{2}(a, b);'
     )
 

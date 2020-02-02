@@ -28,6 +28,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 namespace mm {
 
@@ -37,6 +38,14 @@ template <typename T>
 struct type_t {
   using type = T;
 };
+
+// Helper to support pointers and more isoteric things like std::uintptr_t.
+template <typename T, typename Int>
+constexpr bool is_equivalent() {
+  if (sizeof(T) != sizeof(Int)) return false;
+  if (std::is_signed_v<Int>) return std::is_signed_v<T> || std::is_pointer_v<T>;
+  return !std::is_signed_v<T>;
+}
 
 // register_i ------------------------------
 
@@ -178,53 +187,53 @@ template <typename T, typename Register>
 inline auto min(Register a, Register b) {
   static constexpr size_t register_width = bit_width<Register>();
 
-  if constexpr (register_width == 128 && std::is_same_v<T, std::int8_t>)
+  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
     return _mm_min_epi8(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint8_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint8_t>())
     return _mm_min_epu8(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
     return _mm_min_epi16(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint16_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint16_t>())
     return _mm_min_epu16(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
     return _mm_min_epi32(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint32_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint32_t>())
     return _mm_min_epu32(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
     return _mm_min_epi64(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint64_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint64_t>())
     return _mm_min_epu64(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int8_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
     return _mm256_min_epi8(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint8_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint8_t>())
     return _mm256_min_epu8(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
     return _mm256_min_epi16(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint16_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint16_t>())
     return _mm256_min_epu16(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
     return _mm256_min_epi32(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint32_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint32_t>())
     return _mm256_min_epu32(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
     return _mm256_min_epi64(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint64_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint64_t>())
     return _mm256_min_epu64(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int8_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
     return _mm512_min_epi8(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint8_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint8_t>())
     return _mm512_min_epu8(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
     return _mm512_min_epi16(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint16_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint16_t>())
     return _mm512_min_epu16(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
     return _mm512_min_epi32(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint32_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint32_t>())
     return _mm512_min_epu32(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
     return _mm512_min_epi64(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint64_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint64_t>())
     return _mm512_min_epu64(a, b);
   else
     return error_t{};
@@ -234,53 +243,53 @@ template <typename T, typename Register>
 inline auto max(Register a, Register b) {
   static constexpr size_t register_width = bit_width<Register>();
 
-  if constexpr (register_width == 128 && std::is_same_v<T, std::int8_t>)
+  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
     return _mm_max_epi8(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint8_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint8_t>())
     return _mm_max_epu8(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
     return _mm_max_epi16(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint16_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint16_t>())
     return _mm_max_epu16(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
     return _mm_max_epi32(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint32_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint32_t>())
     return _mm_max_epu32(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
     return _mm_max_epi64(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::uint64_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint64_t>())
     return _mm_max_epu64(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int8_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
     return _mm256_max_epi8(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint8_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint8_t>())
     return _mm256_max_epu8(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
     return _mm256_max_epi16(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint16_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint16_t>())
     return _mm256_max_epu16(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
     return _mm256_max_epi32(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint32_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint32_t>())
     return _mm256_max_epu32(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
     return _mm256_max_epi64(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::uint64_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint64_t>())
     return _mm256_max_epu64(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int8_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
     return _mm512_max_epi8(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint8_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint8_t>())
     return _mm512_max_epu8(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
     return _mm512_max_epi16(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint16_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint16_t>())
     return _mm512_max_epu16(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
     return _mm512_max_epi32(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint32_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint32_t>())
     return _mm512_max_epu32(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
     return _mm512_max_epi64(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::uint64_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint64_t>())
     return _mm512_max_epu64(a, b);
   else
     return error_t{};
@@ -324,29 +333,29 @@ inline auto cmpeq(Register a, Register b) {
 template <typename T, typename Register>
 inline auto cmpgt(Register a, Register b) {
   static constexpr size_t register_width = bit_width<Register>();
-  if constexpr (register_width == 128 && std::is_same_v<T, std::int8_t>)
+  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
     return _mm_cmpgt_epi8(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
     return _mm_cmpgt_epi16(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
     return _mm_cmpgt_epi32(a, b);
-  else if constexpr (register_width == 128 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
     return _mm_cmpgt_epi64(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int8_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
     return _mm256_cmpgt_epi8(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
     return _mm256_cmpgt_epi16(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
     return _mm256_cmpgt_epi32(a, b);
-  else if constexpr (register_width == 256 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
     return _mm256_cmpgt_epi64(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int8_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
     return _mm512_cmpgt_epi8(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int16_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
     return _mm512_cmpgt_epi16(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int32_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
     return _mm512_cmpgt_epi32(a, b);
-  else if constexpr (register_width == 512 && std::is_same_v<T, std::int64_t>)
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
     return _mm512_cmpgt_epi64(a, b);
   else
     return error_t{};
