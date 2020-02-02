@@ -101,33 +101,31 @@ TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
   }
 
   SECTION("less/greater") {
-    if constexpr (sizeof(scalar) < 8) {
-      auto run = [&] {
-        auto small = load<size>(a.data());
-        auto big = load<size>(b.data());
+    auto run = [&] {
+      auto small = load<size>(a.data());
+      auto big = load<size>(b.data());
 
-        REQUIRE(small < big);
-        REQUIRE_FALSE(small < small);
-        REQUIRE(small <= big);
-        REQUIRE(small <= small);
+      REQUIRE(small < big);
+      REQUIRE_FALSE(small < small);
+      REQUIRE(small <= big);
+      REQUIRE(small <= small);
 
-        REQUIRE(big > small);
-        REQUIRE(big >= small);
-        REQUIRE(small >= small);
-      };
+      REQUIRE(big > small);
+      REQUIRE(big >= small);
+      REQUIRE(small >= small);
+    };
 
-      run();
+    run();
 
-      std::swap(a, b);
-      a[0] = small_v;
-      b[0] = big_v;
-      run();
+    std::swap(a, b);
+    a[0] = small_v;
+    b[0] = big_v;
+    run();
 
-      a[0] = big_v;
-      a[1] = small_v;
-      b[1] = big_v;
-      run();
-    }
+    a[0] = big_v;
+    a[1] = small_v;
+    b[1] = big_v;
+    run();
   }
 }
 
@@ -335,6 +333,52 @@ TEMPLATE_TEST_CASE("simd.pack.blend", "[simd]", ALL_TEST_PACKS) {
 
     mask[1] = 0;
     expected[1] = small_v;
+    run();
+  }
+
+  SECTION("min_pairwise") {
+    auto run = [&] {
+      pack_t x = load<size>(a.data());
+      pack_t y = load<size>(b.data());
+
+      store(actual.data(), min_pairwise(x, y));
+      REQUIRE(expected == actual);
+    };
+    expected = a;
+    run();
+
+    std::swap(a, b);
+    run();
+
+    a[1] = (scalar)-1;
+    if (asif_signed_v<scalar>) {
+      expected[1] = (scalar)-1;
+    }
+    run();
+  }
+
+  SECTION("max_pairwise") {
+    auto run = [&] {
+      pack_t x = load<size>(a.data());
+      pack_t y = load<size>(b.data());
+
+      store(actual.data(), max_pairwise(x, y));
+      REQUIRE(expected == actual);
+    };
+    expected = b;
+    run();
+
+    std::swap(a, b);
+    run();
+
+    b[1] = (scalar)2;
+    expected[1] = (scalar)2;
+    run();
+
+    a[1] = (scalar)-1;
+    if (!asif_signed_v<scalar>) {
+      expected[1] = (scalar)-1;
+    }
     run();
   }
 }

@@ -24,7 +24,12 @@ namespace simd {
 
 template <typename T, std::size_t W>
 pack<T, W> min_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return pack<T, W>{mm::min<T>(x.reg, y.reg)};
+ if constexpr (sizeof(T) < 8) {
+    return pack<T, W>{mm::min<T>(x.reg, y.reg)};
+  } else {
+    // blend: if true take second.
+    return blend(x, y, greater_pairwise(x, y));
+  }
 }
 
 template <typename T, std::size_t W>
@@ -32,7 +37,8 @@ pack<T, W> max_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
   if constexpr (sizeof(T) < 8) {
     return pack<T, W>{mm::max<T>(x.reg, y.reg)};
   } else {
-    return blend(x, y, greater_pairwise(x, y));
+    // blend: if true take second.
+    return blend(y, x, greater_pairwise(x, y));
   }
 }
 

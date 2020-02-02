@@ -688,6 +688,10 @@ as for containers. There are `pairwise` versions of similar operations when you 
 
 Default load, store require aligned pointers.
 
+`blend(pack, pack, vbool)`
+
+Same as intel, if true take second.
+
 ## Test
 
 Tests for everything. Has a few general purpose test utilities though.
