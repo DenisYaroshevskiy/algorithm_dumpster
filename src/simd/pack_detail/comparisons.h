@@ -25,6 +25,19 @@
 #include <iostream>
 
 namespace simd {
+namespace _comparisons {
+
+template <typename Reg>
+std::uint32_t movemask(Reg x) {
+  return static_cast<std::uint32_t>(mm::movemask<std::uint8_t>(x));
+}
+
+}  // namespace _comparisons
+
+template <typename T, std::size_t W>
+vbool_t<pack<T, W>> equal_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return vbool_t<pack<T, W>>{mm::cmpeq<T>(x.reg, y.reg)};
+}
 
 template <typename T, size_t W>
 bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
@@ -35,15 +48,9 @@ bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
   using reg_t = register_t<pack<T, W>>;
 
   const reg_t byte_equal = mm::cmpeq<std::uint8_t>(x.reg, y.reg);
-  const std::int32_t mmask = mm::movemask<std::uint8_t>(byte_equal);
+  const std::uint32_t mmask = _comparisons::movemask(byte_equal);
 
-  static constexpr std::int32_t ones = lower_n_bits_1(sizeof(pack<T, W>));
-  return mmask == ones;
-}
-
-template <typename T, std::size_t W>
-vbool_t<pack<T, W>> equal_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return vbool_t<pack<T, W>>{mm::cmpeq<T>(x.reg, y.reg)};
+  return mmask == set_lower_n_bits(sizeof(pack<T, W>));
 }
 
 /*
@@ -71,14 +78,13 @@ bool less_full(const pack<T, W>& x, const pack<T, W>& y) {
   // we get more bytes.
   // FFFFF0000 and FF00 would both compare the same if comparing bytes.
 
-  const std::int32_t x_mmask = mm::movemask<std::uint8_t>(x_cmp.reg);
-  const std::int32_t y_mmask = mm::movemask<std::uint8_t>(y_cmp.reg);
+  const std::uint32_t x_mmask = _comparisons::movemask(x_cmp.reg);
+  const std::uint32_t y_mmask = _comparisons::movemask(y_cmp.reg);
 
   // The true bits are where it's equal to minimun.
-  // The one that's bigger is going to compare to min the most significatn place.
-  return lsb_less(
-    static_cast<std::uint32_t>(y_mmask),
-    static_cast<std::uint32_t>(x_mmask));
+  // The one that's bigger is going to compare to min the most significatn
+  // place.
+  return lsb_less(y_mmask, x_mmask);
 }
 
 }  // namespace simd

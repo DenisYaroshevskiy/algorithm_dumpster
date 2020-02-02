@@ -39,6 +39,13 @@ inline bool lsb_less(std::uint32_t x, std::uint32_t y) {
   return count_trailing_zeros(x) > count_trailing_zeros(y);
 }
 
+constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
+  std::uint64_t res{1};
+  res <<= n;
+  res -= 1;
+  return static_cast<std::uint32_t>(res);
+}
+
 }  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_BITS_H_

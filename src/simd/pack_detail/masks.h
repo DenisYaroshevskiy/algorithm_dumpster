@@ -21,13 +21,6 @@
 
 namespace simd {
 
-constexpr std::int32_t lower_n_bits_1(std::int32_t n) {
-  std::int64_t res{1};
-  res <<= n;
-  res -= 1;
-  return static_cast<std::int32_t>(res);
-}
-
 }  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_MASKS_H_

@@ -31,4 +31,11 @@ TEST_CASE("lsb_less", "[simd]") {
   REQUIRE(lsb_less(5u, 3u));  // 0101 0011
 }
 
+TEST_CASE("set_lower_n_bits", "[simd]") {
+  REQUIRE(0 == set_lower_n_bits(0));
+  REQUIRE(1 == set_lower_n_bits(1));
+  REQUIRE(3 == set_lower_n_bits(2));
+  REQUIRE(0xffffffff == set_lower_n_bits(32));
+}
+
 }  // namespace simd

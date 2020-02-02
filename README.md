@@ -603,6 +603,7 @@ Will see how this works out for me, I'd like to do simd optimized algorithms.
 
 `count_trailing_zeros`<br/>
 `lsb_less` <br/>
+`set_lower_n_bits` <br/>
 
 Some bit maniputation for regular integers.
 
