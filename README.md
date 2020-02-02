@@ -656,6 +656,12 @@ python script to generate mm.h
 `load<pack_width>(const T*)`</br>
 `store(T*, pack)`
 
+`cast<pack>` </br>
+`cast_elements<T>` </br>
+`cast_to_bytes` </br>
+`cast_to_signed` </br>
+`cast_to_unsigned` </br>
+
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
 

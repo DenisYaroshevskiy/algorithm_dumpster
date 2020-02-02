@@ -21,14 +21,15 @@
 #include "simd/pack_detail/comparisons_pairwise.h"
 #include "simd/pack_detail/masks.h"
 #include "simd/pack_detail/minmax_pairwise.h"
+#include "simd/pack_detail/pack_cast.h"
 #include "simd/pack_detail/pack_declaration.h"
 
 namespace simd {
 namespace _comparisons {
 
-template <typename Reg>
-std::uint32_t movemask(Reg x) {
-  return static_cast<std::uint32_t>(mm::movemask<std::uint8_t>(x));
+template <std::size_t W>
+std::uint32_t movemask(const pack<std::uint8_t, W>& x) {
+  return static_cast<std::uint32_t>(mm::movemask<std::uint8_t>(x.reg));
 }
 
 }  // namespace _comparisons
@@ -39,10 +40,11 @@ bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
   // We could also use memcmp, on clang that produced ~the same code.
   // However on gcc it didn't - I decided against it.
 
-  using reg_t = register_t<pack<T, W>>;
+  const auto x_bytes = cast_to_bytes(x);
+  const auto y_bytes = cast_to_bytes(y);
 
-  const reg_t byte_equal = mm::cmpeq<std::uint8_t>(x.reg, y.reg);
-  const std::uint32_t mmask = _comparisons::movemask(byte_equal);
+  const auto eq_bytes = equal_pairwise(x_bytes, y_bytes);
+  const std::uint32_t mmask = _comparisons::movemask(eq_bytes);
 
   return mmask == set_lower_n_bits(sizeof(pack<T, W>));
 }
@@ -60,8 +62,8 @@ bool less_lexicographical(const pack<T, W>& x, const pack<T, W>& y) {
   // we get more bytes.
   // FFFFF0000 and FF00 would both compare the same if comparing bytes.
 
-  const std::uint32_t x_mmask = _comparisons::movemask(x_cmp.reg);
-  const std::uint32_t y_mmask = _comparisons::movemask(y_cmp.reg);
+  const std::uint32_t x_mmask = _comparisons::movemask(cast_to_bytes(x_cmp));
+  const std::uint32_t y_mmask = _comparisons::movemask(cast_to_bytes(y_cmp));
 
   // Since the bits are written lsb for the most left one,
   // we need to compare appropriately.
