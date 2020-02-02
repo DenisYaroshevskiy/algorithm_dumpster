@@ -17,6 +17,7 @@
 #ifndef SIMD_PACK_DETAIL_MINMAX_PAIRWISE_H
 #define SIMD_PACK_DETAIL_MINMAX_PAIRWISE_H
 
+#include "simd/pack_detail/comparisons_pairwise.h"
 #include "simd/pack_detail/pack_declaration.h"
 
 namespace simd {
@@ -28,7 +29,11 @@ pack<T, W> min_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 
 template <typename T, std::size_t W>
 pack<T, W> max_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return pack<T, W>{mm::max<T>(x.reg, y.reg)};
+  if constexpr (sizeof(T) < 8) {
+    return pack<T, W>{mm::max<T>(x.reg, y.reg)};
+  } else {
+    return blend(x, y, greater_pairwise(x, y));
+  }
 }
 
 }  // namespace simd

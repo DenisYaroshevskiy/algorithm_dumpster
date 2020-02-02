@@ -660,6 +660,11 @@ python script to generate mm.h
 `load<pack_width>(const T*)`</br>
 `store(T*, pack)`
 
+`set_all<pack>(scalar)`<br/>
+`set_zero<pack>`
+
+`blend(pack, pack, vbool)`
+
 `cast<pack>` </br>
 `cast_elements<T>` </br>
 `cast_to_bytes` </br>

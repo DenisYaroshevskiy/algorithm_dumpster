@@ -299,5 +299,45 @@ TEMPLATE_TEST_CASE("simd.pack.set", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
+TEMPLATE_TEST_CASE("simd.pack.blend", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  using vbool = vbool_t<pack_t>;
+  using bool_t = scalar_t<vbool>;
+
+  alignas(pack_t) std::array<scalar, size> a, b, expected, actual;
+  alignas(vbool) std::array<bool_t, size> mask;
+
+  const scalar small_v = (scalar)0;
+  const scalar big_v = (scalar)(1);
+
+  a.fill(small_v);
+  b.fill(big_v);
+  mask.fill(0);
+
+  SECTION("blend") {
+    auto run = [&] {
+      pack_t x = load<size>(a.data());
+      pack_t y = load<size>(b.data());
+      vbool m = load<size>(mask.data());
+
+      store(actual.data(), blend(x, y, m));
+      REQUIRE(expected == actual);
+    };
+    expected = a;
+    run();
+
+    mask.fill(std::numeric_limits<bool_t>::max());
+    expected = b;
+    run();
+
+    mask[1] = 0;
+    expected[1] = small_v;
+    run();
+  }
+}
+
 }  // namespace
 }  // namespace simd

@@ -17,8 +17,14 @@
 #ifndef SIMD_PACK_DETAIL_MASKS_H_
 #define SIMD_PACK_DETAIL_MASKS_H_
 
+#include <array>
 #include <cstdint>
+#include <type_traits>
 
-namespace simd {}  // namespace simd
+#include "pack_declaration.h"
+
+namespace simd {
+
+}  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_MASKS_H_

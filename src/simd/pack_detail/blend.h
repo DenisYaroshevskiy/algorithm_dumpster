@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_H_
-#define SIMD_PACK_H_
-
-#include "simd/pack_detail/comparisons.h"
-#include "simd/pack_detail/comparisons_pairwise.h"
-#include "simd/pack_detail/minmax_pairwise.h"
+#ifndef SIMD_PACK_DETAIL_BLEND_H_
+#define SIMD_PACK_DETAIL_BLEND_H_
 
 #include "simd/pack_detail/load.h"
-#include "simd/pack_detail/store.h"
-#include "simd/pack_detail/set.h"
-
-#include "simd/pack_detail/blend.h"
-
-#include "simd/pack_detail/arithmetic_pairwise.h"
-
-#include "simd/pack_detail/operators.h"
+#include "simd/pack_detail/masks.h"
 #include "simd/pack_detail/pack_declaration.h"
 
-#endif  // SIMD_PACK_H_
+namespace simd {
+
+template <typename T, std::size_t W>
+pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
+                 const vbool_t<pack<T, W>>& mask) {
+  return pack<T, W>{mm::blendv<std::uint8_t>(x.reg, y.reg, mask.reg)};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_BLEND_H_
