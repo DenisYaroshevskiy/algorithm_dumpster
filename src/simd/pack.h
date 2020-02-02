@@ -24,7 +24,7 @@
 
 #include "simd/pack_detail/minmax_pairwise.h"
 
-#include "simd/pack_detail/pack_declaration.h"
 #include "simd/pack_detail/operators.h"
+#include "simd/pack_detail/pack_declaration.h"
 
 #endif  // SIMD_PACK_H_

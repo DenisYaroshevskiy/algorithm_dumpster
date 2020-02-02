@@ -38,7 +38,7 @@ bool operator!=(const pack<T, W>& x, const pack<T, W>& y) {
 
 template <typename T, std::size_t W>
 bool operator<(const pack<T, W>& x, const pack<T, W>& y) {
-  return less_full(x, y);
+  return less_lexicographical(x, y);
 }
 
 template <typename T, std::size_t W>

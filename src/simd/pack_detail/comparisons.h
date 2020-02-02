@@ -66,7 +66,7 @@ vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 */
 
 template <typename T, std::size_t W>
-bool less_full(const pack<T, W>& x, const pack<T, W>& y) {
+bool less_lexicographical(const pack<T, W>& x, const pack<T, W>& y) {
   // The trick is: compare both with mininum.
   // If x compares equal to the left of y we return true.
 
@@ -81,9 +81,8 @@ bool less_full(const pack<T, W>& x, const pack<T, W>& y) {
   const std::uint32_t x_mmask = _comparisons::movemask(x_cmp.reg);
   const std::uint32_t y_mmask = _comparisons::movemask(y_cmp.reg);
 
-  // The true bits are where it's equal to minimun.
-  // The one that's bigger is going to compare to min the most significatn
-  // place.
+  // Since the bits are written lsb for the most left one,
+  // we need to compare appropriately.
   return lsb_less(y_mmask, x_mmask);
 }
 

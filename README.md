@@ -638,16 +638,17 @@ python script to generate mm.h
 
 ### pack
 
-`pack<T, W>`
-`register_t<pack>`
-`vbool_t<pack>`
+`pack<T, W>`<br/>
+`register_t<pack>`<br/>
+`vbool_t<pack>`<br/>
 
-`equal_full(pack, pack)`
-`equal_pairwise(pack, pack)`
-`less_full(pack, pack)`
+`equal_full(pack, pack)`<br/>
+`equal_pairwise(pack, pack)`<br/>
+`less_lexicographical(pack, pack)`<br/>
 `operator==/!=/</>/<=/>=`
 
-`load<pack_width>(const T*)`
+`load<pack_width>(const T*)`</br>
+`store(T*, pack)`
 
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>

@@ -255,4 +255,4 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
 }
 
 }  // namespace
-}  // namespace
+}  // namespace mm

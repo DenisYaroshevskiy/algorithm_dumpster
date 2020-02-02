@@ -19,8 +19,6 @@
 
 #include <cstdint>
 
-namespace simd {
-
-}  // namespace simd
+namespace simd {}  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_MASKS_H_

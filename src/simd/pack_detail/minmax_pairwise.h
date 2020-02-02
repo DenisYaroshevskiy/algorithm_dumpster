@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef SIMD_PACK_DETAIL_MINMAX_PAIRWISE_H
 #define SIMD_PACK_DETAIL_MINMAX_PAIRWISE_H
 
