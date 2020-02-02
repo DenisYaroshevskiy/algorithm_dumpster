@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H
-#define SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H
+#ifndef SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_
+#define SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_
 
 #include <type_traits>
 
 #include "simd/bits.h"
 #include "simd/pack_detail/pack_declaration.h"
+#include "simd/pack_detail/pack_cast.h"
+#include "simd/pack_detail/set.h"
 
 namespace simd {
 
@@ -36,20 +38,15 @@ vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
   } else {
     // https://stackoverflow.com/a/33173643/5021064
 
-    using reg_t = register_t<pack<T, W>>;
+    const auto convertion_mask = set_all<pack<T, W>>(set_highest_4_bits<T>());
 
-    const reg_t convertion_mask = mm::set1<reg_t>(set_highest_4_bits<T>());
+    const auto _x = add_pairwise(x, convertion_mask);
+    const auto _y = add_pairwise(y, convertion_mask);
 
-    const reg_t x_as_signed = mm::add<T>(x.reg, convertion_mask);
-    const reg_t y_as_signed = mm::add<T>(y.reg, convertion_mask);
-
-    using casted = signed_equivalent<T>;
-
-    return greater_pairwise(pack<casted, W>{x_as_signed},
-                            pack<casted, W>{y_as_signed});
+    return greater_pairwise(cast_to_signed(_x), cast_to_signed(_y));
   }
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H
+#endif  // SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_

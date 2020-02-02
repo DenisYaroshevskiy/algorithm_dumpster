@@ -236,7 +236,7 @@ TEMPLATE_TEST_CASE("simd.pack.arithmetic", "[simd]", ALL_TEST_PACKS) {
     run();
 
     a = b;
-    expected.fill((scalar) 2);
+    expected.fill((scalar)2);
     run();
 
     b[1] = (scalar)-1;
@@ -268,12 +268,34 @@ TEMPLATE_TEST_CASE("simd.pack.arithmetic", "[simd]", ALL_TEST_PACKS) {
     run();
 
     a = b;
-    expected.fill((scalar) 0);
+    expected.fill((scalar)0);
     run();
 
     a[1] = (scalar)-1;
     expected[1] = (scalar)2;
     run();
+  }
+}
+
+TEMPLATE_TEST_CASE("simd.pack.set", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> expected, actual;
+
+  SECTION("set_all/set_zero") {
+    store(actual.data(), set_all<pack_t>((scalar)1));
+    expected.fill((scalar)(1));
+    REQUIRE(expected == actual);
+
+    store(actual.data(), set_all<pack_t>((scalar)2));
+    expected.fill((scalar)(2));
+    REQUIRE(expected == actual);
+
+    store(actual.data(), set_zero<pack_t>());
+    expected.fill((scalar)(0));
+    REQUIRE(expected == actual);
   }
 }
 

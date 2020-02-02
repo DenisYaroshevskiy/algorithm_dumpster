@@ -154,29 +154,29 @@ inline auto set1(T a) {
   static constexpr std::size_t t_width = sizeof(T) * 8;
 
   if constexpr (register_width == 128 && t_width == 8)
-    return _mm_set1_epi8(a);
+    return _mm_set1_epi8((std::int8_t)a);
   else if constexpr (register_width == 128 && t_width == 16)
-    return _mm_set1_epi16(a);
+    return _mm_set1_epi16((std::int16_t)a);
   else if constexpr (register_width == 128 && t_width == 32)
-    return _mm_set1_epi32(a);
+    return _mm_set1_epi32((std::int32_t)a);
   else if constexpr (register_width == 128 && t_width == 64)
-    return _mm_set1_epi64x(a);
+    return _mm_set1_epi64x((std::int64_t)a);
   else if constexpr (register_width == 256 && t_width == 8)
-    return _mm256_set1_epi8(a);
+    return _mm256_set1_epi8((std::int8_t)a);
   else if constexpr (register_width == 256 && t_width == 16)
-    return _mm256_set1_epi16(a);
+    return _mm256_set1_epi16((std::int16_t)a);
   else if constexpr (register_width == 256 && t_width == 32)
-    return _mm256_set1_epi32(a);
+    return _mm256_set1_epi32((std::int32_t)a);
   else if constexpr (register_width == 256 && t_width == 64)
-    return _mm256_set1_epi64x(a);
+    return _mm256_set1_epi64x((std::int64_t)a);
   else if constexpr (register_width == 512 && t_width == 8)
-    return _mm512_set1_epi8(a);
+    return _mm512_set1_epi8((std::int8_t)a);
   else if constexpr (register_width == 512 && t_width == 16)
-    return _mm512_set1_epi16(a);
+    return _mm512_set1_epi16((std::int16_t)a);
   else if constexpr (register_width == 512 && t_width == 32)
-    return _mm512_set1_epi32(a);
+    return _mm512_set1_epi32((std::int32_t)a);
   else if constexpr (register_width == 512 && t_width == 64)
-    return _mm512_set1_epi64x(a);
+    return _mm512_set1_epi64((std::int64_t)a);
   else
     return error_t{};
 }

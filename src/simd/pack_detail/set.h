@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_H_
-#define SIMD_PACK_H_
+#ifndef SIMD_PACK_DETAIL_SET_H_
+#define SIMD_PACK_DETAIL_SET_H_
 
-#include "simd/pack_detail/comparisons.h"
-#include "simd/pack_detail/comparisons_pairwise.h"
-#include "simd/pack_detail/minmax_pairwise.h"
-
-#include "simd/pack_detail/load.h"
-#include "simd/pack_detail/store.h"
-#include "simd/pack_detail/set.h"
-
-#include "simd/pack_detail/arithmetic_pairwise.h"
-
-#include "simd/pack_detail/operators.h"
 #include "simd/pack_detail/pack_declaration.h"
 
-#endif  // SIMD_PACK_H_
+namespace simd {
+
+template <typename Pack>
+Pack set_all(scalar_t<Pack> x) {
+  return Pack{mm::set1<register_t<Pack>>(x)};
+}
+
+template <typename Pack>
+Pack set_zero() {
+  return Pack{mm::setzero<register_t<Pack>>()};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_SET_H_

@@ -277,10 +277,16 @@ inline auto set1(T a) {
 
 '''
 
-    return res + instantiateIfConstexprPattern_intWidth(
+    res += instantiateIfConstexprPattern_intWidth(
         'register_width == {0} && t_width == {2}',
-        'return _mm{1}_set1_epi{2}(a);'
+        'return _mm{1}_set1_epi{2}((std::int{2}_t)a);'
     )
+
+    res = res.replace('mm_set1_epi64', 'mm_set1_epi64x')
+    res = res.replace('mm256_set1_epi64', 'mm256_set1_epi64x')
+
+    return res
+
 
 # Min/Max ===========================================
 
@@ -442,12 +448,6 @@ def generateMainCode():
 
     return res
 
-
-# Fixups ================================
-
-def fixUp(res):
-    return res.replace('set1_epi64', 'set1_epi64x')
-
 # Driver ==================================
 
 
@@ -457,7 +457,6 @@ def generateCode():
     res += generateMainCode()
     res += suffixCode()
 
-    res = fixUp(res)
     return res
 
 
