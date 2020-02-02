@@ -26,16 +26,18 @@ namespace {
 template <typename T>
 void is_same_test(T, T) {}
 
-#define ALL_TEST_PACKS                                                        \
-  (pack<std::int8_t, 16>), (pack<std::int8_t, 32>), (pack<std::uint8_t, 16>), \
-      (pack<std::uint8_t, 32>), (pack<std::int16_t, 8>),                      \
-      (pack<std::int16_t, 16>), (pack<std::uint16_t, 8>),                     \
-      (pack<std::uint16_t, 16>), (pack<std::int32_t, 4>),                     \
-      (pack<std::int32_t, 8>), (pack<std::uint32_t, 4>),                      \
-      (pack<std::uint32_t, 8>), (pack<std::int64_t, 2>),                      \
-      (pack<std::int64_t, 4>), (pack<std::uint64_t, 2>),                      \
-      (pack<std::uint64_t, 4>), (pack<const int*, 2>), (pack<const int*, 4>), \
-      (pack<uintptr_t, 2>), (pack<uintptr_t, 4>)
+// clang-format off
+#define ALL_TEST_PACKS                                 \
+  (pack<std::int8_t, 16>),  (pack<std::int8_t, 32>),   \
+  (pack<std::uint8_t, 16>), (pack<std::uint8_t, 32>),  \
+  (pack<std::int16_t, 8>),  (pack<std::int16_t, 16>),  \
+  (pack<std::uint16_t, 8>), (pack<std::uint16_t, 16>), \
+  (pack<std::int32_t, 4>),  (pack<std::int32_t, 8>),   \
+  (pack<std::uint32_t, 4>), (pack<std::uint32_t, 8>),  \
+  (pack<std::int64_t, 2>),  (pack<std::int64_t, 4>),   \
+  (pack<std::uint64_t, 2>), (pack<std::uint64_t, 4>),  \
+  (pack<const int*, 2>),    (pack<const int*, 4>)
+// clang-format on
 
 TEST_CASE("simd.pack.types.register_t", "[simd]") {
   is_same_test(mm::register_i<128>{}, register_t<pack<std::int8_t, 16>>{});
@@ -150,50 +152,50 @@ TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
   const bool_t false_ = 0, true_ = all_ones<bool_t>();
 
   SECTION("equal_pairwise") {
-      auto run = [&] {
-        auto x = load<size>(a.data());
-        auto y = load<size>(b.data());
+    auto run = [&] {
+      auto x = load<size>(a.data());
+      auto y = load<size>(b.data());
 
-        store(actual.data(), equal_pairwise(x, y));
-        REQUIRE(expected == actual);
-      };
+      store(actual.data(), equal_pairwise(x, y));
+      REQUIRE(expected == actual);
+    };
 
-      expected.fill(false_);
-      run();
+    expected.fill(false_);
+    run();
 
-      b = a;
-      expected.fill(true_);
-      run();
+    b = a;
+    expected.fill(true_);
+    run();
 
-      b[1] = big_v;
-      expected[1] = false_;
-      run();
+    b[1] = big_v;
+    expected[1] = false_;
+    run();
   }
 
   SECTION("greater_pairwise") {
-      auto run = [&] {
-        auto x = load<size>(a.data());
-        auto y = load<size>(b.data());
+    auto run = [&] {
+      auto x = load<size>(a.data());
+      auto y = load<size>(b.data());
 
-        store(actual.data(), greater_pairwise(x, y));
-        REQUIRE(expected == actual);
-      };
+      store(actual.data(), greater_pairwise(x, y));
+      REQUIRE(expected == actual);
+    };
 
-      expected.fill(false_);
-      run();
+    expected.fill(false_);
+    run();
 
-      std::swap(a, b);
-      expected.fill(true_);
-      run();
+    std::swap(a, b);
+    expected.fill(true_);
+    run();
 
-      a.fill(small_v);
-      b.fill(small_v);
-      expected.fill(false_);
-      run();
+    a.fill(small_v);
+    b.fill(small_v);
+    expected.fill(false_);
+    run();
 
-      a[1] = big_v;
-      expected[1] = true_;
-      run();
+    a[1] = big_v;
+    expected[1] = true_;
+    run();
   }
 }
 

@@ -39,7 +39,7 @@ struct type_t {
   using type = T;
 };
 
-// Helper to support pointers and more isoteric things like std::uintptr_t.
+// Helper to support pointers.
 template <typename T, typename Int>
 constexpr bool is_equivalent() {
   if (sizeof(T) != sizeof(Int)) return false;

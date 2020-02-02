@@ -26,11 +26,8 @@ namespace simd {
 namespace _pack_declaration {
 
 template <typename T>
-auto select_vbool_scalar_type() {
+auto select_unsigned_equivalent_type() {
   if constexpr (std::is_pointer_v<T>) {
-    static_assert(sizeof(T) == sizeof(std::uint64_t));
-    return std::uint64_t{};
-  } else if constexpr (std::is_same_v<T, std::uintptr_t>) {
     static_assert(sizeof(T) == sizeof(std::uint64_t));
     return std::uint64_t{};
   } else {
@@ -46,7 +43,8 @@ struct pack {
   using register_type = mm::register_i<W * sizeof(T) * 8>;
 
   using vbool_type =
-      pack<decltype(_pack_declaration::select_vbool_scalar_type<T>()), W>;
+      pack<decltype(_pack_declaration::select_unsigned_equivalent_type<T>()),
+           W>;
 
   using value_type = T;
 
@@ -71,6 +69,13 @@ constexpr std::size_t size_v = Pack::size();
 
 template <typename T>
 constexpr bool asif_signed_v = std::is_signed_v<T> || std::is_pointer_v<T>;
+
+template <typename T>
+using signed_equivalent = std::make_signed_t<T>;
+
+template <typename T>
+using unsigned_equivalent =
+    decltype(_pack_declaration::select_unsigned_equivalent_type<T>());
 
 }  // namespace simd
 

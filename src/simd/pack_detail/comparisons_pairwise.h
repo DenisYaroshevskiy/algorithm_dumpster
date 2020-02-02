@@ -43,8 +43,7 @@ vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
     const reg_t x_as_signed = mm::add<T>(x.reg, convertion_mask);
     const reg_t y_as_signed = mm::add<T>(y.reg, convertion_mask);
 
-    using casted = std::conditional_t<std::is_same_v<T, uintptr_t>,
-                                      std::int64_t, std::make_signed_t<T>>;
+    using casted = signed_equivalent<T>;
 
     return greater_pairwise(pack<casted, W>{x_as_signed},
                             pack<casted, W>{y_as_signed});
