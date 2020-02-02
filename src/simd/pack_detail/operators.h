@@ -20,6 +20,7 @@
 #include <array>
 #include <ostream>
 
+#include "simd/pack_detail/arithmetic_pairwise.h"
 #include "simd/pack_detail/comparisons.h"
 #include "simd/pack_detail/pack_declaration.h"
 #include "simd/pack_detail/store.h"
@@ -54,6 +55,28 @@ bool operator<=(const pack<T, W>& x, const pack<T, W>& y) {
 template <typename T, std::size_t W>
 bool operator>=(const pack<T, W>& x, const pack<T, W>& y) {
   return !(x < y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator+=(pack<T, W>& x, const pack<T, W>& y) {
+  x = add_pairwise(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator+(pack<T, W>& x, const pack<T, W>& y) {
+  return add_pairwise(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator-=(pack<T, W>& x, const pack<T, W>& y) {
+  x = sub_pairwise(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator-(pack<T, W>& x, const pack<T, W>& y) {
+  return sub_pairwise(x, y);
 }
 
 template <typename T, std::size_t W>

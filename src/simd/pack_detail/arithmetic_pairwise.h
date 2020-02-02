@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_H_
-#define SIMD_PACK_H_
+#ifndef SIMD_PACK_DETAIL_ARITHMETIC_H_
+#define SIMD_PACK_DETAIL_ARITHMETIC_H_
 
-#include "simd/pack_detail/comparisons.h"
-#include "simd/pack_detail/comparisons_pairwise.h"
-#include "simd/pack_detail/minmax_pairwise.h"
-
-#include "simd/pack_detail/load.h"
-#include "simd/pack_detail/store.h"
-
-#include "simd/pack_detail/arithmetic_pairwise.h"
-
-#include "simd/pack_detail/operators.h"
 #include "simd/pack_detail/pack_declaration.h"
 
-#endif  // SIMD_PACK_H_
+namespace simd {
+
+template <typename T, std::size_t W>
+pack<T, W> add_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::add<T>(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::sub<T>(x.reg, y.reg)};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_ARITHMETIC_H_

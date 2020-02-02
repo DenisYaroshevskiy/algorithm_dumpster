@@ -199,5 +199,83 @@ TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
+TEMPLATE_TEST_CASE("simd.pack.arithmetic", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> a, b, expected, actual;
+
+  const scalar small_v = (scalar)0;
+  const scalar big_v = (scalar)(1);
+
+  a.fill(small_v);
+  b.fill(big_v);
+
+  SECTION("add_pairwise/operator+/operator+=") {
+    auto run = [&] {
+      pack_t x = load<size>(a.data());
+      pack_t y = load<size>(b.data());
+
+      pack_t res = add_pairwise(x, y);
+      store(actual.data(), res);
+
+      REQUIRE(expected == actual);
+
+      res = x;
+      res += y;
+      store(actual.data(), res);
+      REQUIRE(expected == actual);
+
+      res = x + y;
+      store(actual.data(), res);
+      REQUIRE(expected == actual);
+    };
+
+    expected.fill(big_v);
+    run();
+
+    a = b;
+    expected.fill((scalar) 2);
+    run();
+
+    b[1] = (scalar)-1;
+    expected[1] = small_v;
+    run();
+  }
+
+  SECTION("sub_pairwise/operator-/operator-=") {
+    auto run = [&] {
+      pack_t x = load<size>(a.data());
+      pack_t y = load<size>(b.data());
+
+      pack_t res = sub_pairwise(y, x);
+      store(actual.data(), res);
+
+      REQUIRE(expected == actual);
+
+      res = y;
+      res -= x;
+      store(actual.data(), res);
+      REQUIRE(expected == actual);
+
+      res = y - x;
+      store(actual.data(), res);
+      REQUIRE(expected == actual);
+    };
+
+    expected.fill(big_v);
+    run();
+
+    a = b;
+    expected.fill((scalar) 0);
+    run();
+
+    a[1] = (scalar)-1;
+    expected[1] = (scalar)2;
+    run();
+  }
+}
+
 }  // namespace
 }  // namespace simd

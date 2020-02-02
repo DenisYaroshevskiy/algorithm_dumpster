@@ -653,6 +653,10 @@ python script to generate mm.h
 `less_lexicographical(pack, pack)`<br/>
 `operator==/!=/</>/<=/>=`
 
+`add_pairwise` <br/>
+`sub_pairwise` <br/>
+`operator+/-/+=/-=`
+
 `load<pack_width>(const T*)`</br>
 `store(T*, pack)`
 
