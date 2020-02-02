@@ -20,7 +20,7 @@
 #include <array>
 #include <ostream>
 
-#include "simd/pack_detail/equal_full.h"
+#include "simd/pack_detail/comparisons.h"
 #include "simd/pack_detail/pack_declaration.h"
 #include "simd/pack_detail/store.h"
 
@@ -34,6 +34,26 @@ bool operator==(const pack<T, W>& x, const pack<T, W>& y) {
 template <typename T, std::size_t W>
 bool operator!=(const pack<T, W>& x, const pack<T, W>& y) {
   return !(x == y);
+}
+
+template <typename T, std::size_t W>
+bool operator<(const pack<T, W>& x, const pack<T, W>& y) {
+  return less_full(x, y);
+}
+
+template <typename T, std::size_t W>
+bool operator>(const pack<T, W>& x, const pack<T, W>& y) {
+  return y < x;
+}
+
+template <typename T, std::size_t W>
+bool operator<=(const pack<T, W>& x, const pack<T, W>& y) {
+  return !(y < x);
+}
+
+template <typename T, std::size_t W>
+bool operator>=(const pack<T, W>& x, const pack<T, W>& y) {
+  return !(x < y);
 }
 
 template <typename T, std::size_t W>

@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PAIRWISE_EQUAL_H
-#define SIMD_PAIRWISE_EQUAL_H
+
+#ifndef SIMD_PACK_DETAIL_MINMAX_PAIRWISE_H
+#define SIMD_PACK_DETAIL_MINMAX_PAIRWISE_H
 
 #include "simd/pack_detail/pack_declaration.h"
 
 namespace simd {
 
 template <typename T, std::size_t W>
-inline auto equal_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  using res_t = vbool_t<pack<T, W>>;
-  return res_t{mm::cmpeq<T>(x.reg, y.reg)};
+pack<T, W> min_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::min<T>(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> max_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::max<T>(x.reg, y.reg)};
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PAIRWISE_EQUAL_H
+#endif  // SIMD_PACK_DETAIL_MINMAX_PAIRWISE_H

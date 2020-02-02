@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+#include "simd/pack.h"
+
 #include <array>
 
-#include "simd/pack.h"
 #include "test/catch.h"
 
 namespace simd {
@@ -76,8 +77,11 @@ TEMPLATE_TEST_CASE("simd.pack.basic", "[simd]", ALL_TEST_PACKS) {
 
   alignas(pack_t) std::array<scalar, size> a, b;
 
-  a.fill((scalar)0);
-  b.fill((scalar)1);
+  const scalar small_v = (scalar)0;
+  const scalar big_v = (scalar)(1);
+
+  a.fill(small_v);
+  b.fill(big_v);
 
   SECTION("load/store aligned") {
     auto x = load<size>(a.data());
@@ -92,6 +96,36 @@ TEMPLATE_TEST_CASE("simd.pack.basic", "[simd]", ALL_TEST_PACKS) {
 
     REQUIRE(x == x);
     REQUIRE(x != y);
+  }
+
+  SECTION("less/greater") {
+    if constexpr (sizeof(scalar) < 8) {
+      auto run = [&] {
+        auto small = load<size>(a.data());
+        auto big = load<size>(b.data());
+
+        REQUIRE(small < big);
+        REQUIRE_FALSE(small < small);
+        REQUIRE(small <= big);
+        REQUIRE(small <= small);
+
+        REQUIRE(big > small);
+        REQUIRE(big >= small);
+        REQUIRE(small >= small);
+      };
+
+      run();
+
+      std::swap(a, b);
+      a[0] = small_v;
+      b[0] = big_v;
+      run();
+
+      a[0] = big_v;
+      a[1] = small_v;
+      b[1] = big_v;
+      run();
+    }
   }
 }
 

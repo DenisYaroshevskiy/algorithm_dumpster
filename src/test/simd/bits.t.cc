@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_H_
-#define SIMD_PACK_H_
+#include "simd/bits.h"
 
-#include "simd/pack_detail/comparisons.h"
+#include "test/catch.h"
 
-#include "simd/pack_detail/load.h"
-#include "simd/pack_detail/store.h"
+namespace simd {
 
-#include "simd/pack_detail/minmax_pairwise.h"
+TEST_CASE("lsb_less", "[simd]") {
+  REQUIRE_FALSE(lsb_less(0u, 0u));
+  REQUIRE_FALSE(lsb_less(1u, 1u));
+  REQUIRE(lsb_less(0u, 1u));  // 0000 0001
+  REQUIRE(lsb_less(2u, 1u));  // 0010 0001
+  REQUIRE(lsb_less(1u, 3u));  // 0001 0011
+  REQUIRE(lsb_less(4u, 1u));  // 0100 0001
+  REQUIRE(lsb_less(1u, 5u));  // 0100 0001
+  REQUIRE(lsb_less(5u, 3u));  // 0101 0011
+}
 
-#include "simd/pack_detail/pack_declaration.h"
-#include "simd/pack_detail/operators.h"
-
-#endif  // SIMD_PACK_H_
+}  // namespace simd

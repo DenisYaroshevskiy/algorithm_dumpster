@@ -46,6 +46,7 @@ target_sources(tests PRIVATE
                algo/unroll.t.cc
                bench_generic/counting_benchmark.t.cc
                bench_generic/input_generators.t.cc
+               simd/bits.t.cc
                simd/mm.t.cc
                simd/pack.t.cc
                catch_main.cc)

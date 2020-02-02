@@ -599,6 +599,17 @@ Everything Intel specific, I work with at least AVX2.
 
 Will see how this works out for me, I'd like to do simd optimized algorithms.
 
+### bits
+
+`count_trailing_zeros`<br/>
+`lsb_less` <br/>
+
+Some bit maniputation for regular integers.
+
+`lsb_less` - pretend that the more significant bits are less significant<br/>
+and do comparison that way.
+
+
 ### mm
 
 `register_i<bits>` <br/>
@@ -632,6 +643,7 @@ python script to generate mm.h
 
 `equal_full(pack, pack)`
 `equal_pairwise(pack, pack)`
+`less_full(pack, pack)`
 `operator==/!=/</>/<=/>=`
 
 `load<pack_width>(const T*)`
