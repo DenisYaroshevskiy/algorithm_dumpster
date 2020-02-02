@@ -657,7 +657,8 @@ python script to generate mm.h
 `sub_pairwise` <br/>
 `operator+/-/+=/-=`
 
-`load<pack_width>(const T*)`</br>
+`load<pack_width>(const T*)`<br/>
+`load_left_align<pack_width>(addr) -> [pack, addr]`<br/>
 `store(T*, pack)`
 
 `set_all<pack>(scalar)`<br/>
@@ -687,6 +688,14 @@ as for containers. There are `pairwise` versions of similar operations when you 
 `load/store`
 
 Default load, store require aligned pointers.
+
+`load_left_align`
+
+Take an address, align it to the left  so that we are still reading within the same page and load.<br/>
+Returns loaded pack and where we ended up reading from. <br/>
+Based on the idea from `strlen`, see more here: https://stackoverflow.com/questions/25566302/vectorized-strlen-getting-away-with-reading-unallocated-memory<br/>
+Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strlen.s.auto.html<br/>
+
 
 `blend(pack, pack, vbool)`
 

@@ -92,6 +92,22 @@ TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
     REQUIRE(a == b);
   }
 
+
+  SECTION("load_left_align") {
+    auto run = [&] (std::ptrdiff_t offset) {
+      auto [x, ptr] = load_left_align<size>(a.data() + offset);
+      store(b.data(), x);
+      REQUIRE(a == b);
+      REQUIRE(a.data() == ptr);
+    };
+
+    run(0);
+    run(1);
+    if (a.size() > 5) {
+      run(5);
+    }
+  }
+
   SECTION("equality") {
     auto x = load<size>(a.data());
     auto y = load<size>(b.data());
