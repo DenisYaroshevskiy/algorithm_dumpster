@@ -17,30 +17,32 @@
 #ifndef ALGO_STRLEN_H
 #define ALGO_STRLEN_H
 
-#include "algo/simd.h"
+#include "simd/pack.h"
 
 namespace algo {
 
-inline size_t strlen(const char* s_chars) {
-  const auto* s = reinterpret_cast<const std::int8_t*>(s_chars);
+template <std::size_t width>
+std::size_t strlen(const char* s) {
+  using pack = simd::pack<char, width>;
+  using vbool = simd::vbool_t<pack>;
 
-  simd<std::int8_t, 16> zeros;
-  zeros.fill_0();
+  const pack zeros = simd::set_zero<pack>();
 
-  auto chars = load_unaligned_with_filler<simd<std::int8_t, 16>>(s, 0xff);
+  auto [chars, aligned_s] = simd::load_left_align<width>(s);
 
-  constexpr std::uintptr_t mask = ~15;
+  const std::uint32_t offset = static_cast<std::uint32_t>(s - aligned_s);
 
-  const auto* aligned_s =
-      reinterpret_cast<decltype(s)>(reinterpret_cast<std::uintptr_t>(s) & mask);
+  vbool test = equal_pairwise(chars, zeros);
+  std::optional match = simd::first_true_ignore_first_n(test, offset);
 
-  while (!any_pairwise_equal(chars, zeros)) {
-    aligned_s += 16;
-    chars.load(aligned_s);
+  while (!match) {
+    aligned_s += width;
+    chars = simd::load_partial_miss<width>(aligned_s);
+    test = simd::equal_pairwise(chars, zeros);
+    match = simd::first_true(test);
   }
 
-  return static_cast<size_t>((aligned_s + first_pairwise_equal(chars, zeros)) -
-                             s);
+  return static_cast<size_t>(aligned_s + *match - s);
 }
 
 }  // namespace algo

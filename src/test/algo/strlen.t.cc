@@ -23,19 +23,33 @@
 namespace algo {
 namespace {
 
-TEST_CASE("algo.simd.strings.strlen", "[algo, simd, strings]") {
-  REQUIRE(algo::strlen("a") == 1);
-  REQUIRE(algo::strlen("") == 0);
+template <std::size_t width>
+struct strlen_functor {
+  std::size_t operator()(const char* s) const {
+    return algo::strlen<width>(s);
+  }
+};
 
-  {
-    std::string s(18, 'a');
-    REQUIRE(algo::strlen(s.c_str()) == 18);
+#define ALL_WIDTH (strlen_functor<16>), (strlen_functor<32>)
+
+TEMPLATE_TEST_CASE("algo.simd.strings.strlen", "[algo][simd]", ALL_WIDTH) {
+  TestType selected_strlen;
+
+  REQUIRE(selected_strlen("a") == 1);
+  REQUIRE(selected_strlen("") == 0);
+
+  for (std::size_t size = 0; size < 128; ++size) {
+    const std::string in(size, 'a');
+    for (std::size_t offset = 0; offset <= size; ++offset) {
+      REQUIRE(selected_strlen(in.c_str() + offset) == size - offset);
+    }
   }
 
-  {
-    std::string s(73, 'a');
-    REQUIRE(algo::strlen(s.c_str()) == 73);
-  }
+  std::string more_than_a_page(4096 + 1, 'a');
+  REQUIRE(more_than_a_page.size() == selected_strlen(more_than_a_page.c_str()));
+
+  more_than_a_page = std::string(3'000'000, 'a');
+  REQUIRE(more_than_a_page.size() == selected_strlen(more_than_a_page.c_str()));
 }
 
 }  // namespace

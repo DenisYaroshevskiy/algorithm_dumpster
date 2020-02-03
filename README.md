@@ -296,6 +296,12 @@ _TODO_: maybe I want to support iterations to reduce key reuse in a registry.
 On the other hand - it's not really a registry - maybe it should just be a slot-map.
 [Allan Deutsch on Slot map](https://youtu.be/-8UZhDjgeZU)
 
+### strlen
+
+Implementation of an std::strlen from a C standard library using simd. <br/>
+Complelty based on: https://stackoverflow.com/questions/25566302/ but allows <br/>
+to choose between how many bytes are processed at once (currently 16 and 32).
+
 ### shuffle_biased
 
 `shuffle_biased`
@@ -378,49 +384,6 @@ consider using big number library.
 _NOTE_: algorithm can potentially be done in place but it's hard and unneccary.
 
 Allocates O(distance(f, l)) memory.
-
-### simd
-
-`simd<std::int8_t, 16>` <br/>
-
-`all_non_zero`<br/>
-`fill` <br/>
-`load` <br/>
-`pick_min/pick_max` <br/>
-`store` <br/>
-
-A very cut down simd wrapper library based on: https://github.com/ospray/tsimd that I <br/>
-feel in as I need. I couldn't use an existing wrapper library, looked at tsimd and VC - <br/>
-one doesn't support bytes and I'd like to do bytes, the other needs gcc.
-
-Will see how this works out for me, ideally I'd like to do C string library functions. <br/>
-
-`blend_n_from_high/blend_n_from_low` <br/>
-is not an intrinsic unfortunatly, I had to do some jumping with <br/> precomputed masks. Idea is we have register a [ A A A A ] and register b [ B B B B ]. <br/>
-I'd like to make register [ A B B B ]. There is an intrinsic to do that, like `_mm_alignr_epi8`<br/>
-but it requires a compile time constant as a parametr. From low/high controls wether we count <br/>
-from the left of x or from the right, not too sure I got that correct. <br/>
-One more thing is that because we have N elements => we have N + 1 positions, totally fine to <br/>
-pass the pack width - will just get all of the second register. <br/>
-
-`load_unaligned_with_filler` <br/>
-is based on the idea from `strlen`, see more here: https://stackoverflow.com/questions/25566302/vectorized-strlen-getting-away-with-reading-unallocated-memory<br/>
-Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strlen.s.auto.html<br/>
-We are allowed to read within one page on x86, even if that's outside our allocated <br/>
-memory. So if our pointer is let's say ...20 we can read from ...16. The first 4 elements <br/>
-are going to be filled in with `filler` passed in.
-
-`pairwise_equal` <br/>
-`any_pairwise_equal` <br/>
-`first_pairwise_equal` <br/>
-`operator==`<br/>
-
-`pairwise_equeal` returns a `vbool`.<br/>
-`operator==` returns true is all elements are true.<br/>
-`any_pairwise_equal` returns true, if there is at least one pair. </br>
-`first_pairwise_equal` returns an index (from the left or low) of the first equal pair.<br/>
-Unfortunately - currently relies on `__builtin_ctz` - so if there are no equal elements, result is undefined. <br/>
-Use in combination with any.
 
 ### stable_sort
 
@@ -589,14 +552,17 @@ On my machine - noticebaly better.
 
 This benchmark on Quick-bench: http://quick-bench.com/aDq3iN3dpi9VWQc8XSd6o7Hlzl4<br/>
 
-## Simd
+## simd
 
-A very cut down simd wrapper library based on: https://github.com/ospray/tsimd that I <br/>
-feel in as I need. I couldn't use an existing wrapper library, looked at tsimd and VC - <br/>
-one doesn't support bytes and I'd like to do bytes, the other needs gcc.
+A very cut down simd wrapper library that I feel in as need. <br/>
+Existing wrapper libraries didn't work for me, looked at:<br/>
 
-Everything Intel specific, I work with at least AVX2.
+* nsimd
+* xsimd
+* tsimd
+* VC
 
+Only work with integer types, everything Intel specific, needs at least AVX2.
 Will see how this works out for me, I'd like to do simd optimized algorithms.
 
 ### bits

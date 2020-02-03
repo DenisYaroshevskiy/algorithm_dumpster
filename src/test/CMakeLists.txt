@@ -38,7 +38,6 @@ target_sources(tests PRIVATE
                algo/positions.t.cc
                algo/quadratic_sort.t.cc
                algo/shuffle_biased.t.cc
-               algo/simd.t.cc
                algo/stable_sort.t.cc
                algo/strlen.t.cc
                algo/type_functions.t.cc
