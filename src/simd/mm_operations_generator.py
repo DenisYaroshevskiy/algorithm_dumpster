@@ -244,6 +244,13 @@ inline register_i<{0}> load_ignore_asan(const register_i<{0}>* addr) {{
 '''
     return instantiateJustRegister(pattern)
 
+def loadu():
+    pattern = '''
+inline register_i<{0}> loadu(const register_i<{0}>* addr) {{
+  return _mm{1}_loadu_si{0}(addr);
+}}
+'''
+    return instantiateJustRegister(pattern)
 
 def store():
     pattern = '''
@@ -424,6 +431,7 @@ def generateMainCode():
     res += section('load/store')
     res += load()
     res += load_ignore_asan()
+    res += loadu()
     res += store()
 
     res += section('set one value everywhere')

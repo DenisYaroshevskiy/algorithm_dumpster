@@ -50,6 +50,9 @@ bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
 
 template <typename T, std::size_t W>
 bool less_lexicographical(const pack<T, W>& x, const pack<T, W>& y) {
+  // TODO: try an alternative implmentation - compare for equality,
+  // store/compare unequal elements.
+
   // The trick is: compare both with mininum.
   // If x compares equal to the left of y we return true.
 

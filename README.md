@@ -624,6 +624,7 @@ python script to generate mm.h
 `operator+/-/+=/-=`
 
 `load<pack_width>(const T*)`<br/>
+`load_unaligned<pack_width>(const T*)`<br/>
 `load_left_align<pack_width>(addr) -> [pack, addr]`<br/>
 `store(T*, pack)`
 

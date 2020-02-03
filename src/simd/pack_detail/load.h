@@ -37,6 +37,12 @@ pack<T, W> load_partial_miss(const T* addr) {
 }
 
 template <std::size_t W, typename T>
+pack<T, W> load_unaligned(const T* addr) {
+  using reg_t = register_t<pack<T, W>>;
+  return pack<T, W>{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
+}
+
+template <std::size_t W, typename T>
 std::pair<pack<T, W>, const T*> load_left_align(const T* addr) {
   constexpr std::uintptr_t mask = ~(alignof(pack<T, W>) - 1);
 

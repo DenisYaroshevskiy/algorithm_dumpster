@@ -16,7 +16,9 @@
 
 #include "simd/pack.h"
 
+#include <algorithm>
 #include <array>
+#include <numeric>
 
 #include "test/catch.h"
 
@@ -92,9 +94,20 @@ TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
     REQUIRE(a == b);
   }
 
+  SECTION("load_unaligned") {
+    std::array<scalar, size * 2> in;
+    std::iota(in.begin(), in.end(), (scalar)0);
+
+    for (std::uint8_t i = 0; i < size; ++i) {
+      auto x = load_unaligned<size>(&in[i]);
+      std::copy_n(&in[i], size, a.begin());
+      store(b.data(), x);
+      REQUIRE(a == b);
+    }
+  }
 
   SECTION("load_left_align") {
-    auto run = [&] (std::ptrdiff_t offset) {
+    auto run = [&](std::ptrdiff_t offset) {
       auto [x, ptr] = load_left_align<size>(a.data() + offset);
       store(b.data(), x);
       REQUIRE(a == b);

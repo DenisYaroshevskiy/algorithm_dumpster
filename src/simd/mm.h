@@ -120,6 +120,18 @@ __attribute__((no_sanitize_address)) inline register_i<512> load_ignore_asan(
   return _mm512_load_si512(addr);
 }
 
+inline register_i<128> loadu(const register_i<128>* addr) {
+  return _mm_loadu_si128(addr);
+}
+
+inline register_i<256> loadu(const register_i<256>* addr) {
+  return _mm256_loadu_si256(addr);
+}
+
+inline register_i<512> loadu(const register_i<512>* addr) {
+  return _mm512_loadu_si512(addr);
+}
+
 inline void store(register_i<128>* addr, register_i<128> a) {
   _mm_store_si128(addr, a);
 }

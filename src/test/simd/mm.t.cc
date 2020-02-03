@@ -15,6 +15,7 @@
  */
 
 #include <array>
+#include <numeric>
 #include <type_traits>
 
 #include "simd/mm.h"
@@ -90,6 +91,26 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
     reg_t loaded_a = load(a_casted);
     store(b_casted, loaded_a);
     REQUIRE(a == b);
+
+    loaded_a = load_ignore_asan(a_casted);
+    store(b_casted, loaded_a);
+    REQUIRE(a == b);
+  }
+
+  SECTION("loadu") {
+    std::array<std::uint8_t, byte_width<reg_t>() * 2> in;
+    std::array<std::uint8_t, byte_width<reg_t>()> expected;
+    std::array<std::uint8_t, byte_width<reg_t>()> actual;
+
+    std::iota(in.begin(), in.end(), 0);
+
+    for (std::uint8_t i = 0; i < byte_width<reg_t>(); ++i) {
+      reg_t loaded = loadu(reinterpret_cast<reg_t*>(&in[i]));
+      store(reinterpret_cast<reg_t*>(actual.data()), loaded);
+
+      std::iota(expected.begin(), expected.end(), i);
+      REQUIRE(expected == actual);
+    }
   }
 
   SECTION("setzero") {
