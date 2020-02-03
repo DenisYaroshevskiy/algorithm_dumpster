@@ -22,7 +22,7 @@
 
 namespace simd {
 
-inline std::int32_t count_trailing_zeros(std::uint32_t x) {
+inline std::int32_t count_trailing_zeroes(std::uint32_t x) {
   return __builtin_ctz(x);
 }
 

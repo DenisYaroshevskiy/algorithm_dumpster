@@ -672,6 +672,12 @@ python script to generate mm.h
 `cast_to_signed` </br>
 `cast_to_unsigned` </br>
 
+`all_true`<br/>
+`any_true`<br/>
+`any_true_ignore_first_n`<br/>
+`first_true` <br/>
+`first_true_ignore_first_n`
+
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
 
@@ -688,6 +694,10 @@ as for containers. There are `pairwise` versions of similar operations when you 
 `load/store`
 
 Default load, store require aligned pointers.
+
+`load_partial_miss`
+
+load for partially unallocated memory. For nasty tricks, see `load_left_aligned`.
 
 `load_left_align`
 

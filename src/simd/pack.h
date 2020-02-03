@@ -32,4 +32,6 @@
 #include "simd/pack_detail/operators.h"
 #include "simd/pack_detail/pack_declaration.h"
 
+#include "simd/pack_detail/vbool_tests.h"
+
 #endif  // SIMD_PACK_H_

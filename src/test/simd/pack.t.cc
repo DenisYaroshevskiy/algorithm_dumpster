@@ -211,6 +211,60 @@ TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
     expected[1] = true_;
     run();
   }
+
+  SECTION("vbool_tests") {
+    vbool mask;
+    auto eq = [&]() mutable {
+      auto x = load<size>(a.data());
+      auto y = load<size>(b.data());
+
+      mask = equal_pairwise(x, y);
+    };
+    eq();
+
+    REQUIRE_FALSE(all_true(mask));
+    REQUIRE_FALSE(any_true(mask));
+    REQUIRE_FALSE(first_true(mask));
+    REQUIRE_FALSE(any_true_ignore_first_n(mask, 0));
+    REQUIRE_FALSE(first_true_ignore_first_n(mask, 0));
+    REQUIRE_FALSE(any_true_ignore_first_n(mask, 1));
+    REQUIRE_FALSE(first_true_ignore_first_n(mask, 1));
+
+    b = a;
+    eq();
+
+    REQUIRE(all_true(mask));
+    REQUIRE(any_true(mask));
+    REQUIRE(first_true(mask) == 0u);
+    REQUIRE(any_true_ignore_first_n(mask, 0));
+    REQUIRE(first_true_ignore_first_n(mask, 0) == 0u);
+    REQUIRE(any_true_ignore_first_n(mask, 1));
+    REQUIRE(first_true_ignore_first_n(mask, 1) == 1u);
+
+    b[0] = big_v;
+    eq();
+
+    REQUIRE_FALSE(all_true(mask));
+    REQUIRE(any_true(mask));
+    REQUIRE(first_true(mask) == 1u);
+    REQUIRE(any_true_ignore_first_n(mask, 0));
+    REQUIRE(first_true_ignore_first_n(mask, 0) == 1u);
+    REQUIRE(any_true_ignore_first_n(mask, 1));
+    REQUIRE(first_true_ignore_first_n(mask, 1) == 1u);
+
+    a.fill(small_v);
+    b.fill(big_v);
+    b[0] = small_v;
+    eq();
+
+    REQUIRE_FALSE(all_true(mask));
+    REQUIRE(any_true(mask));
+    REQUIRE(*first_true(mask) == 0u);
+    REQUIRE(any_true_ignore_first_n(mask, 0));
+    REQUIRE(first_true_ignore_first_n(mask, 0) == 0u);
+    REQUIRE_FALSE(any_true_ignore_first_n(mask, 1));
+    REQUIRE_FALSE(first_true_ignore_first_n(mask, 1));
+  }
 }
 
 TEMPLATE_TEST_CASE("simd.pack.arithmetic", "[simd]", ALL_TEST_PACKS) {

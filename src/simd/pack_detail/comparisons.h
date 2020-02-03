@@ -23,6 +23,7 @@
 #include "simd/pack_detail/minmax_pairwise.h"
 #include "simd/pack_detail/pack_cast.h"
 #include "simd/pack_detail/pack_declaration.h"
+#include "simd/pack_detail/vbool_tests.h"
 
 namespace simd {
 namespace _comparisons {
@@ -44,9 +45,7 @@ bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
   const auto y_bytes = cast_to_bytes(y);
 
   const auto eq_bytes = equal_pairwise(x_bytes, y_bytes);
-  const std::uint32_t mmask = _comparisons::movemask(eq_bytes);
-
-  return mmask == set_lower_n_bits(sizeof(pack<T, W>));
+  return all_true(eq_bytes);
 }
 
 template <typename T, std::size_t W>
