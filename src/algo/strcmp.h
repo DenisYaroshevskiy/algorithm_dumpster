@@ -14,37 +14,35 @@
  * limitations under the License.
  */
 
-#ifndef ALGO_STRLEN_H
-#define ALGO_STRLEN_H
+
+#ifndef ALGO_STRCMP_H
+#define ALGO_STRCMP_H
 
 #include "simd/pack.h"
 
 namespace algo {
 
+#if 0
 template <std::size_t width>
-std::size_t strlen(const char* s) {
+int strcmp(const char* x, const char* y) {
   using pack = simd::pack<char, width>;
   using vbool = simd::vbool_t<pack>;
 
   const pack zeros = simd::set_zero<pack>();
 
-  auto [chars, aligned_s] = simd::load_left_align<width>(s);
+  auto [x_chars, x_aligned] = simd::load_left_align<width>(sx);
+  auto [y_chars, y_aligned] = simd::load_left_align<width>(sy);
 
-  const std::uint32_t offset = static_cast<std::uint32_t>(s - aligned_s);
+  const std::uint32_t x_offset = static_cast<std::uint32_t>(x - x_aligned);
+  const std::uint32_t y_offset = static_cast<std::uint32_t>(y - y_aligned);
 
-  vbool test = simd::equal_pairwise(chars, zeros);
-  std::optional match = simd::first_true_ignore_first_n(test, offset);
+  vbool_t x_end_test = simd::equal_pairwise(x_chars, zeros);
 
-  while (!match) {
-    aligned_s += width;
-    chars = simd::load_partial_miss<width>(aligned_s);
-    test = simd::equal_pairwise(chars, zeros);
-    match = simd::first_true(test);
-  }
 
-  return static_cast<size_t>(aligned_s + *match - s);
+
 }
+#endif  //
 
 }  // namespace algo
 
-#endif  // ALGO_STRLEN_H
+#endif  // ALGO_STRCMP_H
