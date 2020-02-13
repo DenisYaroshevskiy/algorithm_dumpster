@@ -21,8 +21,6 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "pack_declaration.h"
-
 namespace simd {
 
 }  // namespace simd

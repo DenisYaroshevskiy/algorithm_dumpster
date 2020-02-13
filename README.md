@@ -738,3 +738,9 @@ a differenet folder.
 It also generates the json for benchmark visualisation.
 
 Inputs: folder with benchmarks, folder where to put the result and a path to the template.
+
+### one header
+
+A very hacked together script to generate a single header.
+Single headers are stored in the `single_headers` folder.
+Mostly to use with godbolt.
