@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "algo/strcmp.h"
+
 #include <cstring>
 #include <string>
 #include <random>
@@ -25,8 +27,11 @@ namespace {
 
 template <std::size_t width>
 struct strcmp_functor {
-  std::size_t operator()(const char* sx, const char* sy) const {
-    return std::strcmp(sx, sy);
+  int operator()(const char* sx, const char* sy) const {
+    int res = algo::strcmp<width>(sx, sy);
+    if (res < 0) return -1;
+    if (res > 0) return 1;
+    return 0;
   }
 };
 
