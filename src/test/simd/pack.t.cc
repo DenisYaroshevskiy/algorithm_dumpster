@@ -381,6 +381,46 @@ TEMPLATE_TEST_CASE("simd.pack.set", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
+TEST_CASE("simd.pack.address_manipulation", "[simd]") {
+  SECTION("end_of_page") {
+    auto call = [](std::uintptr_t ptr_bits) {
+      int* ptr = reinterpret_cast<int*>(ptr_bits);
+      auto res = reinterpret_cast<std::uintptr_t>(end_of_page(ptr));
+      const int* cptr = reinterpret_cast<const int*>(ptr_bits);
+      REQUIRE(res == reinterpret_cast<std::uintptr_t>(end_of_page(cptr)));
+      return res;
+    };
+
+    REQUIRE(4096 == call(0));
+    REQUIRE(4096 == call(1));
+    REQUIRE(8192 == call(4096));
+    REQUIRE(8192 == call(5000));
+  }
+
+  SECTION("previous_aligned_address") {
+    auto call = [](auto p, std::uintptr_t ptr_bits) {
+      using pack_t = decltype(p);
+      int* ptr = reinterpret_cast<int*>(ptr_bits);
+      auto res = reinterpret_cast<std::uintptr_t>(previous_aligned_address<pack_t>(ptr));
+      const int* cptr = reinterpret_cast<const int*>(ptr_bits);
+      REQUIRE(res == reinterpret_cast<std::uintptr_t>(previous_aligned_address<pack_t>(cptr)));
+      return res;
+    };
+
+    REQUIRE(0 == call(pack<char, 16>{}, 0));
+    REQUIRE(0 == call(pack<char, 16>{}, 1));
+    REQUIRE(0 == call(pack<char, 16>{}, 15));
+    REQUIRE(16 == call(pack<char, 16>{}, 16));
+    REQUIRE(32 == call(pack<char, 16>{}, 35));
+
+    REQUIRE(0 == call(pack<char, 32>{}, 0));
+    REQUIRE(0 == call(pack<char, 32>{}, 1));
+    REQUIRE(0 == call(pack<char, 32>{}, 15));
+    REQUIRE(0 == call(pack<char, 32>{}, 16));
+    REQUIRE(32 == call(pack<char, 32>{}, 35));
+  }
+}
+
 TEMPLATE_TEST_CASE("simd.pack.blend", "[simd]", ALL_TEST_PACKS) {
   using pack_t = TestType;
   using scalar = scalar_t<pack_t>;

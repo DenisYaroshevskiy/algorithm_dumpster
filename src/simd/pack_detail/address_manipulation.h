@@ -22,7 +22,7 @@ namespace simd {
 template <typename T>
 T* end_of_page(T* addr) {
   constexpr std::uintptr_t four_kb = 1 << 12;
-  return addr & reinterpret_cast<const T*>(four_kb) + four_kb;
+  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & four_kb) + four_kb);
 }
 
 template <typename Pack, typename T>
