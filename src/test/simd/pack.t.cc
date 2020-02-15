@@ -88,7 +88,7 @@ TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
   b.fill(big_v);
 
   SECTION("load/store aligned") {
-    auto x = load<size>(a.data());
+    auto x = load<pack_t>(a.data());
     store(b.data(), x);
 
     REQUIRE(a == b);
@@ -99,16 +99,17 @@ TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
     std::iota(in.begin(), in.end(), (scalar)0);
 
     for (std::uint8_t i = 0; i < size; ++i) {
-      auto x = load_unaligned<size>(&in[i]);
+      auto x = load_unaligned<pack_t>(&in[i]);
       std::copy_n(&in[i], size, a.begin());
       store(b.data(), x);
       REQUIRE(a == b);
     }
   }
 
-  SECTION("load_left_align") {
+  SECTION("load, previously aligned") {
     auto run = [&](std::ptrdiff_t offset) {
-      auto [x, ptr] = load_left_align<size>(a.data() + offset);
+      auto* ptr = simd::previous_aligned_address<pack_t>(a.data() + offset);
+      auto x = load<pack_t>(ptr);
       store(b.data(), x);
       REQUIRE(a == b);
       REQUIRE(a.data() == ptr);
@@ -122,8 +123,8 @@ TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
   }
 
   SECTION("equality") {
-    auto x = load<size>(a.data());
-    auto y = load<size>(b.data());
+    auto x = load<pack_t>(a.data());
+    auto y = load<pack_t>(b.data());
 
     REQUIRE(x == x);
     REQUIRE(x != y);
@@ -131,8 +132,8 @@ TEMPLATE_TEST_CASE("simd.pack.totally_ordered", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("less/greater") {
     auto run = [&] {
-      auto small = load<size>(a.data());
-      auto big = load<size>(b.data());
+      auto small = load<pack_t>(a.data());
+      auto big = load<pack_t>(b.data());
 
       REQUIRE(small < big);
       REQUIRE_FALSE(small < small);
@@ -180,8 +181,8 @@ TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("equal_pairwise") {
     auto run = [&] {
-      auto x = load<size>(a.data());
-      auto y = load<size>(b.data());
+      auto x = load<pack_t>(a.data());
+      auto y = load<pack_t>(b.data());
 
       store(actual.data(), equal_pairwise(x, y));
       REQUIRE(expected == actual);
@@ -201,8 +202,8 @@ TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("greater_pairwise") {
     auto run = [&] {
-      auto x = load<size>(a.data());
-      auto y = load<size>(b.data());
+      auto x = load<pack_t>(a.data());
+      auto y = load<pack_t>(b.data());
 
       store(actual.data(), greater_pairwise(x, y));
       REQUIRE(expected == actual);
@@ -228,8 +229,8 @@ TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
   SECTION("vbool_tests") {
     vbool mask;
     auto eq = [&]() mutable {
-      auto x = load<size>(a.data());
-      auto y = load<size>(b.data());
+      auto x = load<pack_t>(a.data());
+      auto y = load<pack_t>(b.data());
 
       mask = equal_pairwise(x, y);
     };
@@ -295,8 +296,8 @@ TEMPLATE_TEST_CASE("simd.pack.arithmetic", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("add_pairwise/operator+/operator+=") {
     auto run = [&] {
-      pack_t x = load<size>(a.data());
-      pack_t y = load<size>(b.data());
+      pack_t x = load<pack_t>(a.data());
+      pack_t y = load<pack_t>(b.data());
 
       pack_t res = add_pairwise(x, y);
       store(actual.data(), res);
@@ -327,8 +328,8 @@ TEMPLATE_TEST_CASE("simd.pack.arithmetic", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("sub_pairwise/operator-/operator-=") {
     auto run = [&] {
-      pack_t x = load<size>(a.data());
-      pack_t y = load<size>(b.data());
+      pack_t x = load<pack_t>(a.data());
+      pack_t y = load<pack_t>(b.data());
 
       pack_t res = sub_pairwise(y, x);
       store(actual.data(), res);
@@ -400,9 +401,9 @@ TEMPLATE_TEST_CASE("simd.pack.blend", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("blend") {
     auto run = [&] {
-      pack_t x = load<size>(a.data());
-      pack_t y = load<size>(b.data());
-      vbool m = load<size>(mask.data());
+      pack_t x = load<pack_t>(a.data());
+      pack_t y = load<pack_t>(b.data());
+      vbool m = load<vbool>(mask.data());
 
       store(actual.data(), blend(x, y, m));
       REQUIRE(expected == actual);
@@ -421,8 +422,8 @@ TEMPLATE_TEST_CASE("simd.pack.blend", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("min_pairwise") {
     auto run = [&] {
-      pack_t x = load<size>(a.data());
-      pack_t y = load<size>(b.data());
+      pack_t x = load<pack_t>(a.data());
+      pack_t y = load<pack_t>(b.data());
 
       store(actual.data(), min_pairwise(x, y));
       REQUIRE(expected == actual);
@@ -442,8 +443,8 @@ TEMPLATE_TEST_CASE("simd.pack.blend", "[simd]", ALL_TEST_PACKS) {
 
   SECTION("max_pairwise") {
     auto run = [&] {
-      pack_t x = load<size>(a.data());
-      pack_t y = load<size>(b.data());
+      pack_t x = load<pack_t>(a.data());
+      pack_t y = load<pack_t>(b.data());
 
       store(actual.data(), max_pairwise(x, y));
       REQUIRE(expected == actual);

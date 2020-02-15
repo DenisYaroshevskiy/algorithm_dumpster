@@ -28,7 +28,8 @@ std::size_t strlen(const char* s) {
 
   const pack zeros = simd::set_zero<pack>();
 
-  auto [chars, aligned_s] = simd::load_left_align<width>(s);
+  const char* aligned_s = simd::previous_aligned_address<pack>(s);
+  auto chars = simd::load<pack>(aligned_s);
 
   const std::uint32_t offset = static_cast<std::uint32_t>(s - aligned_s);
 
@@ -37,7 +38,7 @@ std::size_t strlen(const char* s) {
 
   while (!match) {
     aligned_s += width;
-    chars = simd::load_partial_miss<width>(aligned_s);
+    chars = simd::load<pack>(aligned_s);
     test = simd::equal_pairwise(chars, zeros);
     match = simd::first_true(test);
   }

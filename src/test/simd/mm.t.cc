@@ -91,10 +91,6 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
     reg_t loaded_a = load(a_casted);
     store(b_casted, loaded_a);
     REQUIRE(a == b);
-
-    loaded_a = load_ignore_asan(a_casted);
-    store(b_casted, loaded_a);
-    REQUIRE(a == b);
   }
 
   SECTION("loadu") {

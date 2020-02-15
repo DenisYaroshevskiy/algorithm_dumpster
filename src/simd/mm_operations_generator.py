@@ -228,6 +228,7 @@ constexpr size_t alignment() {
 
 def load():
     pattern = '''
+__attribute__((no_sanitize_address))
 inline register_i<{0}> load(const register_i<{0}>* addr) {{
   return _mm{1}_load_si{0}(addr);
 }}
@@ -235,17 +236,9 @@ inline register_i<{0}> load(const register_i<{0}>* addr) {{
     return instantiateJustRegister(pattern)
 
 
-def load_ignore_asan():
-    pattern = '''
-__attribute__((no_sanitize_address))
-inline register_i<{0}> load_ignore_asan(const register_i<{0}>* addr) {{
-  return _mm{1}_load_si{0}(addr);
-}}
-'''
-    return instantiateJustRegister(pattern)
-
 def loadu():
     pattern = '''
+__attribute__((no_sanitize_address))
 inline register_i<{0}> loadu(const register_i<{0}>* addr) {{
   return _mm{1}_loadu_si{0}(addr);
 }}
@@ -430,7 +423,6 @@ def generateMainCode():
 
     res += section('load/store')
     res += load()
-    res += load_ignore_asan()
     res += loadu()
     res += store()
 

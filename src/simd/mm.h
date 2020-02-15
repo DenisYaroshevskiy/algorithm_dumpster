@@ -93,42 +93,33 @@ constexpr size_t alignment() {
 
 // load/store ------------------------------
 
-inline register_i<128> load(const register_i<128>* addr) {
-  return _mm_load_si128(addr);
-}
-
-inline register_i<256> load(const register_i<256>* addr) {
-  return _mm256_load_si256(addr);
-}
-
-inline register_i<512> load(const register_i<512>* addr) {
-  return _mm512_load_si512(addr);
-}
-
-__attribute__((no_sanitize_address)) inline register_i<128> load_ignore_asan(
+__attribute__((no_sanitize_address)) inline register_i<128> load(
     const register_i<128>* addr) {
   return _mm_load_si128(addr);
 }
 
-__attribute__((no_sanitize_address)) inline register_i<256> load_ignore_asan(
+__attribute__((no_sanitize_address)) inline register_i<256> load(
     const register_i<256>* addr) {
   return _mm256_load_si256(addr);
 }
 
-__attribute__((no_sanitize_address)) inline register_i<512> load_ignore_asan(
+__attribute__((no_sanitize_address)) inline register_i<512> load(
     const register_i<512>* addr) {
   return _mm512_load_si512(addr);
 }
 
-inline register_i<128> loadu(const register_i<128>* addr) {
+__attribute__((no_sanitize_address)) inline register_i<128> loadu(
+    const register_i<128>* addr) {
   return _mm_loadu_si128(addr);
 }
 
-inline register_i<256> loadu(const register_i<256>* addr) {
+__attribute__((no_sanitize_address)) inline register_i<256> loadu(
+    const register_i<256>* addr) {
   return _mm256_loadu_si256(addr);
 }
 
-inline register_i<512> loadu(const register_i<512>* addr) {
+__attribute__((no_sanitize_address)) inline register_i<512> loadu(
+    const register_i<512>* addr) {
   return _mm512_loadu_si512(addr);
 }
 

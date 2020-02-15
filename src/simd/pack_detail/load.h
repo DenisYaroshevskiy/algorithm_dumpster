@@ -24,40 +24,16 @@
 
 namespace simd {
 
-template <std::size_t W, typename T>
-pack<T, W> load(const T* addr) {
-  using reg_t = register_t<pack<T, W>>;
-  return pack<T, W>{mm::load(reinterpret_cast<const reg_t*>(addr))};
+template <typename Pack, typename T>
+Pack load(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::load(reinterpret_cast<const reg_t*>(addr))};
 }
 
-template <std::size_t W, typename T>
-pack<T, W> load_partial_miss(const T* addr) {
-  using reg_t = register_t<pack<T, W>>;
-  return pack<T, W>{mm::load_ignore_asan(reinterpret_cast<const reg_t*>(addr))};
-}
-
-template <std::size_t W, typename T>
-pack<T, W> load_unaligned(const T* addr) {
-  using reg_t = register_t<pack<T, W>>;
-  return pack<T, W>{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
-}
-
-template <std::size_t W, typename T>
-std::pair<pack<T, W>, const T*> load_left_align(const T* addr) {
-  constexpr std::uintptr_t mask = ~(alignof(pack<T, W>) - 1);
-
-  addr =
-      reinterpret_cast<const T*>(reinterpret_cast<std::uintptr_t>(addr) & mask);
-
-  return std::pair{load_partial_miss<W>(addr), addr};
-}
-
-template <std::size_t W, typename T>
-std::pair<pack<T, W>, T*> load_left_align(T* addr) {
-  auto [pack, const_addr] = load_left_align<W>(static_cast<const T*>(addr));
-
-  addr = const_cast<T*>(const_addr);
-  return std::pair{pack, addr};
+template <typename Pack, typename T>
+Pack load_unaligned(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
 }
 
 }  // namespace simd

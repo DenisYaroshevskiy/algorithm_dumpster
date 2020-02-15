@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_H_
-#define SIMD_PACK_H_
+#ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
+#define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 
-#include "simd/pack_detail/comparisons.h"
-#include "simd/pack_detail/comparisons_pairwise.h"
-#include "simd/pack_detail/minmax_pairwise.h"
+namespace simd {
 
-#include "simd/pack_detail/load.h"
-#include "simd/pack_detail/store.h"
-#include "simd/pack_detail/set.h"
+template <typename T>
+T* end_of_page(T* addr) {
+  constexpr std::uintptr_t four_kb = 1 << 12;
+  return addr & reinterpret_cast<const T*>(four_kb) + four_kb;
+}
 
-#include "simd/pack_detail/blend.h"
+template <typename Pack, typename T>
+T* previous_aligned_address(T* addr) {
+  constexpr std::uintptr_t mask = ~(alignof(Pack) - 1);
+  return reinterpret_cast<T*>(reinterpret_cast<std::uintptr_t>(addr) & mask);
+}
 
-#include "simd/pack_detail/arithmetic_pairwise.h"
+}  // namespace simd
 
-#include "simd/pack_detail/operators.h"
-#include "simd/pack_detail/pack_declaration.h"
-
-#include "simd/pack_detail/address_manipulation.h"
-#include "simd/pack_detail/vbool_tests.h"
-
-#endif  // SIMD_PACK_H_
+#endif  // SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_

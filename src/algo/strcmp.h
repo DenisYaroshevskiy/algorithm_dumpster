@@ -21,27 +21,18 @@
 #include "simd/pack.h"
 
 namespace algo {
+namespace _strcmp {
 
-#if 0
+}  // namespace _strcmp
+
+/*
 template <std::size_t width>
 int strcmp(const char* x, const char* y) {
-  using pack = simd::pack<char, width>;
-  using vbool = simd::vbool_t<pack>;
-
-  const pack zeros = simd::set_zero<pack>();
-
-  auto [x_chars, x_aligned] = simd::load_left_align<width>(sx);
-  auto [y_chars, y_aligned] = simd::load_left_align<width>(sy);
-
-  const std::uint32_t x_offset = static_cast<std::uint32_t>(x - x_aligned);
-  const std::uint32_t y_offset = static_cast<std::uint32_t>(y - y_aligned);
-
-  vbool_t x_end_test = simd::equal_pairwise(x_chars, zeros);
 
 
 
 }
-#endif  //
+*/
 
 }  // namespace algo
 

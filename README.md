@@ -623,9 +623,8 @@ python script to generate mm.h
 `sub_pairwise` <br/>
 `operator+/-/+=/-=`
 
-`load<pack_width>(const T*)`<br/>
-`load_unaligned<pack_width>(const T*)`<br/>
-`load_left_align<pack_width>(addr) -> [pack, addr]`<br/>
+`load<pack>(const T*)`<br/>
+`load_unaligned<pack>(const T*)`<br/>
 `store(T*, pack)`
 
 `set_all<pack>(scalar)`<br/>
@@ -643,7 +642,10 @@ python script to generate mm.h
 `any_true`<br/>
 `any_true_ignore_first_n`<br/>
 `first_true` <br/>
-`first_true_ignore_first_n`
+`first_true_ignore_first_n`<br/>
+
+`end_of_page(addr)` <br/>
+`previous_aligned_address<Pack>(addr)`<br/>
 
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
@@ -662,14 +664,11 @@ as for containers. There are `pairwise` versions of similar operations when you 
 
 Default load, store require aligned pointers.
 
-`load_partial_miss`
+`end_of_page`, `previous_aligned_address`
 
-load for partially unallocated memory. For nasty tricks, see `load_left_aligned`.
-
-`load_left_align`
-
-Take an address, align it to the left  so that we are still reading within the same page and load.<br/>
-Returns loaded pack and where we ended up reading from. <br/>
+We are allowed to read the memory we didn't directly allocated if it's within
+the same page.<br/>
+We can read till `end_of_page` and we always OK to read from `previous_aligned_address`.<br/>
 Based on the idea from `strlen`, see more here: https://stackoverflow.com/questions/25566302/vectorized-strlen-getting-away-with-reading-unallocated-memory<br/>
 Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strlen.s.auto.html<br/>
 

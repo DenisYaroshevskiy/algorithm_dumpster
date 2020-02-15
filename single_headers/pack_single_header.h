@@ -93,42 +93,33 @@ constexpr size_t alignment() {
 
 // load/store ------------------------------
 
-inline register_i<128> load(const register_i<128>* addr) {
-  return _mm_load_si128(addr);
-}
-
-inline register_i<256> load(const register_i<256>* addr) {
-  return _mm256_load_si256(addr);
-}
-
-inline register_i<512> load(const register_i<512>* addr) {
-  return _mm512_load_si512(addr);
-}
-
-__attribute__((no_sanitize_address)) inline register_i<128> load_ignore_asan(
+__attribute__((no_sanitize_address)) inline register_i<128> load(
     const register_i<128>* addr) {
   return _mm_load_si128(addr);
 }
 
-__attribute__((no_sanitize_address)) inline register_i<256> load_ignore_asan(
+__attribute__((no_sanitize_address)) inline register_i<256> load(
     const register_i<256>* addr) {
   return _mm256_load_si256(addr);
 }
 
-__attribute__((no_sanitize_address)) inline register_i<512> load_ignore_asan(
+__attribute__((no_sanitize_address)) inline register_i<512> load(
     const register_i<512>* addr) {
   return _mm512_load_si512(addr);
 }
 
-inline register_i<128> loadu(const register_i<128>* addr) {
+__attribute__((no_sanitize_address)) inline register_i<128> loadu(
+    const register_i<128>* addr) {
   return _mm_loadu_si128(addr);
 }
 
-inline register_i<256> loadu(const register_i<256>* addr) {
+__attribute__((no_sanitize_address)) inline register_i<256> loadu(
+    const register_i<256>* addr) {
   return _mm256_loadu_si256(addr);
 }
 
-inline register_i<512> loadu(const register_i<512>* addr) {
+__attribute__((no_sanitize_address)) inline register_i<512> loadu(
+    const register_i<512>* addr) {
   return _mm512_loadu_si512(addr);
 }
 
@@ -555,6 +546,42 @@ constexpr N all_ones() {
  * limitations under the License.
  */
 
+#ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
+#define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
+
+namespace simd {
+
+template <typename T>
+T* end_of_page(T* addr) {
+  constexpr std::uintptr_t four_kb = 1 << 12;
+  return addr & reinterpret_cast<const T*>(four_kb) + four_kb;
+}
+
+template <typename Pack, typename T>
+T* previous_aligned_address(T* addr) {
+  constexpr std::uintptr_t mask = ~(alignof(Pack) - 1);
+  return reinterpret_cast<T*>(reinterpret_cast<std::uintptr_t>(addr) & mask);
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef SIMD_PACK_DETAIL_MASKS_H_
 #define SIMD_PACK_DETAIL_MASKS_H_
 
@@ -894,40 +921,16 @@ pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 
 namespace simd {
 
-template <std::size_t W, typename T>
-pack<T, W> load(const T* addr) {
-  using reg_t = register_t<pack<T, W>>;
-  return pack<T, W>{mm::load(reinterpret_cast<const reg_t*>(addr))};
+template <typename Pack, typename T>
+Pack load(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::load(reinterpret_cast<const reg_t*>(addr))};
 }
 
-template <std::size_t W, typename T>
-pack<T, W> load_partial_miss(const T* addr) {
-  using reg_t = register_t<pack<T, W>>;
-  return pack<T, W>{mm::load_ignore_asan(reinterpret_cast<const reg_t*>(addr))};
-}
-
-template <std::size_t W, typename T>
-pack<T, W> load_unaligned(const T* addr) {
-  using reg_t = register_t<pack<T, W>>;
-  return pack<T, W>{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
-}
-
-template <std::size_t W, typename T>
-std::pair<pack<T, W>, const T*> load_left_align(const T* addr) {
-  constexpr std::uintptr_t mask = ~(alignof(pack<T, W>) - 1);
-
-  addr =
-      reinterpret_cast<const T*>(reinterpret_cast<std::uintptr_t>(addr) & mask);
-
-  return std::pair{load_partial_miss<W>(addr), addr};
-}
-
-template <std::size_t W, typename T>
-std::pair<pack<T, W>, T*> load_left_align(T* addr) {
-  auto [pack, const_addr] = load_left_align<W>(static_cast<const T*>(addr));
-
-  addr = const_cast<T*>(const_addr);
-  return std::pair{pack, addr};
+template <typename Pack, typename T>
+Pack load_unaligned(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
 }
 
 }  // namespace simd
