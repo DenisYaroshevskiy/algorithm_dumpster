@@ -168,15 +168,17 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
   constexpr scalar_t FF =
       std::numeric_limits<std::make_unsigned_t<scalar_t>>::max();
 
-  alignas(alignment<reg_t>()) type_array<reg_t, scalar_t> a, b, c, d;
+  alignas(alignment<reg_t>()) type_array<reg_t, scalar_t> a, b, c, d, ffs;
 
   a.fill(scalar_t{1});
   b.fill(scalar_t{2});
+  ffs.fill(scalar_t{FF});
 
   auto* a_casted = reinterpret_cast<reg_t*>(a.data());
   auto* b_casted = reinterpret_cast<reg_t*>(b.data());
   auto* c_casted = reinterpret_cast<reg_t*>(c.data());
   auto* d_casted = reinterpret_cast<reg_t*>(d.data());
+  auto* ffs_casted = reinterpret_cast<reg_t*>(ffs.data());
 
   (void)d_casted;
 
@@ -300,6 +302,90 @@ TEMPLATE_PRODUCT_TEST_CASE("simd.mm.ints", "[simd]",          //
 
     d.fill(1);
     run();
+  }
+
+  SECTION("bitwise") {
+    a.fill(scalar_t{0});
+    b.fill(scalar_t{1});
+    d.fill(scalar_t{FF});
+
+    reg_t x = load(a_casted);
+    reg_t y = load(b_casted);
+
+    SECTION("and_") {
+      reg_t res = and_(x, y);
+      store(c_casted, res);
+      REQUIRE(a == c);
+    }
+
+    SECTION("or_") {
+      reg_t res = or_(x, y);
+      store(c_casted, res);
+      REQUIRE(b == c);
+    }
+
+    SECTION("xor_") {
+      reg_t res;
+      res = xor_(x, x);
+      store(c_casted, res);
+      REQUIRE(a == c);
+
+      res = xor_(y, y);
+      store(c_casted, res);
+      REQUIRE(a == c);
+
+      res = xor_(x, y);
+      store(c_casted, res);
+      REQUIRE(b == c);
+
+      {
+        x = load(ffs_casted);
+        res = xor_(x, y);
+        store(c_casted, res);
+
+        d = ffs;
+        for (auto& d_elem : d) d_elem ^= 1;
+        REQUIRE(d == c);
+      }
+
+      {
+        x = load(a_casted);
+        y = load(ffs_casted);
+        res = xor_(x, y);
+        store(c_casted, res);
+        REQUIRE(ffs == c);
+      }
+    }
+
+    SECTION("andnot") {
+      reg_t res;
+      res = andnot(x, x);
+      store(c_casted, res);
+      REQUIRE(a == c);
+
+      res = andnot(y, y);
+      store(c_casted, res);
+      REQUIRE(a == c);
+
+      res = andnot(x, y);
+      store(c_casted, res);
+      REQUIRE(b == c);
+
+      {
+        x = load(ffs_casted);
+        res = andnot(x, y);
+        store(c_casted, res);
+        REQUIRE(a == c);
+      }
+
+      {
+        x = load(a_casted);
+        y = load(ffs_casted);
+        res = xor_(x, y);
+        store(c_casted, res);
+        REQUIRE(ffs == c);
+      }
+    }
   }
 }
 

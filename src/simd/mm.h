@@ -458,6 +458,60 @@ inline auto blendv(Register a, Register b, Register mask) {
     return error_t{};
 }
 
+// bitwise ---------------------------------
+
+template <typename Register>
+inline auto and_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_and_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_and_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_and_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto or_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_or_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_or_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_or_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto xor_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_xor_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_xor_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_xor_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto andnot(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_andnot_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_andnot_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_andnot_si512(a, b);
+  else
+    return error_t{};
+}
+
 }  // namespace mm
 
 #endif  // SIMD_MM_H_

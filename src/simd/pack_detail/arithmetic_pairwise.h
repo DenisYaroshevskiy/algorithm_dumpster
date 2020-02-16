@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_ARITHMETIC_H_
-#define SIMD_PACK_DETAIL_ARITHMETIC_H_
+#ifndef SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+#define SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
 
 #include "simd/pack_detail/pack_declaration.h"
 
@@ -33,4 +33,4 @@ pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_ARITHMETIC_H_
+#endif  // SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_

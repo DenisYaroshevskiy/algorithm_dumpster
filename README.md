@@ -638,6 +638,13 @@ python script to generate mm.h
 `cast_to_signed` </br>
 `cast_to_unsigned` </br>
 
+`and_` <br/>
+`or_` <br/>
+`xor_` <br/>
+`not_x_and_y` <br/>
+`not_` <br/>
+`operator&|^~`
+
 `all_true`<br/>
 `any_true`<br/>
 `any_true_ignore_first_n`<br/>

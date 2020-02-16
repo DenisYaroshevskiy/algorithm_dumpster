@@ -245,6 +245,7 @@ inline register_i<{0}> loadu(const register_i<{0}>* addr) {{
 '''
     return instantiateJustRegister(pattern)
 
+
 def store():
     pattern = '''
 inline void store(register_i<{0}>* addr, register_i<{0}> a) {{
@@ -338,6 +339,7 @@ def cmpeq():
         'return _mm{1}_cmpeq_epi{2}(a, b);'
     )
 
+
 def cmpgt():
     res = '''
   // Instruction is not avaliable for unsigned ints.
@@ -367,6 +369,7 @@ def add():
         'return _mm{1}_add_epi{2}(a, b);'
     )
 
+
 def sub():
     res = '''
   template <typename T, typename Register>
@@ -380,11 +383,61 @@ def sub():
         'return _mm{1}_sub_epi{2}(a, b);'
     )
 
+# bitwise ==============================================
+
+
+def and_():
+    res = '''
+template <typename Register>
+inline auto and_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+'''
+    return res + instantiateIfConstexprPattern_justRegister(
+        'register_width == {0}',
+        'return _mm{1}_and_si{0}(a, b);'
+    )
+
+
+def or_():
+    res = '''
+template <typename Register>
+inline auto or_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+'''
+    return res + instantiateIfConstexprPattern_justRegister(
+        'register_width == {0}',
+        'return _mm{1}_or_si{0}(a, b);'
+    )
+
+
+def xor_():
+    res = '''
+template <typename Register>
+inline auto xor_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+'''
+    return res + instantiateIfConstexprPattern_justRegister(
+        'register_width == {0}',
+        'return _mm{1}_xor_si{0}(a, b);'
+    )
+
+
+def andnot():
+    res = '''
+template <typename Register>
+inline auto andnot(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+'''
+    return res + instantiateIfConstexprPattern_justRegister(
+        'register_width == {0}',
+        'return _mm{1}_andnot_si{0}(a, b);'
+    )
+
 
 # byte mask =============================================
 
 def movemask():
-  return '''
+    return '''
   template <typename T, typename Register>
   inline auto movemask(Register a) {
     static constexpr size_t register_width = bit_width<Register>();
@@ -398,8 +451,9 @@ def movemask():
   }
 '''
 
+
 def blendv():
-  return '''
+    return '''
   template <typename T, typename Register>
   inline auto blendv(Register a, Register b, Register mask) {
     static constexpr size_t register_width = bit_width<Register>();
@@ -412,6 +466,7 @@ def blendv():
     else return error_t{ };
   }
 '''
+
 
 def generateMainCode():
     res = ''
@@ -445,6 +500,12 @@ def generateMainCode():
     res += section('movemask')
     res += movemask()
     res += blendv()
+
+    res += section('bitwise')
+    res += and_()
+    res += or_()
+    res += xor_()
+    res += andnot()
 
     return res
 

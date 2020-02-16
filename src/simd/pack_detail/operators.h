@@ -21,6 +21,7 @@
 #include <ostream>
 
 #include "simd/pack_detail/arithmetic_pairwise.h"
+#include "simd/pack_detail/bit_operations.h"
 #include "simd/pack_detail/comparisons.h"
 #include "simd/pack_detail/pack_declaration.h"
 #include "simd/pack_detail/store.h"
@@ -64,7 +65,7 @@ pack<T, W>& operator+=(pack<T, W>& x, const pack<T, W>& y) {
 }
 
 template <typename T, std::size_t W>
-pack<T, W> operator+(pack<T, W>& x, const pack<T, W>& y) {
+pack<T, W> operator+(const pack<T, W>& x, const pack<T, W>& y) {
   return add_pairwise(x, y);
 }
 
@@ -75,8 +76,46 @@ pack<T, W>& operator-=(pack<T, W>& x, const pack<T, W>& y) {
 }
 
 template <typename T, std::size_t W>
-pack<T, W> operator-(pack<T, W>& x, const pack<T, W>& y) {
+pack<T, W> operator-(const pack<T, W>& x, const pack<T, W>& y) {
   return sub_pairwise(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator&=(pack<T, W>& x, const pack<T, W>& y) {
+  x = and_(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator&(const pack<T, W>& x, const pack<T, W>& y) {
+  return and_(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator|=(pack<T, W>& x, const pack<T, W>& y) {
+  x = or_(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator|(const pack<T, W>& x, const pack<T, W>& y) {
+  return or_(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator^=(pack<T, W>& x, const pack<T, W>& y) {
+  x = xor_(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator^(const pack<T, W>& x, const pack<T, W>& y) {
+  return xor_(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator~(const pack<T, W>& x) {
+  return not_(x);
 }
 
 template <typename T, std::size_t W>

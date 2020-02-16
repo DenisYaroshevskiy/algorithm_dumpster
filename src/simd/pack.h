@@ -29,6 +29,8 @@
 
 #include "simd/pack_detail/arithmetic_pairwise.h"
 
+#include "simd/pack_detail/bit_operations.h"
+
 #include "simd/pack_detail/operators.h"
 #include "simd/pack_detail/pack_declaration.h"
 

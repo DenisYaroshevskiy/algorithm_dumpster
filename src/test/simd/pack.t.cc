@@ -507,5 +507,106 @@ TEMPLATE_TEST_CASE("simd.pack.blend", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
+TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  using uscalar = unsigned_equivalent<scalar>;
+
+  const scalar FF = (scalar)all_ones<uscalar>();
+  const scalar not_one_scalar = (scalar)( ~uscalar(1) );
+
+  const pack_t zeroes = set_zero<pack_t>();
+  const pack_t ones = set_all<pack_t>((scalar)1);
+  const pack_t ffs = set_all<pack_t>(FF);
+  const pack_t not_1 = set_all<pack_t>(not_one_scalar);
+
+  SECTION("and_") {
+    auto run = [](pack_t x, pack_t y) {
+      pack_t res = and_(x, y);
+      pack_t option = x & y;
+      REQUIRE(res == option);
+
+      option = x;
+      option &= y;
+
+      REQUIRE(res == option);
+      return res;
+    };
+
+    REQUIRE(zeroes == run(zeroes, zeroes));
+    REQUIRE(zeroes == run(zeroes, ones));
+    REQUIRE(zeroes == run(zeroes, ffs));
+    REQUIRE(zeroes == run(ffs, zeroes));
+    REQUIRE(ones == run(ones, ones));
+    REQUIRE(ones == run(ones, ffs));
+    REQUIRE(ones == run(ffs, ones));
+  }
+
+  SECTION("or_") {
+    auto run = [](pack_t x, pack_t y) {
+      pack_t res = or_(x, y);
+      pack_t option = x | y;
+      REQUIRE(res == option);
+
+      option = x;
+      option |= y;
+
+      REQUIRE(res == option);
+      return res;
+    };
+
+    REQUIRE(zeroes == run(zeroes, zeroes));
+    REQUIRE(ones == run(zeroes, ones));
+    REQUIRE(ffs == run(zeroes, ffs));
+    REQUIRE(ffs == run(ffs, zeroes));
+    REQUIRE(ones == run(ones, ones));
+    REQUIRE(ffs == run(ones, ffs));
+  }
+
+  SECTION("xor_") {
+    auto run = [](pack_t x, pack_t y) {
+      pack_t res = xor_(x, y);
+      pack_t option = x ^ y;
+      REQUIRE(res == option);
+
+      option = x;
+      option ^= y;
+
+      REQUIRE(res == option);
+      return res;
+    };
+
+    REQUIRE(zeroes == run(zeroes, zeroes));
+    REQUIRE(ones == run(zeroes, ones));
+    REQUIRE(ffs == run(zeroes, ffs));
+    REQUIRE(ffs == run(ffs, zeroes));
+    REQUIRE(zeroes == run(ones, ones));
+  }
+
+  SECTION("not_x_and_y") {
+    REQUIRE(zeroes == not_x_and_y(zeroes, zeroes));
+    REQUIRE(ones == not_x_and_y(zeroes, ones));
+    REQUIRE(zeroes == not_x_and_y(ones, zeroes));
+    REQUIRE(ffs == not_x_and_y(zeroes, ffs));
+    REQUIRE(zeroes == not_x_and_y(ffs, zeroes));
+    REQUIRE(zeroes == not_x_and_y(ffs, ffs));
+  }
+
+  SECTION("not_") {
+    auto run = [](pack_t x) {
+      pack_t res = not_(x);
+      pack_t option = ~x;
+      REQUIRE(res == option);
+      return res;
+    };
+
+    REQUIRE(ffs == run(zeroes));
+    REQUIRE(zeroes == run(ffs));
+    REQUIRE(not_1 == run(ones));
+    REQUIRE(ones == run(not_1));
+  }
+}
+
+
 }  // namespace
 }  // namespace simd

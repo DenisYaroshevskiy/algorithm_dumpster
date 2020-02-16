@@ -458,6 +458,60 @@ inline auto blendv(Register a, Register b, Register mask) {
     return error_t{};
 }
 
+// bitwise ---------------------------------
+
+template <typename Register>
+inline auto and_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_and_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_and_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_and_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto or_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_or_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_or_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_or_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto xor_(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_xor_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_xor_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_xor_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto andnot(Register a, Register b) {
+  static constexpr size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_andnot_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_andnot_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_andnot_si512(a, b);
+  else
+    return error_t{};
+}
+
 }  // namespace mm
 
 #endif  // SIMD_MM_H_
@@ -877,8 +931,8 @@ Pack set_zero() {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_ARITHMETIC_H_
-#define SIMD_PACK_DETAIL_ARITHMETIC_H_
+#ifndef SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+#define SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
 
 
 namespace simd {
@@ -895,7 +949,7 @@ pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_ARITHMETIC_H_
+#endif  // SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -984,6 +1038,58 @@ vbool_t<pack<T, W>> greater_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
 }  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_BIT_OPERATIONS_H_
+#define SIMD_PACK_DETAIL_BIT_OPERATIONS_H_
+
+
+namespace simd {
+
+template <typename T, std::size_t W>
+pack<T, W> and_(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::and_(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> or_(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::or_(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> xor_(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::xor_(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> not_x_and_y(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::andnot(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> not_(const pack<T, W>& x) {
+  using uscalar = unsigned_equivalent<T>;
+  const T FF = (T)all_ones<uscalar>();
+  return not_x_and_y(x, set_all<pack<T, W>>(FF));
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_BIT_OPERATIONS_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1192,7 +1298,7 @@ pack<T, W>& operator+=(pack<T, W>& x, const pack<T, W>& y) {
 }
 
 template <typename T, std::size_t W>
-pack<T, W> operator+(pack<T, W>& x, const pack<T, W>& y) {
+pack<T, W> operator+(const pack<T, W>& x, const pack<T, W>& y) {
   return add_pairwise(x, y);
 }
 
@@ -1203,8 +1309,46 @@ pack<T, W>& operator-=(pack<T, W>& x, const pack<T, W>& y) {
 }
 
 template <typename T, std::size_t W>
-pack<T, W> operator-(pack<T, W>& x, const pack<T, W>& y) {
+pack<T, W> operator-(const pack<T, W>& x, const pack<T, W>& y) {
   return sub_pairwise(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator&=(pack<T, W>& x, const pack<T, W>& y) {
+  x = and_(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator&(const pack<T, W>& x, const pack<T, W>& y) {
+  return and_(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator|=(pack<T, W>& x, const pack<T, W>& y) {
+  x = or_(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator|(const pack<T, W>& x, const pack<T, W>& y) {
+  return or_(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W>& operator^=(pack<T, W>& x, const pack<T, W>& y) {
+  x = xor_(x, y);
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator^(const pack<T, W>& x, const pack<T, W>& y) {
+  return xor_(x, y);
+}
+
+template <typename T, std::size_t W>
+pack<T, W> operator~(const pack<T, W>& x) {
+  return not_(x);
 }
 
 template <typename T, std::size_t W>
@@ -1244,6 +1388,7 @@ std::ostream& operator<<(std::ostream& out, const pack<T, W>& x) {
 
 #ifndef SIMD_PACK_H_
 #define SIMD_PACK_H_
+
 
 
 
