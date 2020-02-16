@@ -51,7 +51,7 @@ target_sources(tests PRIVATE
                simd/pack.t.cc
                catch_main.cc)
 target_compile_options(tests PRIVATE
-                       -Werror -Wall -Wextra -Wpedantic -O1 -g
+                       -Werror -Wall -Wextra -Wpedantic -g
                        -fsanitize=address -fno-omit-frame-pointer
                        --std=c++17
                        -march=native)

@@ -395,6 +395,9 @@ TEST_CASE("simd.pack.address_manipulation", "[simd]") {
     REQUIRE(4096 == call(1));
     REQUIRE(8192 == call(4096));
     REQUIRE(8192 == call(5000));
+
+    std::string empty;
+    REQUIRE(call((std::uintptr_t)empty.c_str()) > (std::uintptr_t)empty.c_str());
   }
 
   SECTION("previous_aligned_address") {

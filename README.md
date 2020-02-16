@@ -296,6 +296,17 @@ _TODO_: maybe I want to support iterations to reduce key reuse in a registry.
 On the other hand - it's not really a registry - maybe it should just be a slot-map.
 [Allan Deutsch on Slot map](https://youtu.be/-8UZhDjgeZU)
 
+### strcmp
+
+`strmismatch` <br/>
+`strcmp`
+
+Implementation of std::strcmp using simd. <br/>
+Tried to be as close as possible to:
+https://opensource.apple.com/source/Libc/Libc-825.40.1/x86_64/string/strcmp.s.auto.html
+
+Allows to pick how many bytes to process 16 or 32 at a time.
+
 ### strlen
 
 Implementation of an std::strlen from a C standard library using simd. <br/>

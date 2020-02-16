@@ -53,8 +53,10 @@ TEMPLATE_TEST_CASE("algo.simd.strings.strcmp", "[algo][simd][strcmp]", ALL_WIDTH
     for (std::size_t y_size = 0; y_size < 128; ++y_size) {
       const std::string x = make_string(x_size);
       const std::string y = make_string(y_size);
+      const std::string z = x + 'a';
 
       REQUIRE(std::strcmp(x.c_str(), y.c_str()) == selected_strcmp(x.c_str(), y.c_str()));
+      REQUIRE(std::strcmp(x.c_str(), z.c_str()) == selected_strcmp(x.c_str(), z.c_str()));
     }
   }
 
@@ -62,16 +64,21 @@ TEMPLATE_TEST_CASE("algo.simd.strings.strcmp", "[algo][simd][strcmp]", ALL_WIDTH
   {
       const std::string x = make_string(4097);
       const std::string y = make_string(4099);
+      const std::string z = x + 'a';
+
 
       REQUIRE(std::strcmp(x.c_str(), y.c_str()) == selected_strcmp(x.c_str(), y.c_str()));
+      REQUIRE(std::strcmp(x.c_str(), z.c_str()) == selected_strcmp(x.c_str(), z.c_str()));
   }
 
   // Very big ones
   {
       const std::string x = make_string(2'000'010);
       const std::string y = make_string(2'000'012);
+      const std::string z = x + 'a';
 
       REQUIRE(std::strcmp(x.c_str(), y.c_str()) == selected_strcmp(x.c_str(), y.c_str()));
+      REQUIRE(std::strcmp(x.c_str(), z.c_str()) == selected_strcmp(x.c_str(), z.c_str()));
   }
 }
 

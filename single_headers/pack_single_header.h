@@ -608,7 +608,8 @@ namespace simd {
 template <typename T>
 T* end_of_page(T* addr) {
   constexpr std::uintptr_t four_kb = 1 << 12;
-  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & four_kb) + four_kb);
+  constexpr std::uintptr_t mask = ~(four_kb - 1);
+  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) + four_kb);
 }
 
 template <typename Pack, typename T>
