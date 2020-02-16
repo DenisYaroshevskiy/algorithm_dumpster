@@ -77,17 +77,18 @@ inline bool strmismatch_page_boundary(std::ptrdiff_t n, const char** px,
 
 template <std::size_t width>
 std::pair<const char*, const char*> strmismatch(const char* x, const char* y) {
-  const char* page_end_x = simd::end_of_page(x);
-  const char* page_end_y = simd::end_of_page(y);
-  std::ptrdiff_t n = std::min(page_end_x - x, page_end_y - y);
-  std::ptrdiff_t simd_n = n / width;
-  n -= simd_n * width;
+  while (true) {
+    const char* page_end_x = simd::end_of_page(x);
+    const char* page_end_y = simd::end_of_page(y);
+    std::ptrdiff_t n = std::min(page_end_x - x, page_end_y - y);
+    std::ptrdiff_t simd_n = n / width;
+    n -= simd_n * width;
 
-  if (_strcmp::strmismatch_middle_of_the_page<width>(simd_n, &x, &y) ||
-      _strcmp::strmismatch_page_boundary(n, &x, &y)) {
-    return {x, y};
+    if (_strcmp::strmismatch_middle_of_the_page<width>(simd_n, &x, &y) ||
+        _strcmp::strmismatch_page_boundary(n, &x, &y)) {
+      return {x, y};
+    }
   }
-  return strmismatch<width>(x, y);
 }
 
 template <std::size_t width>
