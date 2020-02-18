@@ -26,6 +26,16 @@ namespace algo {
 namespace {
 
 template <std::size_t width>
+struct strcmp_v1_functor {
+  int operator()(const char* sx, const char* sy) const {
+    int res = algo::v1::strcmp<width>(sx, sy);
+    if (res < 0) return -1;
+    if (res > 0) return 1;
+    return 0;
+  }
+};
+
+template <std::size_t width>
 struct strcmp_functor {
   int operator()(const char* sx, const char* sy) const {
     int res = algo::strcmp<width>(sx, sy);
@@ -35,9 +45,10 @@ struct strcmp_functor {
   }
 };
 
-#define ALL_WIDTH (strcmp_functor<16>), (strcmp_functor<32>)
+#define ALL_CASES (strcmp_v1_functor<16>), (strcmp_v1_functor<32>), \
+                  (strcmp_functor<16>), (strcmp_functor<32>)
 
-TEMPLATE_TEST_CASE("algo.simd.strings.strcmp", "[algo][simd][strcmp]", ALL_WIDTH) {
+TEMPLATE_TEST_CASE("algo.simd.strings.strcmp", "[algo][simd][strcmp]", ALL_CASES) {
   TestType selected_strcmp;
 
   std::mt19937 g;

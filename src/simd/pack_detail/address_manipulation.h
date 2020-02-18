@@ -17,13 +17,18 @@
 #ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 #define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 
+#include <cstddef>
+
 namespace simd {
+
+constexpr std::ptrdiff_t page_size() { return 1 << 12; }
 
 template <typename T>
 T* end_of_page(T* addr) {
-  constexpr std::uintptr_t four_kb = 1 << 12;
-  constexpr std::uintptr_t mask = ~(four_kb - 1);
-  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) + four_kb);
+  std::uintptr_t upage_size = page_size();
+  std::uintptr_t mask = ~(upage_size - 1);
+  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) +
+                              upage_size);
 }
 
 template <typename Pack, typename T>

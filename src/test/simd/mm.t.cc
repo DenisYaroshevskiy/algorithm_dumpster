@@ -94,9 +94,9 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
   }
 
   SECTION("loadu") {
-    std::array<std::uint8_t, byte_width<reg_t>() * 2> in;
-    std::array<std::uint8_t, byte_width<reg_t>()> expected;
-    std::array<std::uint8_t, byte_width<reg_t>()> actual;
+    alignas(alignment<reg_t>()) std::array<std::uint8_t, byte_width<reg_t>() * 2> in;
+    alignas(alignment<reg_t>()) std::array<std::uint8_t, byte_width<reg_t>()> expected;
+    alignas(alignment<reg_t>()) std::array<std::uint8_t, byte_width<reg_t>()> actual;
 
     std::iota(in.begin(), in.end(), 0);
 

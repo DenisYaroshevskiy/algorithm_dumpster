@@ -302,8 +302,10 @@ On the other hand - it's not really a registry - maybe it should just be a slot-
 `strcmp`
 
 Implementation of std::strcmp using simd. <br/>
-Tried to be as close as possible to:
+For `v1::` Tried to be as close as possible to:
 https://opensource.apple.com/source/Libc/Libc-825.40.1/x86_64/string/strcmp.s.auto.html
+
+The main one doesn't fall back to checking one by one.
 
 Allows to pick how many bytes to process 16 or 32 at a time.
 

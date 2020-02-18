@@ -603,13 +603,18 @@ constexpr N all_ones() {
 #ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 #define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 
+#include <cstddef>
+
 namespace simd {
+
+constexpr std::ptrdiff_t page_size() { return 1 << 12; }
 
 template <typename T>
 T* end_of_page(T* addr) {
-  constexpr std::uintptr_t four_kb = 1 << 12;
-  constexpr std::uintptr_t mask = ~(four_kb - 1);
-  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) + four_kb);
+  std::uintptr_t upage_size = page_size();
+  std::uintptr_t mask = ~(upage_size - 1);
+  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) +
+                              upage_size);
 }
 
 template <typename Pack, typename T>
@@ -783,6 +788,11 @@ std::optional<std::uint32_t> first_true(const pack<T, W>& x) {
   auto mask = _vbool_tests::movemask(x);
   if (!mask) return std::nullopt;
   return count_trailing_zeroes(mask) / sizeof(T);
+}
+
+template <typename T, std::size_t W>
+std::optional<std::uint32_t> first_true_ignore_first_n(const pack<T, W>& x) {
+  return first_true(x);
 }
 
 template <typename T, std::size_t W>

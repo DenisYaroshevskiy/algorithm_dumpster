@@ -56,6 +56,11 @@ std::optional<std::uint32_t> first_true(const pack<T, W>& x) {
 }
 
 template <typename T, std::size_t W>
+std::optional<std::uint32_t> first_true_ignore_first_n(const pack<T, W>& x) {
+  return first_true(x);
+}
+
+template <typename T, std::size_t W>
 std::optional<std::uint32_t> first_true_ignore_first_n(const pack<T, W>& x, std::uint32_t n) {
   auto mask = _vbool_tests::movemask(x);
   mask &= ~set_lower_n_bits(n * sizeof(T));

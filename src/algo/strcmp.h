@@ -23,6 +23,7 @@
 #include "simd/pack.h"
 
 namespace algo {
+namespace v1 {
 namespace _strcmp {
 
 template <std::size_t width>
@@ -88,6 +89,59 @@ std::pair<const char*, const char*> strmismatch(const char* x, const char* y) {
         _strcmp::strmismatch_page_boundary(n, &x, &y)) {
       return {x, y};
     }
+  }
+}
+
+template <std::size_t width>
+int strcmp(const char* sx, const char* sy) {
+  auto [x, y] = strmismatch<width>(sx, sy);
+
+  auto as_int = [](const char x) {
+    return static_cast<int>(static_cast<unsigned char>(x));
+  };
+
+  return as_int(*x) - as_int(*y);
+}
+
+}  // namespace v1
+
+// -----------------------------------------------------------------------------
+
+template <std::size_t width>
+std::pair<const char*, const char*> strmismatch(const char* x, const char* y) {
+  using pack = simd::pack<char, width>;
+  using vbool = simd::vbool_t<pack>;
+  const pack zeros = simd::set_zero<pack>();
+
+  auto simd_step = [&](auto... ignore_first) mutable {
+    const pack chars_x = simd::load_unaligned<pack>(x);
+    const pack chars_y = simd::load_unaligned<pack>(y);
+
+    const vbool end_test = simd::equal_pairwise(chars_x, zeros);
+    const vbool x_neq_y = ~simd::equal_pairwise(chars_x, chars_y);
+    const vbool test = end_test | x_neq_y;
+
+    const std::optional stop_at =
+        simd::first_true_ignore_first_n(test, ignore_first...);
+
+    x += stop_at.value_or(width);
+    y += stop_at.value_or(width);
+    return stop_at.has_value();
+  };
+
+  while(true) {
+    const char* page_end_x = simd::end_of_page(x);
+    const char* page_end_y = simd::end_of_page(y);
+    const std::ptrdiff_t n = std::min(page_end_x - x, page_end_y - y);
+
+    for (std::ptrdiff_t simd_n = n / width; simd_n; --simd_n) {
+       if (simd_step()) return {x, y};
+    }
+
+    const std::ptrdiff_t trash = width - n % width;
+    x -= trash;
+    y -= trash;
+    if (simd_step(trash)) return {x, y};
   }
 }
 
