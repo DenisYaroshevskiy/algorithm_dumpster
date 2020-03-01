@@ -1,65 +1,87 @@
 {
   "context": {
-    "date": "2019-11-03 20:43:59",
+    "date": "2020-03-01 23:24:59",
+    "host_name": "dyarosh-u",
     "executable": "build/src/bench_runnable/zip_to_pair_bit_size_ignore_1000/use_pair",
-    "num_cpus": 4,
-    "mhz_per_cpu": 1800,
+    "num_cpus": 8,
+    "mhz_per_cpu": 4900,
     "cpu_scaling_enabled": false,
     "caches": [
       {
         "type": "Data",
         "level": 1,
-        "size": 32768000,
-        "num_sharing": 2
+        "size": 32768,
+        "num_sharing": 1
       },
       {
         "type": "Instruction",
         "level": 1,
-        "size": 32768000,
-        "num_sharing": 2
+        "size": 32768,
+        "num_sharing": 1
       },
       {
         "type": "Unified",
         "level": 2,
-        "size": 262144000,
-        "num_sharing": 2
+        "size": 262144,
+        "num_sharing": 1
       },
       {
         "type": "Unified",
         "level": 3,
-        "size": 3145728000,
-        "num_sharing": 4
+        "size": 12582912,
+        "num_sharing": 8
       }
     ],
+    "load_avg": [0.74,0.82,0.85],
     "library_build_type": "release"
   },
   "benchmarks": [
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/8",
-      "iterations": 8392480,
-      "real_time": 8.3199517184658916e+01,
-      "cpu_time": 8.3076158656320885e+01,
+      "run_name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/8",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 17844128,
+      "real_time": 3.9189409367557793e+01,
+      "cpu_time": 3.9190724422061983e+01,
       "time_unit": "ns"
     },
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/16",
-      "iterations": 4207666,
-      "real_time": 1.6563150259541555e+02,
-      "cpu_time": 1.6540571423682394e+02,
+      "run_name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/16",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1679462,
+      "real_time": 4.1749109178991927e+02,
+      "cpu_time": 4.1750444428037065e+02,
       "time_unit": "ns"
     },
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/32",
-      "iterations": 2092638,
-      "real_time": 3.3424215177004083e+02,
-      "cpu_time": 3.3382840223679392e+02,
+      "run_name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/32",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1600948,
+      "real_time": 4.3056440309090692e+02,
+      "cpu_time": 4.3057587317014674e+02,
       "time_unit": "ns"
     },
     {
       "name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/64",
-      "iterations": 1862812,
-      "real_time": 3.5846081783585942e+02,
-      "cpu_time": 3.5786703113357657e+02,
+      "run_name": "zip_to_pair_bit_size<SELECTED_ALGORITHM>/1000/64",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 3179760,
+      "real_time": 2.2063901709552536e+02,
+      "cpu_time": 2.2064566004981501e+02,
       "time_unit": "ns"
     }
   ]

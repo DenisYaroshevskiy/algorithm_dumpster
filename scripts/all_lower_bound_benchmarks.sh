@@ -1,0 +1,7 @@
+python3 scripts/run_benchmark_folder.py data/plots/lower_bound_base.json build/src/bench_runnable/lower_bound_int_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/lower_bound_base.json build/src/bench_runnable/lower_bound_double_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/lower_bound_base.json build/src/bench_runnable/lower_bound_std_int64_t_1000 data
+
+python3 scripts/run_benchmark_folder.py data/plots/lower_bound_5_percent_base.json build/src/bench_runnable/lower_bound_first_5_percent_int_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/lower_bound_5_percent_base.json build/src/bench_runnable/lower_bound_first_5_percent_double_1000 data
+python3 scripts/run_benchmark_folder.py data/plots/lower_bound_5_percent_base.json build/src/bench_runnable/lower_bound_first_5_percent_std_int64_t_1000 data
