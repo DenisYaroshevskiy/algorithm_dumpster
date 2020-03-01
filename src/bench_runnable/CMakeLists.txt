@@ -14,8 +14,10 @@
 # limitations under the License.
 #
 
+find_package(benchmark)
+
 function(add_benchmark source algo type number)
-    set(compiler_options --std=c++17 -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native)
+    set(compiler_options --std=c++17 --stdlib=libc++ -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native)
 
     set(benchmark_directory ${source}_${type}_${number})
     set(name ${algo}_${source}_${type}_${number})
@@ -32,26 +34,22 @@ function(add_benchmark source algo type number)
                    google_benchmark_main.cc
                    )
     target_compile_options(${name} PRIVATE ${compiler_options})
-    target_link_libraries(${name} benchmark)
+    target_link_libraries(${name} PUBLIC benchmark pthread)
+    target_link_options(${name} PRIVATE -stdlib=libc++)
     set_target_properties(${name} PROPERTIES
                           RUNTIME_OUTPUT_DIRECTORY ${benchmark_directory}
                           OUTPUT_NAME ${algo})
 endfunction()
 
 function (add_counting_benchmark name)
-  set(compiler_options --std=c++17 -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native)
+  set(compiler_options --std=c++17 --stdlib=libc++ -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native)
 
   add_executable(${name})
   target_sources(${name} PRIVATE
                  ${name}.cc)
   target_compile_options(${name} PRIVATE ${compiler_options})
+  target_link_options(${name} PRIVATE -stdlib=libc++)
 endfunction()
-
-# Code alignment ####################
-# Stopped reproducing for some reason.
-add_benchmark(code_alignment A int 1 USE_ARG)
-add_benchmark(code_alignment A int 1)
-add_benchmark(code_alignment_almost NO_ALGORITH int 0)
 
 # Copy with reverse iterators
 add_benchmark(copy_reverse_iterators std_copy int 1000)

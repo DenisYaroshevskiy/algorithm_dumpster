@@ -52,10 +52,10 @@ target_sources(tests PRIVATE
                catch_main.cc)
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -Og -g
-                       -ftime-trace
                        -fsanitize=address -fno-omit-frame-pointer
                        --std=c++17
+                       -stdlib=libc++
                        -march=native)
 
-target_link_options(tests PRIVATE -fsanitize=address)
+target_link_options(tests PRIVATE -fsanitize=address -stdlib=libc++)
 set_target_properties(tests PROPERTIES CXX_STANDARD 17)
