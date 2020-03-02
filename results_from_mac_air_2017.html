@@ -2,32 +2,40 @@
 <html>
 <meta charset='utf-8'>
 
-<title>Benchmarking results</title>
+<title>Legacy becnhmarking results from MacBook air 2017</title>
+
+<script>
+  const OLD_ALGORITHM_DUMPSTER_URL = 'https://cdn.jsdelivr.net/gh/DenisYaroshevskiy/algorithm_dumpster@1f5a6d6f25ebce44f2a04c5cb24dc0e88ab3df92/';
+</script>
 
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-<script type='text/javascript'
-  src='scripts/benchmark_visualization.js'></script>
 
+<script type='text/javascript'
+  src='scripts/legacy_visualization_helpers.js'></script>
+
+<script type="text/javascript"
+		src="https://cdn.jsdelivr.net/gh/DenisYaroshevskiy/algorithm_dumpster@1f5a6d6f25ebce44f2a04c5cb24dc0e88ab3df92/scripts/benchmark_visualization.js"></script>
 </html>
 
+
+
 <body>
-  <h1>Becnhmarking results</h1>
+  <h1>Legacy becnhmarking results from MacBook air 2017</h1>
   <a href="#apply_rearrangments">apply rearrangments</a>
   <a href="#lower_bounds">lower bounds</a>
   <a href="#merges">merges</a>
   <a href="#sorts">sorts</a>
   <a href="#uint_tuple">uint_tuple</a>
 
-  <p> Resuls left from when this project was developed previously on Mac Book air 2017 can be found <a href="results_from_mac_air_2017.html">here</a></p>
 
   <a name="apply_rearrangments"></a>
   <h2><a href="#apply_rearrangments">Apply rearrangments</a></h2>
 
   <div id='apply_rearrangment_counting_1000'></div>
-  <script>visualizeCountingBenchmarkFromJson('apply_rearrangment_counting_1000', 'data/apply_rearrangment_counting_1000/description.json')</script>
+  <script>visualizeLegacyCounts('apply_rearrangment_counting_1000', 'data/apply_rearrangment_counting_1000/description.json')</script>
 
   <div id='apply_rearrangment_time_1000'></div>
-  <script>visualizeBecnhmarksForTypes('apply_rearrangment_time_1000',
+  <script>visualizeLegacyTimings('apply_rearrangment_time_1000',
       'data/apply_rearrangment_{}_1000/description.json',
       ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair']);
   </script>
@@ -40,7 +48,7 @@
       elements</a></h3>
 
   <div id='lower_bound_time_1000'></div>
-  <script>visualizeBecnhmarksForTypes('lower_bound_time_1000',
+  <script>visualizeLegacyTimings('lower_bound_time_1000',
       'data/lower_bound_{}_1000/description.json',
       ['int', 'double', 'std_int64_t']);
   </script>
@@ -49,7 +57,7 @@
   <h3><a href="#lower_bounds_first_5">Lower bounds first 5 percent</a></h3>
 
   <div id='lower_bound_first_5_percent_time_1000'></div>
-  <script>visualizeBecnhmarksForTypes('lower_bound_first_5_percent_time_1000',
+  <script>visualizeLegacyTimings('lower_bound_first_5_percent_time_1000',
       'data/lower_bound_first_5_percent_{}_1000/description.json',
       ['int', 'double', 'std_int64_t']);
   </script>
@@ -64,19 +72,19 @@
   Merge with small benchmarks merge a big first range with a small (0-100) second one.
 
   <div id='merge_time_2000'></div>
-  <script>visualizeBecnhmarksForTypes('merge_time_2000',
+  <script>visualizeLegacyTimings('merge_time_2000',
       'data/merge_{}_2000/description.json',
       ['int', 'double', 'std_int64_t']);
   </script>
 
   <div id='merge_with_small_2000'></div>
-  <script>visualizeBecnhmarksForTypes('merge_with_small_2000',
+  <script>visualizeLegacyTimings('merge_with_small_2000',
       'data/merge_with_small_{}_2000/description.json',
       ['int', 'double', 'std_int64_t']);
   </script>
 
   <div id='merge_with_small_1000000'></div>
-  <script>visualizeBecnhmarksForTypes('merge_with_small_1000000',
+  <script>visualizeLegacyTimings('merge_with_small_1000000',
       'data/merge_with_small_{}_1000000/description.json',
       ['int', 'double', 'std_int64_t']);
   </script>
@@ -90,16 +98,16 @@
   From middle to the very right, inverse of the left ones.
 
   <div id='sort_1000_counting'></div>
-  <script>visualizeCountingBenchmarkFromJson('sort_1000_counting', 'data/sort_counting_1000/description.json')</script>
+  <script>visualizeLegacyCounts('sort_1000_counting', 'data/sort_counting_1000/description.json')</script>
 
   <div id='sort_time_1000'></div>
-  <script>visualizeBecnhmarksForTypes('sort_time_1000',
+  <script>visualizeLegacyTimings('sort_time_1000',
       'data/sort_{}_1000/description.json',
       ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair', 'noinline_int']);
   </script>
 
   <div id='sort_size_time_1000'></div>
-  <script>visualizeBecnhmarksForTypes('sort_size_time_1000',
+  <script>visualizeLegacyTimings('sort_size_time_1000',
       'data/sort_size_{}_100/description.json',
       ['int', 'double', 'std_int64_t', 'fake_url', 'fake_url_pair', 'noinline_int']);
   </script>
@@ -113,7 +121,7 @@
   I believe this to be a clang codegen bug.<br/><br/>
 
   <div id='uint_tuple_1000'></div>
-  <script>visualizeBecnhmarksForTypes('uint_tuple_1000',
+  <script>visualizeLegacyTimings('uint_tuple_1000',
       'data/zip_to_pair_bit_size_{}_1000/description.json', ['ignore']);
   </script>
 
@@ -126,7 +134,7 @@
   Note: this benchmark doesn't subtract the baseline from sorting - hard to do baselines for different types.<br/><br/>
 
   <div id='sort_type_1000'></div>
-  <script>visualizeBecnhmarksForTypes('sort_type_1000',
+  <script>visualizeLegacyTimings('sort_type_1000',
       'data/sort_type_{}_1000/description.json', ['std_sort']);
   </script>
 
