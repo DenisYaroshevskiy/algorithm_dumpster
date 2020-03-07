@@ -213,12 +213,12 @@ constexpr std::size_t bit_width() {
 }
 
 template <typename Register>
-constexpr size_t byte_width() {
+constexpr std::size_t byte_width() {
   return bit_width<Register>() / 8;
 }
 
 template <typename Register>
-constexpr size_t alignment() {
+constexpr std::size_t alignment() {
   return alignof(Register);
 }
 '''
@@ -262,7 +262,7 @@ def set0():
 // Does not exist for floats.
 template <typename Register>
 inline auto setzero() {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 '''
     return res + instantiateIfConstexprPattern_justRegister(
         'register_width == {0}',
@@ -296,7 +296,7 @@ def min():
     res = '''
 template <typename T, typename Register>
 inline auto min(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 
 '''
 
@@ -312,7 +312,7 @@ def max():
     res = '''
 template <typename T, typename Register>
 inline auto max(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 
 '''
 
@@ -330,8 +330,8 @@ def cmpeq():
     res = '''
   template <typename T, typename Register>
   inline auto cmpeq(Register a, Register b) {
-    static constexpr size_t register_width = bit_width<Register>();
-    static constexpr size_t t_width = sizeof(T) * 8;
+    static constexpr std::size_t register_width = bit_width<Register>();
+    static constexpr std::size_t t_width = sizeof(T) * 8;
 '''
 
     return res + instantiateIfConstexprPattern_intWidth(
@@ -345,7 +345,7 @@ def cmpgt():
   // Instruction is not avaliable for unsigned ints.
   template <typename T, typename Register>
   inline auto cmpgt(Register a, Register b) {
-    static constexpr size_t register_width = bit_width<Register>();
+    static constexpr std::size_t register_width = bit_width<Register>();
 '''
 
     return res + instantiateIfConstexprPattern_intWidth(
@@ -360,8 +360,8 @@ def add():
     res = '''
   template <typename T, typename Register>
   inline auto add(Register a, Register b) {
-    static constexpr size_t register_width = bit_width<Register>();
-    static constexpr size_t t_width = sizeof(T) * 8;
+    static constexpr std::size_t register_width = bit_width<Register>();
+    static constexpr std::size_t t_width = sizeof(T) * 8;
 '''
 
     return res + instantiateIfConstexprPattern_intWidth(
@@ -374,8 +374,8 @@ def sub():
     res = '''
   template <typename T, typename Register>
   inline auto sub(Register a, Register b) {
-    static constexpr size_t register_width = bit_width<Register>();
-    static constexpr size_t t_width = sizeof(T) * 8;
+    static constexpr std::size_t register_width = bit_width<Register>();
+    static constexpr std::size_t t_width = sizeof(T) * 8;
 '''
 
     return res + instantiateIfConstexprPattern_intWidth(
@@ -390,7 +390,7 @@ def and_():
     res = '''
 template <typename Register>
 inline auto and_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 '''
     return res + instantiateIfConstexprPattern_justRegister(
         'register_width == {0}',
@@ -402,7 +402,7 @@ def or_():
     res = '''
 template <typename Register>
 inline auto or_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 '''
     return res + instantiateIfConstexprPattern_justRegister(
         'register_width == {0}',
@@ -414,7 +414,7 @@ def xor_():
     res = '''
 template <typename Register>
 inline auto xor_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 '''
     return res + instantiateIfConstexprPattern_justRegister(
         'register_width == {0}',
@@ -426,7 +426,7 @@ def andnot():
     res = '''
 template <typename Register>
 inline auto andnot(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 '''
     return res + instantiateIfConstexprPattern_justRegister(
         'register_width == {0}',
@@ -440,8 +440,8 @@ def movemask():
     return '''
   template <typename T, typename Register>
   inline auto movemask(Register a) {
-    static constexpr size_t register_width = bit_width<Register>();
-    static constexpr size_t t_width = sizeof(T) * 8;
+    static constexpr std::size_t register_width = bit_width<Register>();
+    static constexpr std::size_t t_width = sizeof(T) * 8;
 
     if constexpr (register_width == 128 && t_width == 8)
       return _mm_movemask_epi8(a);
@@ -456,8 +456,8 @@ def blendv():
     return '''
   template <typename T, typename Register>
   inline auto blendv(Register a, Register b, Register mask) {
-    static constexpr size_t register_width = bit_width<Register>();
-    static constexpr size_t t_width = sizeof(T) * 8;
+    static constexpr std::size_t register_width = bit_width<Register>();
+    static constexpr std::size_t t_width = sizeof(T) * 8;
 
     if constexpr (register_width == 128 && t_width == 8)
       return _mm_blendv_epi8(a, b, mask);
@@ -466,7 +466,6 @@ def blendv():
     else return error_t{ };
   }
 '''
-
 
 def generateMainCode():
     res = ''
@@ -497,7 +496,7 @@ def generateMainCode():
     res += add()
     res += sub()
 
-    res += section('movemask')
+    res += section('masks/bytes')
     res += movemask()
     res += blendv()
 
@@ -528,4 +527,4 @@ if __name__ == '__main__':
     f.write(generateCode())
     f.close()
 
-    os.system('clang-format-mp-7.0 -i ' + mm_h)
+    os.system('clang-format -i ' + mm_h)

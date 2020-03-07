@@ -82,12 +82,12 @@ constexpr std::size_t bit_width() {
 }
 
 template <typename Register>
-constexpr size_t byte_width() {
+constexpr std::size_t byte_width() {
   return bit_width<Register>() / 8;
 }
 
 template <typename Register>
-constexpr size_t alignment() {
+constexpr std::size_t alignment() {
   return alignof(Register);
 }
 
@@ -140,7 +140,7 @@ inline void store(register_i<512>* addr, register_i<512> a) {
 // Does not exist for floats.
 template <typename Register>
 inline auto setzero() {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
   if constexpr (register_width == 128)
     return _mm_setzero_si128();
   else if constexpr (register_width == 256)
@@ -188,7 +188,7 @@ inline auto set1(T a) {
 
 template <typename T, typename Register>
 inline auto min(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 
   if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
     return _mm_min_epi8(a, b);
@@ -244,7 +244,7 @@ inline auto min(Register a, Register b) {
 
 template <typename T, typename Register>
 inline auto max(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
 
   if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
     return _mm_max_epi8(a, b);
@@ -302,8 +302,8 @@ inline auto max(Register a, Register b) {
 
 template <typename T, typename Register>
 inline auto cmpeq(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
   if constexpr (register_width == 128 && t_width == 8)
     return _mm_cmpeq_epi8(a, b);
   else if constexpr (register_width == 128 && t_width == 16)
@@ -335,7 +335,7 @@ inline auto cmpeq(Register a, Register b) {
 // Instruction is not avaliable for unsigned ints.
 template <typename T, typename Register>
 inline auto cmpgt(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
   if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
     return _mm_cmpgt_epi8(a, b);
   else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
@@ -368,8 +368,8 @@ inline auto cmpgt(Register a, Register b) {
 
 template <typename T, typename Register>
 inline auto add(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
   if constexpr (register_width == 128 && t_width == 8)
     return _mm_add_epi8(a, b);
   else if constexpr (register_width == 128 && t_width == 16)
@@ -400,8 +400,8 @@ inline auto add(Register a, Register b) {
 
 template <typename T, typename Register>
 inline auto sub(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
   if constexpr (register_width == 128 && t_width == 8)
     return _mm_sub_epi8(a, b);
   else if constexpr (register_width == 128 && t_width == 16)
@@ -430,12 +430,12 @@ inline auto sub(Register a, Register b) {
     return error_t{};
 }
 
-// movemask --------------------------------
+// masks/bytes -----------------------------
 
 template <typename T, typename Register>
 inline auto movemask(Register a) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
 
   if constexpr (register_width == 128 && t_width == 8)
     return _mm_movemask_epi8(a);
@@ -447,8 +447,8 @@ inline auto movemask(Register a) {
 
 template <typename T, typename Register>
 inline auto blendv(Register a, Register b, Register mask) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
 
   if constexpr (register_width == 128 && t_width == 8)
     return _mm_blendv_epi8(a, b, mask);
@@ -462,7 +462,7 @@ inline auto blendv(Register a, Register b, Register mask) {
 
 template <typename Register>
 inline auto and_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
   if constexpr (register_width == 128)
     return _mm_and_si128(a, b);
   else if constexpr (register_width == 256)
@@ -475,7 +475,7 @@ inline auto and_(Register a, Register b) {
 
 template <typename Register>
 inline auto or_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
   if constexpr (register_width == 128)
     return _mm_or_si128(a, b);
   else if constexpr (register_width == 256)
@@ -488,7 +488,7 @@ inline auto or_(Register a, Register b) {
 
 template <typename Register>
 inline auto xor_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
   if constexpr (register_width == 128)
     return _mm_xor_si128(a, b);
   else if constexpr (register_width == 256)
@@ -501,7 +501,7 @@ inline auto xor_(Register a, Register b) {
 
 template <typename Register>
 inline auto andnot(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
+  static constexpr std::size_t register_width = bit_width<Register>();
   if constexpr (register_width == 128)
     return _mm_andnot_si128(a, b);
   else if constexpr (register_width == 256)
