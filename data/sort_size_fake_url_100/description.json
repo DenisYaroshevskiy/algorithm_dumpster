@@ -5,14 +5,6 @@
   },
   "measurements": [
     {
-      "name": "algo_stable_sort_lifting",
-      "url": "data/sort_size_fake_url_100/algo_stable_sort_lifting.json"
-    },
-    {
-      "name": "std_sort",
-      "url": "data/sort_size_fake_url_100/std_sort.json"
-    },
-    {
       "name": "baseline_sort",
       "url": "data/sort_size_fake_url_100/baseline_sort.json"
     },
@@ -21,12 +13,20 @@
       "url": "data/sort_size_fake_url_100/algo_stable_sort_sufficient_allocation.json"
     },
     {
+      "name": "std_stable_sort",
+      "url": "data/sort_size_fake_url_100/std_stable_sort.json"
+    },
+    {
+      "name": "std_sort",
+      "url": "data/sort_size_fake_url_100/std_sort.json"
+    },
+    {
       "name": "algo_stable_sort_sufficient_allocation_std_merge",
       "url": "data/sort_size_fake_url_100/algo_stable_sort_sufficient_allocation_std_merge.json"
     },
     {
-      "name": "std_stable_sort",
-      "url": "data/sort_size_fake_url_100/std_stable_sort.json"
+      "name": "algo_stable_sort_lifting",
+      "url": "data/sort_size_fake_url_100/algo_stable_sort_lifting.json"
     }
   ]
 }
