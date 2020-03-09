@@ -20,6 +20,8 @@
 #include <array>
 #include <numeric>
 
+#include <iostream>
+
 #include "test/catch.h"
 
 namespace simd {
@@ -397,16 +399,19 @@ TEST_CASE("simd.pack.address_manipulation", "[simd]") {
     REQUIRE(8192 == call(5000));
 
     std::string empty;
-    REQUIRE(call((std::uintptr_t)empty.c_str()) > (std::uintptr_t)empty.c_str());
+    REQUIRE(call((std::uintptr_t)empty.c_str()) >
+            (std::uintptr_t)empty.c_str());
   }
 
   SECTION("previous_aligned_address") {
     auto call = [](auto p, std::uintptr_t ptr_bits) {
       using pack_t = decltype(p);
       int* ptr = reinterpret_cast<int*>(ptr_bits);
-      auto res = reinterpret_cast<std::uintptr_t>(previous_aligned_address<pack_t>(ptr));
+      auto res = reinterpret_cast<std::uintptr_t>(
+          previous_aligned_address<pack_t>(ptr));
       const int* cptr = reinterpret_cast<const int*>(ptr_bits);
-      REQUIRE(res == reinterpret_cast<std::uintptr_t>(previous_aligned_address<pack_t>(cptr)));
+      REQUIRE(res == reinterpret_cast<std::uintptr_t>(
+                         previous_aligned_address<pack_t>(cptr)));
       return res;
     };
 
@@ -516,7 +521,7 @@ TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
   using uscalar = unsigned_equivalent<scalar>;
 
   const scalar FF = (scalar)all_ones<uscalar>();
-  const scalar not_one_scalar = (scalar)( ~uscalar(1) );
+  const scalar not_one_scalar = (scalar)(~uscalar(1));
 
   const pack_t zeroes = set_zero<pack_t>();
   const pack_t ones = set_all<pack_t>((scalar)1);
@@ -610,6 +615,125 @@ TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
+TEST_CASE("simd.pack.compress_mask_16", "[simd]") {
+  using pack_t = pack<std::uint8_t, 16>;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> a, b, actual;
+
+  auto run = [&]() mutable {
+    pack_t loaded_a = load<pack_t>(a.data());
+    pack_t loaded_b = load<pack_t>(b.data());
+    auto eq = equal_pairwise(loaded_a, loaded_b);
+    auto compressed =
+        compress_mask<register_t<pack_t>>(mm::movemask<std::uint8_t>(eq.reg));
+
+    store(actual.data(), pack_t{compressed.first});
+
+    return compressed.second;
+  };
+
+  a.fill(1);
+  b.fill(2);
+
+  SECTION("only first half has trues") {
+    REQUIRE(0 == run());
+
+    b[0] = 1;
+    REQUIRE(1 == run());
+    REQUIRE(0 == actual[0]);
+
+    b.fill(2);
+    b[1] = 1;
+    REQUIRE(1 == run());
+    REQUIRE(1 == actual[0]);
+
+    b.fill(2);
+    b[0] = 1;
+    b[1] = 1;
+    REQUIRE(2 == run());
+    REQUIRE(0 == actual[0]);
+    REQUIRE(1 == actual[1]);
+
+    b.fill(2);
+    b[0] = 1;
+    b[4] = 1;
+    REQUIRE(2 == run());
+    REQUIRE(0 == actual[0]);
+    REQUIRE(4 == actual[1]);
+  }
+
+  SECTION("mixed first/second halves have trues") {
+    b[8] = 1;
+    REQUIRE(1 == run());
+    REQUIRE(8 == actual[0]);
+
+    b.fill(2);
+    b[0] = 1;
+    b[8] = 1;
+    REQUIRE(2 == run());
+    REQUIRE(0 == actual[0]);
+    REQUIRE(8 == actual[1]);
+
+    b.fill(2);
+    b[0] = 1;
+    b[2] = 1;
+    b[9] = 1;
+    b[15] = 1;
+    REQUIRE(4 == run());
+    REQUIRE(0 == actual[0]);
+    REQUIRE(2 == actual[1]);
+    REQUIRE(9 == actual[2]);
+    REQUIRE(15 == actual[3]);
+
+    b.fill(2);
+    std::fill(b.begin() + 8, b.end() - 1, 1);
+    REQUIRE(7 == run());
+    for (std::uint8_t i = 0; i < 7; ++i) {
+      REQUIRE(i + 8 == actual[i]);
+    }
+
+    b.fill(1);
+    REQUIRE(16 == run());
+    for (std::uint8_t i = 0; i < 16; ++i) {
+      REQUIRE(i == actual[i]);
+    }
+  }
+}
+
+TEST_CASE("simd.pack.understanding_shuffle", "[simd]") {
+  using pack_t = pack<std::uint8_t, 16>;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> a, b;
+
+  std::iota(a.begin(), a.end(), 0);
+  b.fill(0);
+
+  auto run = [&]() mutable {
+    pack_t loaded_a = load<pack_t>(a.data());
+    pack_t loaded_b = load<pack_t>(b.data());
+    pack_t res{_mm_shuffle_epi8(loaded_a.reg, loaded_b.reg)};
+
+    alignas(pack_t) std::array<scalar, size> actual;
+    store(actual.data(), res);
+    return actual;
+  };
+
+  REQUIRE(b == run());
+
+  b[0] = 1;
+  REQUIRE(b == run());
+
+  b[0] = 15;
+  b[1] = 3;
+  REQUIRE(b == run());
+
+  b[15] = 1;
+  REQUIRE(b == run());
+}
 
 }  // namespace
 }  // namespace simd

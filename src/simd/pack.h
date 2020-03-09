@@ -37,4 +37,6 @@
 #include "simd/pack_detail/address_manipulation.h"
 #include "simd/pack_detail/vbool_tests.h"
 
+#include "simd/pack_detail/compress_mask.h"
+
 #endif  // SIMD_PACK_H_

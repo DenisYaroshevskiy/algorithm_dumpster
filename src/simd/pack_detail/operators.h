@@ -125,9 +125,19 @@ std::ostream& operator<<(std::ostream& out, const pack<T, W>& x) {
   alignas(pack<T, W>) std::array<scalar, W> stored;
   store(stored.data(), x);
 
-  out << '[' << stored[0];
+  auto print_t = [&](T elem) {
+    if constexpr(std::is_same_v<T, char> || std::is_same_v<T, unsigned char>) {
+      out << elem << '(' << int(elem) << ')';
+    } else {
+      out << elem;
+    }
+  };
+
+  out << '[';
+  print_t(stored[0]);
   for (std::size_t i = 1; i != W; ++i) {
-    out << ", " << stored[i];
+    out << ", ";
+    print_t(stored[i]);
   }
   out << ']';
 

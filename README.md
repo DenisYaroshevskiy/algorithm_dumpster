@@ -667,6 +667,8 @@ python script to generate mm.h
 `end_of_page(addr)` <br/>
 `previous_aligned_address<Pack>(addr)`<br/>
 
+`compress_mask` <br/>
+
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
 
@@ -696,6 +698,26 @@ Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strle
 `blend(pack, pack, vbool)`
 
 Same as intel, if true take second.
+
+`compress_mask(mm::registry_i)`
+
+In avx-512 there are intrinsics `*compressstore*` - which are very useful. <br/>
+This is an approximation of this for avx-2. <br/>
+
+The solutions is based on: https://stackoverflow.com/a/36951611/5021064 <br/>
+This was also very instrumental: https://stackoverflow.com/questions/18971401/sparse-array-compression-using-simd-avx2
+
+Input - a mask obtained from mm::movemask.<br/>
+Output: a pair: <br/>
+ 1) compressed array of indexes where bits were true, followed by zeros.
+ 2) popcount of the input mask - computed as a by-product and is a very useful thing when <br/>
+    using compress.
+
+_TODO_: This is purely an mm hand written code, that doesn't get generated from python. <br/>
+I need to figure out what do I do with code like that - probably mm should become it's own <br/>
+stand alone folder and this should go there. It's not really a part of the pack interface.
+
+_TODO_: there are various tradeoffs for using lookup tables vs computation, I need to measure those after implementing remove_if.
 
 ## Test
 
