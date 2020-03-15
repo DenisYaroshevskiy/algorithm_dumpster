@@ -615,8 +615,9 @@ TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
-TEST_CASE("simd.pack.compress_mask_16", "[simd]") {
-  using pack_t = pack<std::uint8_t, 16>;
+TEMPLATE_TEST_CASE("simd.pack.compress_mask.first16", "[simd]",
+                    (pack<std::uint8_t, 16>), (pack<std::uint8_t, 32>)) {
+  using pack_t = TestType;
   using scalar = scalar_t<pack_t>;
   constexpr size_t size = size_v<pack_t>;
 
@@ -634,20 +635,37 @@ TEST_CASE("simd.pack.compress_mask_16", "[simd]") {
     return compressed.second;
   };
 
+  auto test_for_rest_is_zeros = [&](std::uint8_t popcount) {
+    return std::all_of(actual.begin() + popcount, actual.end(),
+                      [](auto x) { return x == 0; });
+  };
+
   a.fill(1);
   b.fill(2);
 
-  SECTION("only first half has trues") {
+  SECTION("only first 8 has trues") {
     REQUIRE(0 == run());
 
     b[0] = 1;
     REQUIRE(1 == run());
     REQUIRE(0 == actual[0]);
+    REQUIRE(test_for_rest_is_zeros(1));
+
+    b.fill(2);
+    b[2] = 1;
+    b[3] = 1;
+    b[9] = 1;
+    REQUIRE(3 == run());
+    REQUIRE(2 == actual[0]);
+    REQUIRE(3 == actual[1]);
+    REQUIRE(9 == actual[2]);
+    REQUIRE(test_for_rest_is_zeros(3));
 
     b.fill(2);
     b[1] = 1;
     REQUIRE(1 == run());
     REQUIRE(1 == actual[0]);
+    REQUIRE(test_for_rest_is_zeros(1));
 
     b.fill(2);
     b[0] = 1;
@@ -655,6 +673,7 @@ TEST_CASE("simd.pack.compress_mask_16", "[simd]") {
     REQUIRE(2 == run());
     REQUIRE(0 == actual[0]);
     REQUIRE(1 == actual[1]);
+    REQUIRE(test_for_rest_is_zeros(2));
 
     b.fill(2);
     b[0] = 1;
@@ -662,12 +681,14 @@ TEST_CASE("simd.pack.compress_mask_16", "[simd]") {
     REQUIRE(2 == run());
     REQUIRE(0 == actual[0]);
     REQUIRE(4 == actual[1]);
+    REQUIRE(test_for_rest_is_zeros(2));
   }
 
-  SECTION("mixed first/second halves have trues") {
+  SECTION("mixed first/second 8s have trues") {
     b[8] = 1;
     REQUIRE(1 == run());
     REQUIRE(8 == actual[0]);
+    REQUIRE(test_for_rest_is_zeros(1));
 
     b.fill(2);
     b[0] = 1;
@@ -675,6 +696,7 @@ TEST_CASE("simd.pack.compress_mask_16", "[simd]") {
     REQUIRE(2 == run());
     REQUIRE(0 == actual[0]);
     REQUIRE(8 == actual[1]);
+    REQUIRE(test_for_rest_is_zeros(2));
 
     b.fill(2);
     b[0] = 1;
@@ -686,19 +708,65 @@ TEST_CASE("simd.pack.compress_mask_16", "[simd]") {
     REQUIRE(2 == actual[1]);
     REQUIRE(9 == actual[2]);
     REQUIRE(15 == actual[3]);
+    REQUIRE(test_for_rest_is_zeros(4));
 
     b.fill(2);
-    std::fill(b.begin() + 8, b.end() - 1, 1);
+    std::fill(b.begin() + 8, b.begin() + 15, 1);
     REQUIRE(7 == run());
     for (std::uint8_t i = 0; i < 7; ++i) {
       REQUIRE(i + 8 == actual[i]);
     }
+    REQUIRE(test_for_rest_is_zeros(7));
 
-    b.fill(1);
+    std::fill(b.begin(), b.begin() + 16, 1);
     REQUIRE(16 == run());
     for (std::uint8_t i = 0; i < 16; ++i) {
       REQUIRE(i == actual[i]);
     }
+    REQUIRE(test_for_rest_is_zeros(16));
+  }
+
+  SECTION("all 4 8s") {
+    if (size < 32) return;
+
+    b[16] = 1;
+    REQUIRE(1 == run());
+    REQUIRE(16 == actual[0]);
+    REQUIRE(test_for_rest_is_zeros(1));
+
+    b.fill(2);
+    b[24] = 1;
+    REQUIRE(1 == run());
+    REQUIRE(24 == actual[0]);
+    REQUIRE(test_for_rest_is_zeros(1));
+
+    b.fill(2);
+    b[1] = 1;
+    b[2] = 1;
+    b[3] = 1;
+    b[4] = 1;
+    b[9] = 1;
+    b[10] = 1;
+    b[11] = 1;
+    b[17] = 1;
+    b[18] = 1;
+    b[25] = 1;
+    REQUIRE(10 == run());
+    REQUIRE(std::array<scalar, size>{1, 2, 3, 4, 9, 10, 11, 17, 18, 25} == actual);
+
+    b.fill(2);
+    b[23] = 1;
+    b[24] = 1;
+    REQUIRE(2 == run());
+    REQUIRE(std::array<scalar, size>{23, 24} == actual);
+
+
+    b.fill(1);
+    REQUIRE(32 == run());
+    for (std::uint8_t i = 0; i < 32; ++i) {
+      REQUIRE(i == actual[i]);
+    }
+    REQUIRE(test_for_rest_is_zeros(32));
   }
 }
 

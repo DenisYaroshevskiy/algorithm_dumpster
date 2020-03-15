@@ -127,7 +127,7 @@ std::ostream& operator<<(std::ostream& out, const pack<T, W>& x) {
 
   auto print_t = [&](T elem) {
     if constexpr(std::is_same_v<T, char> || std::is_same_v<T, unsigned char>) {
-      out << elem << '(' << int(elem) << ')';
+      out << '(' << int(elem) << ')';
     } else {
       out << elem;
     }
