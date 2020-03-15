@@ -78,6 +78,8 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
   constexpr size_t width = bit_width<reg_t>();
 
   alignas(alignment<reg_t>()) byte_array<reg_t> a, b, c, d;
+  using uint_array = std::array<std::uint8_t, byte_width<reg_t>()>;
+  using twice_uint_array = std::array<std::uint8_t, byte_width<reg_t>() * 2>;
 
   a.fill(std::byte{1});
   b.fill(std::byte{2});
@@ -94,9 +96,8 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
   }
 
   SECTION("loadu") {
-    alignas(alignment<reg_t>()) std::array<std::uint8_t, byte_width<reg_t>() * 2> in;
-    alignas(alignment<reg_t>()) std::array<std::uint8_t, byte_width<reg_t>()> expected;
-    alignas(alignment<reg_t>()) std::array<std::uint8_t, byte_width<reg_t>()> actual;
+    alignas(alignment<reg_t>()) twice_uint_array in;
+    alignas(alignment<reg_t>()) uint_array expected, actual;
 
     std::iota(in.begin(), in.end(), 0);
 
@@ -106,6 +107,51 @@ TEMPLATE_TEST_CASE("simd.mm.just_bytes", "[simd]",  //
 
       std::iota(expected.begin(), expected.end(), i);
       REQUIRE(expected == actual);
+    }
+  }
+
+  SECTION("storeu") {
+    alignas(alignment<reg_t>()) twice_uint_array expected, actual;
+
+    for (std::uint8_t i = 0; i < byte_width<reg_t>(); ++i) {
+      std::iota(expected.begin(), expected.end(), 0);
+      actual = expected;
+
+      storeu(reinterpret_cast<reg_t*>(actual.data() + i), setzero<reg_t>());
+      std::fill(expected.begin() + i,
+                expected.begin() + i + byte_width<reg_t>(), 0);
+
+      REQUIRE(expected == actual);
+    }
+  }
+
+  SECTION("maskmoeu") {
+    alignas(alignment<reg_t>()) uint_array expected, actual, mask;
+
+    if constexpr (bit_width<reg_t>() == 128) {
+      for (std::uint8_t i = 0; i < byte_width<reg_t>(); ++i) {
+        std::iota(expected.begin(), expected.end(), 0);
+        actual = expected;
+
+        // Fill in the mask.
+        mask.fill(0);
+        for (std::uint8_t j = 0; j < mask.size(); j += 2) {
+          mask[j] = 0xff;
+        }
+        std::fill(mask.end() - i, mask.end(), 0);
+
+        // Fill in expected
+        std::transform(expected.begin() + i, expected.end(), mask.begin(),
+                       expected.begin() + i, [](auto init, auto is_masked) {
+                         return is_masked ? 0 : init;
+                       });
+
+        // Fill in actual
+        maskmoveu(reinterpret_cast<reg_t*>(actual.data() + i), setzero<reg_t>(),
+                  load(reinterpret_cast<const reg_t*>(mask.data())));
+
+        REQUIRE(expected == actual);
+      }
     }
   }
 

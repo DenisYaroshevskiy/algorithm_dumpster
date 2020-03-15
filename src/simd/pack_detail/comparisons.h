@@ -35,7 +35,7 @@ std::uint32_t movemask(const pack<std::uint8_t, W>& x) {
 
 }  // namespace _comparisons
 
-template <typename T, size_t W>
+template <typename T, std::size_t W>
 bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
   // For equality (for integers) we are OK to use bitwise equality.
   // We could also use memcmp, on clang that produced ~the same code.

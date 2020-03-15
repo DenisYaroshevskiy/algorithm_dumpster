@@ -254,6 +254,21 @@ inline void store(register_i<{0}>* addr, register_i<{0}> a) {{
 '''
     return instantiateJustRegister(pattern)
 
+def storeu():
+    pattern = '''
+inline void storeu(register_i<{0}>* addr, register_i<{0}> a) {{
+  _mm{1}_storeu_si{0}(addr, a);
+}}
+'''
+    return instantiateJustRegister(pattern)
+
+def maskmoveu():
+    return '''
+inline void maskmoveu(register_i<128>* addr, register_i<128> a, register_i<128> mask) {{
+    _mm_maskmoveu_si128(a, mask, reinterpret_cast<char*>(addr));
+}}
+'''
+
 
 # Set one value everywhere =======================================
 
@@ -479,6 +494,8 @@ def generateMainCode():
     res += load()
     res += loadu()
     res += store()
+    res += storeu()
+    res += maskmoveu()
 
     res += section('set one value everywhere')
     res += set0()

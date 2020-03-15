@@ -135,6 +135,23 @@ inline void store(register_i<512>* addr, register_i<512> a) {
   _mm512_store_si512(addr, a);
 }
 
+inline void storeu(register_i<128>* addr, register_i<128> a) {
+  _mm_storeu_si128(addr, a);
+}
+
+inline void storeu(register_i<256>* addr, register_i<256> a) {
+  _mm256_storeu_si256(addr, a);
+}
+
+inline void storeu(register_i<512>* addr, register_i<512> a) {
+  _mm512_storeu_si512(addr, a);
+}
+
+inline void maskmoveu(register_i<128>* addr, register_i<128> a,
+                      register_i<128> mask) {
+  { _mm_maskmoveu_si128(a, mask, reinterpret_cast<char*>(addr)); }
+}
+
 // set one value everywhere ----------------
 
 // Does not exist for floats.
