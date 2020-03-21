@@ -615,8 +615,8 @@ TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
-TEMPLATE_TEST_CASE("simd.pack.compress_mask.first16", "[simd]",
-                    (pack<std::uint8_t, 16>), (pack<std::uint8_t, 32>)) {
+TEMPLATE_TEST_CASE("simd.pack.compress_mask", "[simd]",
+                   (pack<std::uint8_t, 16>), (pack<std::uint8_t, 32>)) {
   using pack_t = TestType;
   using scalar = scalar_t<pack_t>;
   constexpr size_t size = size_v<pack_t>;
@@ -637,7 +637,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask.first16", "[simd]",
 
   auto test_for_rest_is_zeros = [&](std::uint8_t popcount) {
     return std::all_of(actual.begin() + popcount, actual.end(),
-                      [](auto x) { return x == 0; });
+                       [](auto x) { return x == 0; });
   };
 
   a.fill(1);
@@ -752,14 +752,14 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask.first16", "[simd]",
     b[18] = 1;
     b[25] = 1;
     REQUIRE(10 == run());
-    REQUIRE(std::array<scalar, size>{1, 2, 3, 4, 9, 10, 11, 17, 18, 25} == actual);
+    REQUIRE(std::array<scalar, size>{1, 2, 3, 4, 9, 10, 11, 17, 18, 25} ==
+            actual);
 
     b.fill(2);
     b[23] = 1;
     b[24] = 1;
     REQUIRE(2 == run());
     REQUIRE(std::array<scalar, size>{23, 24} == actual);
-
 
     b.fill(1);
     REQUIRE(32 == run());
@@ -801,6 +801,84 @@ TEST_CASE("simd.pack.understanding_shuffle", "[simd]") {
 
   b[15] = 1;
   REQUIRE(b == run());
+}
+
+TEMPLATE_TEST_CASE("simd.pack.compress_store", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using vbool = vbool_t<pack_t>;
+  using scalar = scalar_t<pack_t>;
+  using bool_t = scalar_t<vbool>;
+
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> input, expected, actual;
+  alignas(vbool) std::array<bool_t, size> mask;
+
+  for (std::size_t i = 0; i != input.size(); ++i) {
+    input[i] = (scalar)i;
+  }
+
+  auto run = [&](std::size_t offset = 0) mutable {
+    const vbool loaded_mask = load<vbool>(mask.data());
+    const auto mmask = mm::movemask<std::uint8_t>(
+        greater_pairwise(loaded_mask, set_zero<vbool>()).reg);
+
+    const int non_zero_count = size - std::count(mask.begin(), mask.end(), 0);
+
+    actual.fill((scalar)-1);
+    const pack_t loaded_input = load<pack_t>(input.data());
+
+    auto* res =
+        compress_store_unaligned(actual.data() + offset, loaded_input, mmask);
+    REQUIRE(non_zero_count == res - actual.data() - static_cast<int>(offset));
+    return res;
+  };
+
+  SECTION("Start from all positions") {
+    for (std::size_t i = 0; i != size; ++i) {
+      mask.fill(0);
+
+      int remaining = static_cast<int>(size - i);
+
+      std::fill(mask.begin(), mask.begin() + remaining, 1);
+
+      run(i);
+
+      expected.fill((scalar)-1);
+      std::copy(input.begin(), input.begin() + remaining, expected.begin() + i);
+
+      REQUIRE(expected == actual);
+    }
+  }
+
+  SECTION("Up to first 4 even elements") {
+    std::size_t even_end = std::min(size, 8ul);
+
+    mask.fill(0);
+    expected.fill((scalar)-1);
+    auto* output_start = expected.begin() + (size - even_end / 2);
+    for (std::size_t i = 0; i != even_end; i += 2) {
+      mask[i] = 1;
+      output_start[i / 2] = (scalar)i;
+    }
+
+    run(size - even_end / 2);
+    REQUIRE(expected == actual);
+  }
+
+  SECTION("Max first element") {
+    scalar buggy_value = (scalar)std::numeric_limits<unsigned_equivalent<scalar>>::max() - 5;
+    input[0] = buggy_value;
+
+    expected.fill((scalar)-1);
+    expected[0] = buggy_value;
+
+    mask.fill(0);
+    mask[0] = 1;
+
+    run();
+    REQUIRE(expected == actual);
+  }
 }
 
 }  // namespace

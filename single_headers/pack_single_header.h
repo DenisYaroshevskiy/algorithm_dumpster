@@ -14,523 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * ================================================================
- *
- *  GENERATED CODE. Script: ../src/simd/mm_operations_generator.py
- *
- * ================================================================
- */
-#ifndef SIMD_MM_H_
-#define SIMD_MM_H_
-
-#include <immintrin.h>
-
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
-
-namespace mm {
-
-struct error_t {};
-
-template <typename T>
-struct type_t {
-  using type = T;
-};
-
-// Helper to support pointers.
-template <typename T, typename Int>
-constexpr bool is_equivalent() {
-  if (sizeof(T) != sizeof(Int)) return false;
-  if (std::is_signed_v<Int>) return std::is_signed_v<T> || std::is_pointer_v<T>;
-  return !std::is_signed_v<T>;
-}
-
-// register_i ------------------------------
-
-namespace _mm {
-
-template <std::size_t W>
-constexpr auto register_i_impl() {
-  if constexpr (W == 128)
-    return type_t<__m128i>{};
-  else if constexpr (W == 256)
-    return type_t<__m256i>{};
-  else if constexpr (W == 512)
-    return type_t<__m512i>{};
-  else
-    return error_t{};
-}
-}  // namespace _mm
-
-template <std::size_t W>
-using register_i = typename decltype(_mm::register_i_impl<W>())::type;
-
-// sizes -----------------------------------
-
-template <typename Register>
-constexpr std::size_t bit_width() {
-  if constexpr (std::is_same_v<Register, register_i<128>>) {
-    return 128;
-  } else if constexpr (std::is_same_v<Register, register_i<256>>) {
-    return 256;
-  } else if constexpr (std::is_same_v<Register, register_i<512>>) {
-    return 512;
-  }
-  throw error_t{};
-}
-
-template <typename Register>
-constexpr size_t byte_width() {
-  return bit_width<Register>() / 8;
-}
-
-template <typename Register>
-constexpr size_t alignment() {
-  return alignof(Register);
-}
-
-// load/store ------------------------------
-
-__attribute__((no_sanitize_address)) inline register_i<128> load(
-    const register_i<128>* addr) {
-  return _mm_load_si128(addr);
-}
-
-__attribute__((no_sanitize_address)) inline register_i<256> load(
-    const register_i<256>* addr) {
-  return _mm256_load_si256(addr);
-}
-
-__attribute__((no_sanitize_address)) inline register_i<512> load(
-    const register_i<512>* addr) {
-  return _mm512_load_si512(addr);
-}
-
-__attribute__((no_sanitize_address)) inline register_i<128> loadu(
-    const register_i<128>* addr) {
-  return _mm_loadu_si128(addr);
-}
-
-__attribute__((no_sanitize_address)) inline register_i<256> loadu(
-    const register_i<256>* addr) {
-  return _mm256_loadu_si256(addr);
-}
-
-__attribute__((no_sanitize_address)) inline register_i<512> loadu(
-    const register_i<512>* addr) {
-  return _mm512_loadu_si512(addr);
-}
-
-inline void store(register_i<128>* addr, register_i<128> a) {
-  _mm_store_si128(addr, a);
-}
-
-inline void store(register_i<256>* addr, register_i<256> a) {
-  _mm256_store_si256(addr, a);
-}
-
-inline void store(register_i<512>* addr, register_i<512> a) {
-  _mm512_store_si512(addr, a);
-}
-
-// set one value everywhere ----------------
-
-// Does not exist for floats.
-template <typename Register>
-inline auto setzero() {
-  static constexpr size_t register_width = bit_width<Register>();
-  if constexpr (register_width == 128)
-    return _mm_setzero_si128();
-  else if constexpr (register_width == 256)
-    return _mm256_setzero_si256();
-  else if constexpr (register_width == 512)
-    return _mm512_setzero_si512();
-  else
-    return error_t{};
-}
-
-template <typename Register, typename T>
-inline auto set1(T a) {
-  static constexpr std::size_t register_width = bit_width<Register>();
-  static constexpr std::size_t t_width = sizeof(T) * 8;
-
-  if constexpr (register_width == 128 && t_width == 8)
-    return _mm_set1_epi8((std::int8_t)a);
-  else if constexpr (register_width == 128 && t_width == 16)
-    return _mm_set1_epi16((std::int16_t)a);
-  else if constexpr (register_width == 128 && t_width == 32)
-    return _mm_set1_epi32((std::int32_t)a);
-  else if constexpr (register_width == 128 && t_width == 64)
-    return _mm_set1_epi64x((std::int64_t)a);
-  else if constexpr (register_width == 256 && t_width == 8)
-    return _mm256_set1_epi8((std::int8_t)a);
-  else if constexpr (register_width == 256 && t_width == 16)
-    return _mm256_set1_epi16((std::int16_t)a);
-  else if constexpr (register_width == 256 && t_width == 32)
-    return _mm256_set1_epi32((std::int32_t)a);
-  else if constexpr (register_width == 256 && t_width == 64)
-    return _mm256_set1_epi64x((std::int64_t)a);
-  else if constexpr (register_width == 512 && t_width == 8)
-    return _mm512_set1_epi8((std::int8_t)a);
-  else if constexpr (register_width == 512 && t_width == 16)
-    return _mm512_set1_epi16((std::int16_t)a);
-  else if constexpr (register_width == 512 && t_width == 32)
-    return _mm512_set1_epi32((std::int32_t)a);
-  else if constexpr (register_width == 512 && t_width == 64)
-    return _mm512_set1_epi64((std::int64_t)a);
-  else
-    return error_t{};
-}
-
-// min/max ---------------------------------
-
-template <typename T, typename Register>
-inline auto min(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-
-  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
-    return _mm_min_epi8(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint8_t>())
-    return _mm_min_epu8(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
-    return _mm_min_epi16(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint16_t>())
-    return _mm_min_epu16(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
-    return _mm_min_epi32(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint32_t>())
-    return _mm_min_epu32(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
-    return _mm_min_epi64(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint64_t>())
-    return _mm_min_epu64(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
-    return _mm256_min_epi8(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint8_t>())
-    return _mm256_min_epu8(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
-    return _mm256_min_epi16(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint16_t>())
-    return _mm256_min_epu16(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
-    return _mm256_min_epi32(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint32_t>())
-    return _mm256_min_epu32(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
-    return _mm256_min_epi64(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint64_t>())
-    return _mm256_min_epu64(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
-    return _mm512_min_epi8(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint8_t>())
-    return _mm512_min_epu8(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
-    return _mm512_min_epi16(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint16_t>())
-    return _mm512_min_epu16(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
-    return _mm512_min_epi32(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint32_t>())
-    return _mm512_min_epu32(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
-    return _mm512_min_epi64(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint64_t>())
-    return _mm512_min_epu64(a, b);
-  else
-    return error_t{};
-}
-
-template <typename T, typename Register>
-inline auto max(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-
-  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
-    return _mm_max_epi8(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint8_t>())
-    return _mm_max_epu8(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
-    return _mm_max_epi16(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint16_t>())
-    return _mm_max_epu16(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
-    return _mm_max_epi32(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint32_t>())
-    return _mm_max_epu32(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
-    return _mm_max_epi64(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::uint64_t>())
-    return _mm_max_epu64(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
-    return _mm256_max_epi8(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint8_t>())
-    return _mm256_max_epu8(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
-    return _mm256_max_epi16(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint16_t>())
-    return _mm256_max_epu16(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
-    return _mm256_max_epi32(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint32_t>())
-    return _mm256_max_epu32(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
-    return _mm256_max_epi64(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::uint64_t>())
-    return _mm256_max_epu64(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
-    return _mm512_max_epi8(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint8_t>())
-    return _mm512_max_epu8(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
-    return _mm512_max_epi16(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint16_t>())
-    return _mm512_max_epu16(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
-    return _mm512_max_epi32(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint32_t>())
-    return _mm512_max_epu32(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
-    return _mm512_max_epi64(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::uint64_t>())
-    return _mm512_max_epu64(a, b);
-  else
-    return error_t{};
-}
-
-// comparisons -----------------------------
-
-template <typename T, typename Register>
-inline auto cmpeq(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
-  if constexpr (register_width == 128 && t_width == 8)
-    return _mm_cmpeq_epi8(a, b);
-  else if constexpr (register_width == 128 && t_width == 16)
-    return _mm_cmpeq_epi16(a, b);
-  else if constexpr (register_width == 128 && t_width == 32)
-    return _mm_cmpeq_epi32(a, b);
-  else if constexpr (register_width == 128 && t_width == 64)
-    return _mm_cmpeq_epi64(a, b);
-  else if constexpr (register_width == 256 && t_width == 8)
-    return _mm256_cmpeq_epi8(a, b);
-  else if constexpr (register_width == 256 && t_width == 16)
-    return _mm256_cmpeq_epi16(a, b);
-  else if constexpr (register_width == 256 && t_width == 32)
-    return _mm256_cmpeq_epi32(a, b);
-  else if constexpr (register_width == 256 && t_width == 64)
-    return _mm256_cmpeq_epi64(a, b);
-  else if constexpr (register_width == 512 && t_width == 8)
-    return _mm512_cmpeq_epi8(a, b);
-  else if constexpr (register_width == 512 && t_width == 16)
-    return _mm512_cmpeq_epi16(a, b);
-  else if constexpr (register_width == 512 && t_width == 32)
-    return _mm512_cmpeq_epi32(a, b);
-  else if constexpr (register_width == 512 && t_width == 64)
-    return _mm512_cmpeq_epi64(a, b);
-  else
-    return error_t{};
-}
-
-// Instruction is not avaliable for unsigned ints.
-template <typename T, typename Register>
-inline auto cmpgt(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
-    return _mm_cmpgt_epi8(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
-    return _mm_cmpgt_epi16(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
-    return _mm_cmpgt_epi32(a, b);
-  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
-    return _mm_cmpgt_epi64(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
-    return _mm256_cmpgt_epi8(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
-    return _mm256_cmpgt_epi16(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
-    return _mm256_cmpgt_epi32(a, b);
-  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
-    return _mm256_cmpgt_epi64(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
-    return _mm512_cmpgt_epi8(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
-    return _mm512_cmpgt_epi16(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
-    return _mm512_cmpgt_epi32(a, b);
-  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
-    return _mm512_cmpgt_epi64(a, b);
-  else
-    return error_t{};
-}
-
-// add/sub ---------------------------------
-
-template <typename T, typename Register>
-inline auto add(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
-  if constexpr (register_width == 128 && t_width == 8)
-    return _mm_add_epi8(a, b);
-  else if constexpr (register_width == 128 && t_width == 16)
-    return _mm_add_epi16(a, b);
-  else if constexpr (register_width == 128 && t_width == 32)
-    return _mm_add_epi32(a, b);
-  else if constexpr (register_width == 128 && t_width == 64)
-    return _mm_add_epi64(a, b);
-  else if constexpr (register_width == 256 && t_width == 8)
-    return _mm256_add_epi8(a, b);
-  else if constexpr (register_width == 256 && t_width == 16)
-    return _mm256_add_epi16(a, b);
-  else if constexpr (register_width == 256 && t_width == 32)
-    return _mm256_add_epi32(a, b);
-  else if constexpr (register_width == 256 && t_width == 64)
-    return _mm256_add_epi64(a, b);
-  else if constexpr (register_width == 512 && t_width == 8)
-    return _mm512_add_epi8(a, b);
-  else if constexpr (register_width == 512 && t_width == 16)
-    return _mm512_add_epi16(a, b);
-  else if constexpr (register_width == 512 && t_width == 32)
-    return _mm512_add_epi32(a, b);
-  else if constexpr (register_width == 512 && t_width == 64)
-    return _mm512_add_epi64(a, b);
-  else
-    return error_t{};
-}
-
-template <typename T, typename Register>
-inline auto sub(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
-  if constexpr (register_width == 128 && t_width == 8)
-    return _mm_sub_epi8(a, b);
-  else if constexpr (register_width == 128 && t_width == 16)
-    return _mm_sub_epi16(a, b);
-  else if constexpr (register_width == 128 && t_width == 32)
-    return _mm_sub_epi32(a, b);
-  else if constexpr (register_width == 128 && t_width == 64)
-    return _mm_sub_epi64(a, b);
-  else if constexpr (register_width == 256 && t_width == 8)
-    return _mm256_sub_epi8(a, b);
-  else if constexpr (register_width == 256 && t_width == 16)
-    return _mm256_sub_epi16(a, b);
-  else if constexpr (register_width == 256 && t_width == 32)
-    return _mm256_sub_epi32(a, b);
-  else if constexpr (register_width == 256 && t_width == 64)
-    return _mm256_sub_epi64(a, b);
-  else if constexpr (register_width == 512 && t_width == 8)
-    return _mm512_sub_epi8(a, b);
-  else if constexpr (register_width == 512 && t_width == 16)
-    return _mm512_sub_epi16(a, b);
-  else if constexpr (register_width == 512 && t_width == 32)
-    return _mm512_sub_epi32(a, b);
-  else if constexpr (register_width == 512 && t_width == 64)
-    return _mm512_sub_epi64(a, b);
-  else
-    return error_t{};
-}
-
-// movemask --------------------------------
-
-template <typename T, typename Register>
-inline auto movemask(Register a) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
-
-  if constexpr (register_width == 128 && t_width == 8)
-    return _mm_movemask_epi8(a);
-  else if constexpr (register_width == 256 && t_width == 8)
-    return _mm256_movemask_epi8(a);
-  else
-    return error_t{};
-}
-
-template <typename T, typename Register>
-inline auto blendv(Register a, Register b, Register mask) {
-  static constexpr size_t register_width = bit_width<Register>();
-  static constexpr size_t t_width = sizeof(T) * 8;
-
-  if constexpr (register_width == 128 && t_width == 8)
-    return _mm_blendv_epi8(a, b, mask);
-  else if constexpr (register_width == 256 && t_width == 8)
-    return _mm256_blendv_epi8(a, b, mask);
-  else
-    return error_t{};
-}
-
-// bitwise ---------------------------------
-
-template <typename Register>
-inline auto and_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  if constexpr (register_width == 128)
-    return _mm_and_si128(a, b);
-  else if constexpr (register_width == 256)
-    return _mm256_and_si256(a, b);
-  else if constexpr (register_width == 512)
-    return _mm512_and_si512(a, b);
-  else
-    return error_t{};
-}
-
-template <typename Register>
-inline auto or_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  if constexpr (register_width == 128)
-    return _mm_or_si128(a, b);
-  else if constexpr (register_width == 256)
-    return _mm256_or_si256(a, b);
-  else if constexpr (register_width == 512)
-    return _mm512_or_si512(a, b);
-  else
-    return error_t{};
-}
-
-template <typename Register>
-inline auto xor_(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  if constexpr (register_width == 128)
-    return _mm_xor_si128(a, b);
-  else if constexpr (register_width == 256)
-    return _mm256_xor_si256(a, b);
-  else if constexpr (register_width == 512)
-    return _mm512_xor_si512(a, b);
-  else
-    return error_t{};
-}
-
-template <typename Register>
-inline auto andnot(Register a, Register b) {
-  static constexpr size_t register_width = bit_width<Register>();
-  if constexpr (register_width == 128)
-    return _mm_andnot_si128(a, b);
-  else if constexpr (register_width == 256)
-    return _mm256_andnot_si256(a, b);
-  else if constexpr (register_width == 512)
-    return _mm512_andnot_si512(a, b);
-  else
-    return error_t{};
-}
-
-}  // namespace mm
-
-#endif  // SIMD_MM_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 #ifndef SIMD_PACK_DETAIL_BITS_H_
 #define SIMD_PACK_DETAIL_BITS_H_
 
@@ -600,6 +83,34 @@ constexpr N all_ones() {
  * limitations under the License.
  */
 
+#ifndef SIMD_PACK_DETAIL_MASKS_H_
+#define SIMD_PACK_DETAIL_MASKS_H_
+
+#include <array>
+#include <cstdint>
+#include <type_traits>
+
+namespace simd {
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_MASKS_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 #define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 
@@ -642,18 +153,524 @@ T* previous_aligned_address(T* addr) {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_MASKS_H_
-#define SIMD_PACK_DETAIL_MASKS_H_
+/*
+ * ================================================================
+ *
+ *  GENERATED CODE. Script: ../src/simd/mm_operations_generator.py
+ *
+ * ================================================================
+ */
+#ifndef SIMD_MM_H_
+#define SIMD_MM_H_
 
-#include <array>
+#include <immintrin.h>
+
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 
-namespace simd {
+namespace mm {
 
-}  // namespace simd
+struct error_t {};
 
-#endif  // SIMD_PACK_DETAIL_MASKS_H_
+template <typename T>
+struct type_t {
+  using type = T;
+};
+
+// Helper to support pointers.
+template <typename T, typename Int>
+constexpr bool is_equivalent() {
+  if (sizeof(T) != sizeof(Int)) return false;
+  if (std::is_signed_v<Int>) return std::is_signed_v<T> || std::is_pointer_v<T>;
+  return !std::is_signed_v<T>;
+}
+
+// register_i ------------------------------
+
+namespace _mm {
+
+template <std::size_t W>
+constexpr auto register_i_impl() {
+  if constexpr (W == 128)
+    return type_t<__m128i>{};
+  else if constexpr (W == 256)
+    return type_t<__m256i>{};
+  else if constexpr (W == 512)
+    return type_t<__m512i>{};
+  else
+    return error_t{};
+}
+}  // namespace _mm
+
+template <std::size_t W>
+using register_i = typename decltype(_mm::register_i_impl<W>())::type;
+
+// sizes -----------------------------------
+
+template <typename Register>
+constexpr std::size_t bit_width() {
+  if constexpr (std::is_same_v<Register, register_i<128>>) {
+    return 128;
+  } else if constexpr (std::is_same_v<Register, register_i<256>>) {
+    return 256;
+  } else if constexpr (std::is_same_v<Register, register_i<512>>) {
+    return 512;
+  }
+  throw error_t{};
+}
+
+template <typename Register>
+constexpr std::size_t byte_width() {
+  return bit_width<Register>() / 8;
+}
+
+template <typename Register>
+constexpr std::size_t alignment() {
+  return alignof(Register);
+}
+
+// load/store ------------------------------
+
+__attribute__((no_sanitize_address)) inline register_i<128> load(
+    const register_i<128>* addr) {
+  return _mm_load_si128(addr);
+}
+
+__attribute__((no_sanitize_address)) inline register_i<256> load(
+    const register_i<256>* addr) {
+  return _mm256_load_si256(addr);
+}
+
+__attribute__((no_sanitize_address)) inline register_i<512> load(
+    const register_i<512>* addr) {
+  return _mm512_load_si512(addr);
+}
+
+__attribute__((no_sanitize_address)) inline register_i<128> loadu(
+    const register_i<128>* addr) {
+  return _mm_loadu_si128(addr);
+}
+
+__attribute__((no_sanitize_address)) inline register_i<256> loadu(
+    const register_i<256>* addr) {
+  return _mm256_loadu_si256(addr);
+}
+
+__attribute__((no_sanitize_address)) inline register_i<512> loadu(
+    const register_i<512>* addr) {
+  return _mm512_loadu_si512(addr);
+}
+
+inline void store(register_i<128>* addr, register_i<128> a) {
+  _mm_store_si128(addr, a);
+}
+
+inline void store(register_i<256>* addr, register_i<256> a) {
+  _mm256_store_si256(addr, a);
+}
+
+inline void store(register_i<512>* addr, register_i<512> a) {
+  _mm512_store_si512(addr, a);
+}
+
+inline void storeu(register_i<128>* addr, register_i<128> a) {
+  _mm_storeu_si128(addr, a);
+}
+
+inline void storeu(register_i<256>* addr, register_i<256> a) {
+  _mm256_storeu_si256(addr, a);
+}
+
+inline void storeu(register_i<512>* addr, register_i<512> a) {
+  _mm512_storeu_si512(addr, a);
+}
+
+inline void maskmoveu(register_i<128>* addr, register_i<128> a,
+                      register_i<128> mask) {
+  { _mm_maskmoveu_si128(a, mask, reinterpret_cast<char*>(addr)); }
+}
+
+// set one value everywhere ----------------
+
+// Does not exist for floats.
+template <typename Register>
+inline auto setzero() {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_setzero_si128();
+  else if constexpr (register_width == 256)
+    return _mm256_setzero_si256();
+  else if constexpr (register_width == 512)
+    return _mm512_setzero_si512();
+  else
+    return error_t{};
+}
+
+template <typename Register, typename T>
+inline auto set1(T a) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
+
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_set1_epi8((std::int8_t)a);
+  else if constexpr (register_width == 128 && t_width == 16)
+    return _mm_set1_epi16((std::int16_t)a);
+  else if constexpr (register_width == 128 && t_width == 32)
+    return _mm_set1_epi32((std::int32_t)a);
+  else if constexpr (register_width == 128 && t_width == 64)
+    return _mm_set1_epi64x((std::int64_t)a);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_set1_epi8((std::int8_t)a);
+  else if constexpr (register_width == 256 && t_width == 16)
+    return _mm256_set1_epi16((std::int16_t)a);
+  else if constexpr (register_width == 256 && t_width == 32)
+    return _mm256_set1_epi32((std::int32_t)a);
+  else if constexpr (register_width == 256 && t_width == 64)
+    return _mm256_set1_epi64x((std::int64_t)a);
+  else if constexpr (register_width == 512 && t_width == 8)
+    return _mm512_set1_epi8((std::int8_t)a);
+  else if constexpr (register_width == 512 && t_width == 16)
+    return _mm512_set1_epi16((std::int16_t)a);
+  else if constexpr (register_width == 512 && t_width == 32)
+    return _mm512_set1_epi32((std::int32_t)a);
+  else if constexpr (register_width == 512 && t_width == 64)
+    return _mm512_set1_epi64((std::int64_t)a);
+  else
+    return error_t{};
+}
+
+// min/max ---------------------------------
+
+template <typename T, typename Register>
+inline auto min(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+
+  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
+    return _mm_min_epi8(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint8_t>())
+    return _mm_min_epu8(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
+    return _mm_min_epi16(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint16_t>())
+    return _mm_min_epu16(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
+    return _mm_min_epi32(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint32_t>())
+    return _mm_min_epu32(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
+    return _mm_min_epi64(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint64_t>())
+    return _mm_min_epu64(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
+    return _mm256_min_epi8(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint8_t>())
+    return _mm256_min_epu8(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
+    return _mm256_min_epi16(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint16_t>())
+    return _mm256_min_epu16(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
+    return _mm256_min_epi32(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint32_t>())
+    return _mm256_min_epu32(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
+    return _mm256_min_epi64(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint64_t>())
+    return _mm256_min_epu64(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
+    return _mm512_min_epi8(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint8_t>())
+    return _mm512_min_epu8(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
+    return _mm512_min_epi16(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint16_t>())
+    return _mm512_min_epu16(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
+    return _mm512_min_epi32(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint32_t>())
+    return _mm512_min_epu32(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
+    return _mm512_min_epi64(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint64_t>())
+    return _mm512_min_epu64(a, b);
+  else
+    return error_t{};
+}
+
+template <typename T, typename Register>
+inline auto max(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+
+  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
+    return _mm_max_epi8(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint8_t>())
+    return _mm_max_epu8(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
+    return _mm_max_epi16(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint16_t>())
+    return _mm_max_epu16(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
+    return _mm_max_epi32(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint32_t>())
+    return _mm_max_epu32(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
+    return _mm_max_epi64(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::uint64_t>())
+    return _mm_max_epu64(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
+    return _mm256_max_epi8(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint8_t>())
+    return _mm256_max_epu8(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
+    return _mm256_max_epi16(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint16_t>())
+    return _mm256_max_epu16(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
+    return _mm256_max_epi32(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint32_t>())
+    return _mm256_max_epu32(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
+    return _mm256_max_epi64(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::uint64_t>())
+    return _mm256_max_epu64(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
+    return _mm512_max_epi8(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint8_t>())
+    return _mm512_max_epu8(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
+    return _mm512_max_epi16(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint16_t>())
+    return _mm512_max_epu16(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
+    return _mm512_max_epi32(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint32_t>())
+    return _mm512_max_epu32(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
+    return _mm512_max_epi64(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::uint64_t>())
+    return _mm512_max_epu64(a, b);
+  else
+    return error_t{};
+}
+
+// comparisons -----------------------------
+
+template <typename T, typename Register>
+inline auto cmpeq(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_cmpeq_epi8(a, b);
+  else if constexpr (register_width == 128 && t_width == 16)
+    return _mm_cmpeq_epi16(a, b);
+  else if constexpr (register_width == 128 && t_width == 32)
+    return _mm_cmpeq_epi32(a, b);
+  else if constexpr (register_width == 128 && t_width == 64)
+    return _mm_cmpeq_epi64(a, b);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_cmpeq_epi8(a, b);
+  else if constexpr (register_width == 256 && t_width == 16)
+    return _mm256_cmpeq_epi16(a, b);
+  else if constexpr (register_width == 256 && t_width == 32)
+    return _mm256_cmpeq_epi32(a, b);
+  else if constexpr (register_width == 256 && t_width == 64)
+    return _mm256_cmpeq_epi64(a, b);
+  else if constexpr (register_width == 512 && t_width == 8)
+    return _mm512_cmpeq_epi8(a, b);
+  else if constexpr (register_width == 512 && t_width == 16)
+    return _mm512_cmpeq_epi16(a, b);
+  else if constexpr (register_width == 512 && t_width == 32)
+    return _mm512_cmpeq_epi32(a, b);
+  else if constexpr (register_width == 512 && t_width == 64)
+    return _mm512_cmpeq_epi64(a, b);
+  else
+    return error_t{};
+}
+
+// Instruction is not avaliable for unsigned ints.
+template <typename T, typename Register>
+inline auto cmpgt(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128 && is_equivalent<T, std::int8_t>())
+    return _mm_cmpgt_epi8(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int16_t>())
+    return _mm_cmpgt_epi16(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int32_t>())
+    return _mm_cmpgt_epi32(a, b);
+  else if constexpr (register_width == 128 && is_equivalent<T, std::int64_t>())
+    return _mm_cmpgt_epi64(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int8_t>())
+    return _mm256_cmpgt_epi8(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int16_t>())
+    return _mm256_cmpgt_epi16(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int32_t>())
+    return _mm256_cmpgt_epi32(a, b);
+  else if constexpr (register_width == 256 && is_equivalent<T, std::int64_t>())
+    return _mm256_cmpgt_epi64(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int8_t>())
+    return _mm512_cmpgt_epi8(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int16_t>())
+    return _mm512_cmpgt_epi16(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int32_t>())
+    return _mm512_cmpgt_epi32(a, b);
+  else if constexpr (register_width == 512 && is_equivalent<T, std::int64_t>())
+    return _mm512_cmpgt_epi64(a, b);
+  else
+    return error_t{};
+}
+
+// add/sub ---------------------------------
+
+template <typename T, typename Register>
+inline auto add(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_add_epi8(a, b);
+  else if constexpr (register_width == 128 && t_width == 16)
+    return _mm_add_epi16(a, b);
+  else if constexpr (register_width == 128 && t_width == 32)
+    return _mm_add_epi32(a, b);
+  else if constexpr (register_width == 128 && t_width == 64)
+    return _mm_add_epi64(a, b);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_add_epi8(a, b);
+  else if constexpr (register_width == 256 && t_width == 16)
+    return _mm256_add_epi16(a, b);
+  else if constexpr (register_width == 256 && t_width == 32)
+    return _mm256_add_epi32(a, b);
+  else if constexpr (register_width == 256 && t_width == 64)
+    return _mm256_add_epi64(a, b);
+  else if constexpr (register_width == 512 && t_width == 8)
+    return _mm512_add_epi8(a, b);
+  else if constexpr (register_width == 512 && t_width == 16)
+    return _mm512_add_epi16(a, b);
+  else if constexpr (register_width == 512 && t_width == 32)
+    return _mm512_add_epi32(a, b);
+  else if constexpr (register_width == 512 && t_width == 64)
+    return _mm512_add_epi64(a, b);
+  else
+    return error_t{};
+}
+
+template <typename T, typename Register>
+inline auto sub(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_sub_epi8(a, b);
+  else if constexpr (register_width == 128 && t_width == 16)
+    return _mm_sub_epi16(a, b);
+  else if constexpr (register_width == 128 && t_width == 32)
+    return _mm_sub_epi32(a, b);
+  else if constexpr (register_width == 128 && t_width == 64)
+    return _mm_sub_epi64(a, b);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_sub_epi8(a, b);
+  else if constexpr (register_width == 256 && t_width == 16)
+    return _mm256_sub_epi16(a, b);
+  else if constexpr (register_width == 256 && t_width == 32)
+    return _mm256_sub_epi32(a, b);
+  else if constexpr (register_width == 256 && t_width == 64)
+    return _mm256_sub_epi64(a, b);
+  else if constexpr (register_width == 512 && t_width == 8)
+    return _mm512_sub_epi8(a, b);
+  else if constexpr (register_width == 512 && t_width == 16)
+    return _mm512_sub_epi16(a, b);
+  else if constexpr (register_width == 512 && t_width == 32)
+    return _mm512_sub_epi32(a, b);
+  else if constexpr (register_width == 512 && t_width == 64)
+    return _mm512_sub_epi64(a, b);
+  else
+    return error_t{};
+}
+
+// masks/bytes -----------------------------
+
+template <typename T, typename Register>
+inline auto movemask(Register a) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
+
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_movemask_epi8(a);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_movemask_epi8(a);
+  else
+    return error_t{};
+}
+
+template <typename T, typename Register>
+inline auto blendv(Register a, Register b, Register mask) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  static constexpr std::size_t t_width = sizeof(T) * 8;
+
+  if constexpr (register_width == 128 && t_width == 8)
+    return _mm_blendv_epi8(a, b, mask);
+  else if constexpr (register_width == 256 && t_width == 8)
+    return _mm256_blendv_epi8(a, b, mask);
+  else
+    return error_t{};
+}
+
+// bitwise ---------------------------------
+
+template <typename Register>
+inline auto and_(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_and_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_and_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_and_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto or_(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_or_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_or_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_or_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto xor_(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_xor_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_xor_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_xor_si512(a, b);
+  else
+    return error_t{};
+}
+
+template <typename Register>
+inline auto andnot(Register a, Register b) {
+  static constexpr std::size_t register_width = bit_width<Register>();
+  if constexpr (register_width == 128)
+    return _mm_andnot_si128(a, b);
+  else if constexpr (register_width == 256)
+    return _mm256_andnot_si256(a, b);
+  else if constexpr (register_width == 512)
+    return _mm512_andnot_si512(a, b);
+  else
+    return error_t{};
+}
+
+}  // namespace mm
+
+#endif  // SIMD_MM_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -751,6 +768,233 @@ using unsigned_equivalent =
  * limitations under the License.
  */
 
+#ifndef SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+#define SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+
+
+#include <algorithm>
+#include <tuple>
+
+namespace simd {
+namespace _compress_mask {
+
+// Some magic I stole from: https://stackoverflow.com/a/36951611/5021064
+inline std::pair<std::uint64_t, std::uint8_t> mask8(std::uint8_t mask,
+                                                    std::uint64_t all_idxes) {
+  const std::uint64_t mask_expanded =
+      _pdep_u64(mask, 0x0101010101010101) * 0xff;
+
+  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mask));
+  const std::uint64_t compressed_idxs = _pext_u64(all_idxes, mask_expanded);
+
+  return {compressed_idxs, offset};
+}
+
+constexpr void shift_two_masks8(std::uint64_t& first_mask,
+                                std::uint64_t& second_mask,
+                                std::uint8_t first_n) {
+  first_mask |= first_n == 8 ? 0 : second_mask << (first_n * 8);
+  second_mask = first_n == 0 ? 0 : second_mask >> ((8 - first_n) * 8) ;
+}
+
+constexpr void shift_offsets8(std::uint8_t& first_n, std::uint8_t& second_n) {
+  const std::uint8_t shift =
+      std::min(static_cast<std::uint8_t>(8 - first_n), second_n);
+  first_n += shift;
+  second_n -= shift;
+}
+
+constexpr std::uint64_t make_8_idexes(std::uint8_t offset) {
+  const std::uint64_t basic = 0x0706050403020100;
+  const std::uint64_t plus1 = 0x0101010101010101;
+  return basic + plus1 * offset;
+}
+
+inline std::pair<mm::register_i<128>, std::uint8_t> mask16(std::uint16_t mask) {
+  auto [first_mask, first_n] = mask8(mask & 0xff, make_8_idexes(0));
+  auto [second_mask, second_n] = mask8(mask >> 8, make_8_idexes(8));
+
+  shift_two_masks8(first_mask, second_mask, first_n);
+
+  return {_mm_set_epi64x(second_mask, first_mask), first_n + second_n};
+}
+
+inline std::pair<mm::register_i<256>, std::uint8_t> mask32(std::uint32_t mask) {
+  alignas(mm::register_i<256>) std::array<std::uint64_t, 4> masks = {};
+  std::array<std::uint8_t, 4> ns;
+
+  std::tie(masks[0], ns[0]) = mask8(mask & 0xff, make_8_idexes(0));
+  std::uint8_t last = 1;
+  std::uint8_t total = ns[0];
+
+  auto combine = [&](std::uint8_t mask_part, std::uint8_t idx_offset) mutable {
+    std::tie(masks[last], ns[last]) =
+        mask8(mask_part, make_8_idexes(idx_offset));
+    shift_two_masks8(masks[last - 1], masks[last], ns[last - 1]);
+
+    total += ns[last];
+    shift_offsets8(ns[last - 1], ns[last]);
+    last += (ns[last] != 0);
+  };
+
+  combine((mask >> 8) & 0xff, 8);
+  combine((mask >> 16) & 0xff, 16);
+  combine(mask >> 24, 24);
+
+  return {_mm256_set_epi64x(masks[3], masks[2], masks[1], masks[0]), total};
+}
+
+}  // namespace _compress_mask
+
+template <typename Register>
+std::pair<Register, std::uint8_t> compress_mask(std::uint32_t mmask) {
+  static constexpr std::size_t register_width = mm::bit_width<Register>();
+  if constexpr (register_width == 128) {
+    return _compress_mask::mask16(static_cast<std::uint16_t>(mmask));
+  } else {
+    return _compress_mask::mask32(mmask);
+  }
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_STORE_H_
+#define SIMD_PACK_DETAIL_STORE_H_
+
+
+namespace simd {
+
+template <typename T, std::size_t W>
+void store(T* addr, const pack<T, W>& a) {
+  using reg_t = register_t<pack<T, W>>;
+  mm::store(reinterpret_cast<reg_t*>(addr), a.reg);
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_STORE_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+#define SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+
+
+namespace simd {
+
+template <typename T, std::size_t W>
+pack<T, W> add_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::add<T>(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::sub<T>(x.reg, y.reg)};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+#ifndef SIMD_PACK_DETAIL_PACK_CAST_H_
+#define SIMD_PACK_DETAIL_PACK_CAST_H_
+
+#include <type_traits>
+
+
+namespace simd {
+
+template <typename Pack, typename T, std::size_t W>
+Pack cast(const pack<T, W>& x) {
+  static_assert(std::is_same_v<register_t<Pack>, register_t<pack<T, W>>>);
+  return Pack{x.reg};
+}
+
+template <typename U, typename T, std::size_t W>
+auto cast_elements(const pack<T, W>& x) {
+  return cast<pack<U, W>>(x);
+}
+
+template <typename T, std::size_t W>
+auto cast_to_bytes(const pack<T, W>& x) {
+  return cast<pack<std::uint8_t, W * sizeof(T)>>(x);
+}
+
+template <typename T, std::size_t W>
+auto cast_to_signed(const pack<T, W>& x) {
+  return cast_elements<signed_equivalent<T>>(x);
+}
+
+template <typename T, std::size_t W>
+auto cast_to_unsigned(const pack<T, W>& x) {
+  return cast_elements<unsigned_equivalent<T>>(x);
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_PACK_CAST_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef SIMD_PACK_DETAIL_VBOOL_TESTS_H_
 #define SIMD_PACK_DETAIL_VBOOL_TESTS_H_
 
@@ -822,75 +1066,30 @@ std::optional<std::uint32_t> first_true_ignore_first_n(const pack<T, W>& x, std:
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_STORE_H_
-#define SIMD_PACK_DETAIL_STORE_H_
+#ifndef SIMD_PACK_DETAIL_LOAD_H_
+#define SIMD_PACK_DETAIL_LOAD_H_
+
+#include <cstdint>
+#include <utility>
 
 
 namespace simd {
 
-template <typename T, std::size_t W>
-void store(T* addr, const pack<T, W>& a) {
-  using reg_t = register_t<pack<T, W>>;
-  mm::store(reinterpret_cast<reg_t*>(addr), a.reg);
+template <typename Pack, typename T>
+Pack load(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::load(reinterpret_cast<const reg_t*>(addr))};
+}
+
+template <typename Pack, typename T>
+Pack load_unaligned(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_STORE_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
-#ifndef SIMD_PACK_DETAIL_PACK_CAST_H_
-#define SIMD_PACK_DETAIL_PACK_CAST_H_
-
-#include <type_traits>
-
-
-namespace simd {
-
-template <typename Pack, typename T, std::size_t W>
-Pack cast(const pack<T, W>& x) {
-  static_assert(std::is_same_v<register_t<Pack>, register_t<pack<T, W>>>);
-  return Pack{x.reg};
-}
-
-template <typename U, typename T, std::size_t W>
-auto cast_elements(const pack<T, W>& x) {
-  return cast<pack<U, W>>(x);
-}
-
-template <typename T, std::size_t W>
-auto cast_to_bytes(const pack<T, W>& x) {
-  return cast<pack<std::uint8_t, W * sizeof(T)>>(x);
-}
-
-template <typename T, std::size_t W>
-auto cast_to_signed(const pack<T, W>& x) {
-  return cast_elements<signed_equivalent<T>>(x);
-}
-
-template <typename T, std::size_t W>
-auto cast_to_unsigned(const pack<T, W>& x) {
-  return cast_elements<unsigned_equivalent<T>>(x);
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_PACK_CAST_H_
+#endif  // SIMD_PACK_DETAIL_LOAD_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -942,65 +1141,21 @@ Pack set_zero() {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
-#define SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+#ifndef SIMD_PACK_DETAIL_BLEND_H_
+#define SIMD_PACK_DETAIL_BLEND_H_
 
 
 namespace simd {
 
 template <typename T, std::size_t W>
-pack<T, W> add_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return pack<T, W>{mm::add<T>(x.reg, y.reg)};
-}
-
-template <typename T, std::size_t W>
-pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return pack<T, W>{mm::sub<T>(x.reg, y.reg)};
+pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
+                 const vbool_t<pack<T, W>>& mask) {
+  return pack<T, W>{mm::blendv<std::uint8_t>(x.reg, y.reg, mask.reg)};
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_LOAD_H_
-#define SIMD_PACK_DETAIL_LOAD_H_
-
-#include <cstdint>
-#include <utility>
-
-
-namespace simd {
-
-template <typename Pack, typename T>
-Pack load(const T* addr) {
-  using reg_t = register_t<Pack>;
-  return Pack{mm::load(reinterpret_cast<const reg_t*>(addr))};
-}
-
-template <typename Pack, typename T>
-Pack load_unaligned(const T* addr) {
-  using reg_t = register_t<Pack>;
-  return Pack{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_LOAD_H_
+#endif  // SIMD_PACK_DETAIL_BLEND_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1117,21 +1272,65 @@ pack<T, W> not_(const pack<T, W>& x) {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_BLEND_H_
-#define SIMD_PACK_DETAIL_BLEND_H_
+#ifndef SIMD_PACK_DETAIL_COMPRESS_H_
+#define SIMD_PACK_DETAIL_COMPRESS_H_
+
+#include <utility>
 
 
 namespace simd {
+namespace _compress {
 
 template <typename T, std::size_t W>
-pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
-                 const vbool_t<pack<T, W>>& mask) {
-  return pack<T, W>{mm::blendv<std::uint8_t>(x.reg, y.reg, mask.reg)};
+std::pair<pack<T, W / 2>, pack<T, W / 2>> split(const pack<T, W>& x) {
+  return {{_mm256_extracti128_si256(x.reg, 0)},
+          {_mm256_extracti128_si256(x.reg, 1)}};
+}
+
+template <typename T, typename Register>
+inline Register blend_mask_from_shuffle(const Register& mask) {
+  static constexpr std::size_t fits_count =
+      mm::bit_width<Register>() / (8 * sizeof(T));
+  using prepared_array = std::array<unsigned_equivalent<T>, fits_count>;
+
+  // Not a load, get's optimized.
+  alignas(Register) static constexpr prepared_array first_one_arr = {1};
+  const auto first_one =
+      mm::load(reinterpret_cast<const Register*>(first_one_arr.data()));
+
+  const auto add_one_to_first = mm::add<std::int8_t>(mask, first_one);
+  const auto zero = mm::setzero<Register>();
+
+  return mm::cmpgt<std::int8_t>(add_one_to_first, zero);
+}
+
+}  // namespace _compress
+
+template <typename T, std::size_t W>
+T* compress_store_unaligned(T* out, const pack<T, W>& x, std::uint32_t mmask) {
+  using reg_t = register_t<pack<T, W>>;
+
+  if constexpr (mm::bit_width<reg_t>() == 256) {
+    auto [top, bottom] = _compress::split(x);
+
+    out = compress_store_unaligned(out, top, mmask & 0xffff);
+    return compress_store_unaligned(out, bottom, mmask >> 16);
+  } else {
+    auto [mask, offset] = compress_mask<reg_t>(mmask);
+
+    if (!offset) return out;
+
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
+    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask);
+
+    mm::maskmoveu(reinterpret_cast<reg_t*>(out), shuffled, store_mask);
+    return reinterpret_cast<T*>(reinterpret_cast<std::int8_t*>(out) + offset);
+  }
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_BLEND_H_
+#endif  // SIMD_PACK_DETAIL_COMPRESS_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1207,7 +1406,7 @@ std::uint32_t movemask(const pack<std::uint8_t, W>& x) {
 
 }  // namespace _comparisons
 
-template <typename T, size_t W>
+template <typename T, std::size_t W>
 bool equal_full(const pack<T, W>& x, const pack<T, W>& y) {
   // For equality (for integers) we are OK to use bitwise equality.
   // We could also use memcmp, on clang that produced ~the same code.
@@ -1369,9 +1568,19 @@ std::ostream& operator<<(std::ostream& out, const pack<T, W>& x) {
   alignas(pack<T, W>) std::array<scalar, W> stored;
   store(stored.data(), x);
 
-  out << '[' << stored[0];
+  auto print_t = [&](T elem) {
+    if constexpr(std::is_same_v<T, char> || std::is_same_v<T, unsigned char>) {
+      out << '(' << int(elem) << ')';
+    } else {
+      out << elem;
+    }
+  };
+
+  out << '[';
+  print_t(stored[0]);
   for (std::size_t i = 1; i != W; ++i) {
-    out << ", " << stored[i];
+    out << ", ";
+    print_t(stored[i]);
   }
   out << ']';
 
@@ -1399,6 +1608,7 @@ std::ostream& operator<<(std::ostream& out, const pack<T, W>& x) {
 
 #ifndef SIMD_PACK_H_
 #define SIMD_PACK_H_
+
 
 
 

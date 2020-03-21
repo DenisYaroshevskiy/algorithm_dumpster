@@ -668,6 +668,7 @@ python script to generate mm.h
 `previous_aligned_address<Pack>(addr)`<br/>
 
 `compress_mask` <br/>
+`compress_store_unaligned(T*, pack, mmask) -> T*` <br/>
 
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
@@ -718,6 +719,18 @@ I need to figure out what do I do with code like that - probably mm should becom
 stand alone folder and this should go there. It's not really a part of the pack interface.
 
 _TODO_: there are various tradeoffs for using lookup tables vs computation, I need to measure those after implementing remove_if.
+
+_TODO_: can probably do better, using a supplied type.
+
+`compress`
+
+_TODO_
+
+`compress_store_unaligned`
+
+Same semantics as `*compressstore*` from AVX-512 emulated in AVX2. <br/>
+Only really makes sence when there is no option to write whole register. <br/>
+Otherwise, `compress` + necessary store is cheaper.
 
 ## Test
 

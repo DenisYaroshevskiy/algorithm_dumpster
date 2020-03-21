@@ -38,5 +38,6 @@
 #include "simd/pack_detail/vbool_tests.h"
 
 #include "simd/pack_detail/compress_mask.h"
+#include "simd/pack_detail/compress.h"
 
 #endif  // SIMD_PACK_H_
