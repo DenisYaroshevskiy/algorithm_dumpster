@@ -615,9 +615,8 @@ TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
-TEMPLATE_TEST_CASE("simd.pack.compress_mask", "[simd]",
-                   (pack<std::uint8_t, 16>), (pack<std::uint8_t, 32>)) {
-  using pack_t = TestType;
+TEST_CASE("simd.pack.compress_mask", "[simd]") {
+  using pack_t = pack<std::uint8_t, 16>;
   using scalar = scalar_t<pack_t>;
   constexpr size_t size = size_v<pack_t>;
 
@@ -627,8 +626,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask", "[simd]",
     pack_t loaded_a = load<pack_t>(a.data());
     pack_t loaded_b = load<pack_t>(b.data());
     auto eq = equal_pairwise(loaded_a, loaded_b);
-    auto compressed =
-        compress_mask<register_t<pack_t>>(mm::movemask<std::uint8_t>(eq.reg));
+    auto compressed = compress_mask(mm::movemask<std::uint8_t>(eq.reg));
 
     store(actual.data(), pack_t{compressed.first});
 
@@ -725,49 +723,6 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask", "[simd]",
     }
     REQUIRE(test_for_rest_is_zeros(16));
   }
-
-  SECTION("all 4 8s") {
-    if (size < 32) return;
-
-    b[16] = 1;
-    REQUIRE(1 == run());
-    REQUIRE(16 == actual[0]);
-    REQUIRE(test_for_rest_is_zeros(1));
-
-    b.fill(2);
-    b[24] = 1;
-    REQUIRE(1 == run());
-    REQUIRE(24 == actual[0]);
-    REQUIRE(test_for_rest_is_zeros(1));
-
-    b.fill(2);
-    b[1] = 1;
-    b[2] = 1;
-    b[3] = 1;
-    b[4] = 1;
-    b[9] = 1;
-    b[10] = 1;
-    b[11] = 1;
-    b[17] = 1;
-    b[18] = 1;
-    b[25] = 1;
-    REQUIRE(10 == run());
-    REQUIRE(std::array<scalar, size>{1, 2, 3, 4, 9, 10, 11, 17, 18, 25} ==
-            actual);
-
-    b.fill(2);
-    b[23] = 1;
-    b[24] = 1;
-    REQUIRE(2 == run());
-    REQUIRE(std::array<scalar, size>{23, 24} == actual);
-
-    b.fill(1);
-    REQUIRE(32 == run());
-    for (std::uint8_t i = 0; i < 32; ++i) {
-      REQUIRE(i == actual[i]);
-    }
-    REQUIRE(test_for_rest_is_zeros(32));
-  }
 }
 
 TEST_CASE("simd.pack.understanding_shuffle", "[simd]") {
@@ -803,7 +758,70 @@ TEST_CASE("simd.pack.understanding_shuffle", "[simd]") {
   REQUIRE(b == run());
 }
 
-TEMPLATE_TEST_CASE("simd.pack.compress_store", "[simd]", ALL_TEST_PACKS) {
+TEMPLATE_TEST_CASE("simd.pack.compress_store_unsafe", "[simd]",
+                   ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using vbool = vbool_t<pack_t>;
+  using scalar = scalar_t<pack_t>;
+  using bool_t = scalar_t<vbool>;
+
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> input, expected, actual;
+  alignas(vbool) std::array<bool_t, size> mask;
+
+  for (std::size_t i = 0; i != input.size(); ++i) {
+    input[i] = (scalar)i;
+  }
+
+  auto run = [&]() mutable {
+    const vbool loaded_mask = load<vbool>(mask.data());
+    const auto mmask = mm::movemask<std::uint8_t>(
+        greater_pairwise(loaded_mask, set_zero<vbool>()).reg);
+
+    const int non_zero_count = size - std::count(mask.begin(), mask.end(), 0);
+
+    actual.fill((scalar)-1);
+    const pack_t loaded_input = load<pack_t>(input.data());
+
+    auto* res = compress_store_masked(actual.data(), loaded_input, mmask);
+    REQUIRE(non_zero_count == res - actual.data());
+    return res;
+  };
+
+  SECTION("Up to first 4 even elements") {
+    std::size_t even_end = std::min(size, 8ul);
+
+    mask.fill(0);
+    expected.fill((scalar)-1);
+
+    for (std::size_t i = 0; i != even_end; i += 2) {
+      mask[i] = 1;
+      expected[i / 2] = (scalar)i;
+    }
+
+    run();
+    REQUIRE(expected == actual);
+  }
+
+  SECTION("Max first element") {
+    scalar buggy_value =
+        (scalar)std::numeric_limits<unsigned_equivalent<scalar>>::max() - 5;
+    input[0] = buggy_value;
+
+    expected.fill((scalar)-1);
+    expected[0] = buggy_value;
+
+    mask.fill(0);
+    mask[0] = 1;
+
+    run();
+    REQUIRE(expected == actual);
+  }
+}
+
+TEMPLATE_TEST_CASE("simd.pack.compress_store_masked", "[simd]",
+                   ALL_TEST_PACKS) {
   using pack_t = TestType;
   using vbool = vbool_t<pack_t>;
   using scalar = scalar_t<pack_t>;
@@ -829,7 +847,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store", "[simd]", ALL_TEST_PACKS) {
     const pack_t loaded_input = load<pack_t>(input.data());
 
     auto* res =
-        compress_store_unaligned(actual.data() + offset, loaded_input, mmask);
+        compress_store_masked(actual.data() + offset, loaded_input, mmask);
     REQUIRE(non_zero_count == res - actual.data() - static_cast<int>(offset));
     return res;
   };
@@ -867,7 +885,8 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store", "[simd]", ALL_TEST_PACKS) {
   }
 
   SECTION("Max first element") {
-    scalar buggy_value = (scalar)std::numeric_limits<unsigned_equivalent<scalar>>::max() - 5;
+    scalar buggy_value =
+        (scalar)std::numeric_limits<unsigned_equivalent<scalar>>::max() - 5;
     input[0] = buggy_value;
 
     expected.fill((scalar)-1);

@@ -53,18 +53,41 @@ inline Register blend_mask_from_shuffle(const Register& mask) {
 }  // namespace _compress
 
 template <typename T, std::size_t W>
-T* compress_store_unaligned(T* out, const pack<T, W>& x, std::uint32_t mmask) {
+T* compress_store_unsafe(T* out, const pack<T, W>& x, std::uint32_t mmask) {
   using reg_t = register_t<pack<T, W>>;
 
   if constexpr (mm::bit_width<reg_t>() == 256) {
     auto [top, bottom] = _compress::split(x);
 
-    out = compress_store_unaligned(out, top, mmask & 0xffff);
-    return compress_store_unaligned(out, bottom, mmask >> 16);
+    out = compress_store_unsafe(out, top, mmask & 0xffff);
+    return compress_store_unsafe(out, bottom, mmask >> 16);
   } else {
-    auto [mask, offset] = compress_mask<reg_t>(mmask);
+    auto [mask, offset] = compress_mask(mmask);
 
-    if (!offset) return out;
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
+    mm::store(reinterpret_cast<reg_t*>(out), shuffled);
+
+    return reinterpret_cast<T*>(reinterpret_cast<std::int8_t*>(out) + offset);
+  }
+}
+
+// Copy pasting because of different checks for mmask != 0
+
+template <typename T, std::size_t W>
+T* compress_store_masked(T* out, const pack<T, W>& x, std::uint32_t mmask) {
+  using reg_t = register_t<pack<T, W>>;
+
+  if constexpr (mm::bit_width<reg_t>() == 256) {
+    auto [top, bottom] = _compress::split(x);
+
+    out = compress_store_masked(out, top, mmask & 0xffff);
+    return compress_store_masked(out, bottom, mmask >> 16);
+  } else {
+    // We have to do this check, since we can't in the end distinguish between
+    // just taking the first element and not taking any elements.
+    if (!mmask) return out;
+
+    auto [mask, offset] = compress_mask(mmask);
 
     const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
     const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask);

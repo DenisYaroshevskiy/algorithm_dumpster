@@ -668,7 +668,8 @@ python script to generate mm.h
 `previous_aligned_address<Pack>(addr)`<br/>
 
 `compress_mask` <br/>
-`compress_store_unaligned(T*, pack, mmask) -> T*` <br/>
+`compress_store_unsafe(T*, pack, mmask) -> T*` <br/>
+`compress_store_maskedT*, pack, mmask) -> T*` <br/>
 
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
@@ -722,15 +723,11 @@ _TODO_: there are various tradeoffs for using lookup tables vs computation, I ne
 
 _TODO_: can probably do better, using a supplied type.
 
-`compress`
-
-_TODO_
-
-`compress_store_unaligned`
+`compress_store_unsafe/compress_store_masked`
 
 Same semantics as `*compressstore*` from AVX-512 emulated in AVX2. <br/>
-Only really makes sence when there is no option to write whole register. <br/>
-Otherwise, `compress` + necessary store is cheaper.
+`compress_store_masked` is one for one the same semantics, <br/>
+`compress_store_unsafe` relies on the ability to write the whole register => will override whatever is there for at most the length of the register.
 
 ## Test
 
