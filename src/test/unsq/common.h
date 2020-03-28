@@ -1,0 +1,4 @@
+#ifndef TEST_UNSQ_COMMON_H_
+#define TEST_UNSQ_COMMON_H_
+
+#endif  // TEST_UNSQ_COMMON_H_

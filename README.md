@@ -1,6 +1,17 @@
 This is where I'm going to store all of the little bits of code
 that I do for personal projects.
 
+There are the following libraries-ish.
+* algo - stl like algorithms, data-structrures
+* bench_generic/bench_runnable - benchmarking utils/just benchmarks
+* compiler - I only really use clang, but I chose to hide some extensions
+             behind macros.
+* simd - very minimalistic simd wrapper library. Only works for AVX2.
+* unsq - implementing some stl like algorithms with std::execution::unseq
+         could've been done (for AVX2).
+
+Every diretory has a secion in this README.
+
 ## License and usage
 
 Everything is under Apache-2 - as far as I understand it:
@@ -759,6 +770,24 @@ tag to indicate the origin.<br/>
 ### zeroed_int
 
 A struct with one int, that zeroes out on a move.
+
+## Unsq
+
+SIMD implementation of some of the stl like algorithms, using AVX2 extensions.
+For now only support integer types and only types that can directly represented
+in the simd register. And pointers, pointers should work as well. But generally:
+int/8/16/32/64, uint/8/16/32/64.
+
+Uses simd library to actually do pack operations.
+
+### remove
+
+`remove`,<br/>
+`remove_if`
+
+(very first prototype)
+
+_TODO_ descriptions.
 
 ## Scripts
 
