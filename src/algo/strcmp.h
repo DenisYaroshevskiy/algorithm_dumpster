@@ -45,7 +45,7 @@ bool strmismatch_middle_of_the_page(std::ptrdiff_t n, const char** px,
     const vbool x_neq_y = ~simd::equal_pairwise(chars_x, chars_y);
     const vbool test = end_test | x_neq_y;
 
-    std::optional stop_at = first_true(test);
+    std::optional stop_at = simd::first_true(simd::get_top_bits(test));
     if (!stop_at) {
       x += width;
       y += width;
@@ -121,8 +121,10 @@ std::pair<const char*, const char*> strmismatch(const char* x, const char* y) {
     const vbool x_neq_y = ~simd::equal_pairwise(chars_x, chars_y);
     const vbool test = end_test | x_neq_y;
 
-    const std::optional stop_at =
-        simd::first_true_ignore_first_n(test, ignore_first...);
+    auto mmask = simd::get_top_bits(test);
+    mmask = simd::ignore_first_n(mmask, ignore_first...);
+
+    const std::optional stop_at = simd::first_true(mmask);
 
     x += stop_at.value_or(width);
     y += stop_at.value_or(width);

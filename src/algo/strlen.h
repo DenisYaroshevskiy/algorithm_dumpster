@@ -34,16 +34,19 @@ std::size_t strlen(const char* s) {
   const std::uint32_t offset = static_cast<std::uint32_t>(s - aligned_s);
 
   vbool test = simd::equal_pairwise(chars, zeros);
-  std::optional match = simd::first_true_ignore_first_n(test, offset);
+  simd::top_bits<vbool> mmask =
+      simd::ignore_first_n(simd::get_top_bits(test), offset);
 
-  while (!match) {
+  while (true) {
+    if (const std::optional match = simd::first_true(mmask)) {
+      return static_cast<size_t>(aligned_s + *match - s);
+    }
+
     aligned_s += width;
     chars = simd::load<pack>(aligned_s);
     test = simd::equal_pairwise(chars, zeros);
-    match = simd::first_true(test);
+    mmask = simd::get_top_bits(test);
   }
-
-  return static_cast<size_t>(aligned_s + *match - s);
 }
 
 }  // namespace algo

@@ -227,59 +227,150 @@ TEMPLATE_TEST_CASE("simd.pack.comparisons_pairwise", "[simd]", ALL_TEST_PACKS) {
     expected[1] = true_;
     run();
   }
+}
 
-  SECTION("vbool_tests") {
-    vbool mask;
-    auto eq = [&]() mutable {
-      auto x = load<pack_t>(a.data());
-      auto y = load<pack_t>(b.data());
+TEMPLATE_TEST_CASE("simd.pack.top_bits", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+  using uscalar = unsigned_equivalent<scalar>;
 
-      mask = equal_pairwise(x, y);
+  const scalar zero = (scalar)0;
+  const scalar FF = (scalar)all_ones<uscalar>();
+
+  alignas(pack_t) std::array<scalar, size> a, b;
+
+  auto run = [&] {
+    pack_t loaded = load<pack_t>(a.data());
+    return get_top_bits(loaded);
+  };
+
+  auto run_b = [&] {
+    pack_t loaded = load<pack_t>(b.data());
+    return get_top_bits(loaded);
+  };
+
+  SECTION("get top bits/ignore") {
+    a.fill(zero);
+    REQUIRE(0 == run().raw);
+
+    a.fill(FF);
+    REQUIRE(set_lower_n_bits(sizeof(pack_t)) == run().raw);
+
+    a.fill(zero);
+    a[0] = FF;
+
+    REQUIRE(set_lower_n_bits(sizeof(scalar)) == run().raw);
+  }
+
+  SECTION("ignore first n") {
+    a.fill(zero);
+    a[0] = FF;
+
+    auto run_and_ignore_first = [&](auto... n) {
+      auto option1 = ignore_first_n(run(), n...);
+      auto option2 = (ignore_first_n_mask<pack_t>(n...) & run());
+      REQUIRE(option1 == option2);
+      return option1;
     };
-    eq();
 
-    REQUIRE_FALSE(all_true(mask));
-    REQUIRE_FALSE(any_true(mask));
-    REQUIRE_FALSE(first_true(mask));
-    REQUIRE_FALSE(any_true_ignore_first_n(mask, 0));
-    REQUIRE_FALSE(first_true_ignore_first_n(mask, 0));
-    REQUIRE_FALSE(any_true_ignore_first_n(mask, 1));
-    REQUIRE_FALSE(first_true_ignore_first_n(mask, 1));
+    REQUIRE(set_lower_n_bits(sizeof(scalar)) == run_and_ignore_first().raw);
+    REQUIRE(0 == run_and_ignore_first(1).raw);
 
-    b = a;
-    eq();
+    a.fill(FF);
+    b.fill(FF);
 
-    REQUIRE(all_true(mask));
-    REQUIRE(any_true(mask));
-    REQUIRE(first_true(mask) == 0u);
-    REQUIRE(any_true_ignore_first_n(mask, 0));
-    REQUIRE(first_true_ignore_first_n(mask, 0) == 0u);
-    REQUIRE(any_true_ignore_first_n(mask, 1));
-    REQUIRE(first_true_ignore_first_n(mask, 1) == 1u);
+    for (std::size_t i = 0; i < size; ++i) {
+      REQUIRE(run_b().raw == run_and_ignore_first(i).raw);
+      b[i] = zero;
+    }
 
-    b[0] = big_v;
-    eq();
+    REQUIRE(run_b().raw == run_and_ignore_first(size).raw);
+  }
 
-    REQUIRE_FALSE(all_true(mask));
-    REQUIRE(any_true(mask));
-    REQUIRE(first_true(mask) == 1u);
-    REQUIRE(any_true_ignore_first_n(mask, 0));
-    REQUIRE(first_true_ignore_first_n(mask, 0) == 1u);
-    REQUIRE(any_true_ignore_first_n(mask, 1));
-    REQUIRE(first_true_ignore_first_n(mask, 1) == 1u);
+  SECTION("ignore last n") {
+    a.fill(zero);
+    a[size - 1] = FF;
 
-    a.fill(small_v);
-    b.fill(big_v);
-    b[0] = small_v;
-    eq();
+    auto run_and_ignore_last = [&](auto... n) {
+      auto option1 = ignore_last_n(run(), n...);
+      auto option2 = (ignore_last_n_mask<pack_t>(n...) & run());
+      REQUIRE(option1 == option2);
+      return option1;
+    };
 
-    REQUIRE_FALSE(all_true(mask));
-    REQUIRE(any_true(mask));
-    REQUIRE(*first_true(mask) == 0u);
-    REQUIRE(any_true_ignore_first_n(mask, 0));
-    REQUIRE(first_true_ignore_first_n(mask, 0) == 0u);
-    REQUIRE_FALSE(any_true_ignore_first_n(mask, 1));
-    REQUIRE_FALSE(first_true_ignore_first_n(mask, 1));
+    REQUIRE(0 == run_and_ignore_last(1).raw);
+
+    a.fill(FF);
+    b.fill(FF);
+
+    REQUIRE(run_b().raw == run_and_ignore_last().raw);
+
+    for (std::size_t i = size; i > 0; --i) {
+      REQUIRE(run_b().raw == run_and_ignore_last(size - i).raw);
+      b[i - 1] = zero;
+    }
+
+    REQUIRE(run_b().raw == run_and_ignore_last(size).raw);
+  }
+
+  SECTION("first true/all_true") {
+    a.fill(zero);
+    REQUIRE(std::nullopt == first_true(run()));
+
+    for (std::uint32_t i = size; i; --i) {
+      REQUIRE_FALSE(all_true(run()));
+      a[i - 1] = FF;
+      REQUIRE(i - 1 == first_true(run()));
+    }
+
+    REQUIRE(all_true(run()));
+  }
+
+  SECTION("operators") {
+    using tb = top_bits<pack_t>;
+    const tb x{3}, y{5};
+
+    {
+      tb expected{3u & 5u};
+
+      auto tmp = x;
+      tmp &= y;
+      REQUIRE(tmp == expected);
+      REQUIRE((x & y) == expected);
+    }
+
+    {
+      tb expected{3u | 5u};
+
+      auto tmp = x;
+      tmp |= y;
+      REQUIRE(tmp == expected);
+      REQUIRE((x | y) == expected);
+    }
+
+    {
+      tb expected{~3u};
+
+      REQUIRE(~x == expected);
+    }
+
+    {
+      REQUIRE(x == x);
+      REQUIRE(x != y);
+
+      REQUIRE_FALSE(x < x);
+      REQUIRE(x < y);
+
+      REQUIRE(x <= x);
+      REQUIRE(x <= y);
+
+      REQUIRE(y > x);
+      REQUIRE_FALSE(y > y);
+
+      REQUIRE(y >= y);
+      REQUIRE(y >= x);
+    }
   }
 }
 
@@ -767,7 +858,9 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_unsafe", "[simd]",
 
   constexpr size_t size = size_v<pack_t>;
 
-  alignas(pack_t) std::array<scalar, size> input, expected, actual;
+  std::array<scalar, size> actual, expected;
+
+  alignas(pack_t) std::array<scalar, size> input;
   alignas(vbool) std::array<bool_t, size> mask;
 
   for (std::size_t i = 0; i != input.size(); ++i) {
@@ -776,16 +869,21 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_unsafe", "[simd]",
 
   auto run = [&]() mutable {
     const vbool loaded_mask = load<vbool>(mask.data());
-    const auto mmask = mm::movemask<std::uint8_t>(
-        greater_pairwise(loaded_mask, set_zero<vbool>()).reg);
+    const auto mmask = get_top_bits(
+        greater_pairwise(loaded_mask, set_zero<vbool>()));
 
     const int non_zero_count = size - std::count(mask.begin(), mask.end(), 0);
 
-    actual.fill((scalar)-1);
+    actual.fill(0);
     const pack_t loaded_input = load<pack_t>(input.data());
 
-    auto* res = compress_store_masked(actual.data(), loaded_input, mmask);
+    auto* res = compress_store_unsafe(actual.data(), loaded_input, mmask);
     REQUIRE(non_zero_count == res - actual.data());
+
+    // No guaranties for elements after.
+    std::copy(actual.begin() + non_zero_count, actual.end(),
+              expected.begin() + non_zero_count);
+
     return res;
   };
 
@@ -793,7 +891,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_unsafe", "[simd]",
     std::size_t even_end = std::min(size, 8ul);
 
     mask.fill(0);
-    expected.fill((scalar)-1);
+    expected.fill(0);
 
     for (std::size_t i = 0; i != even_end; i += 2) {
       mask[i] = 1;
@@ -801,6 +899,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_unsafe", "[simd]",
     }
 
     run();
+
     REQUIRE(expected == actual);
   }
 
@@ -809,7 +908,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_unsafe", "[simd]",
         (scalar)std::numeric_limits<unsigned_equivalent<scalar>>::max() - 5;
     input[0] = buggy_value;
 
-    expected.fill((scalar)-1);
+    expected.fill(0);
     expected[0] = buggy_value;
 
     mask.fill(0);
@@ -838,8 +937,8 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_masked", "[simd]",
 
   auto run = [&](std::size_t offset = 0) mutable {
     const vbool loaded_mask = load<vbool>(mask.data());
-    const auto mmask = mm::movemask<std::uint8_t>(
-        greater_pairwise(loaded_mask, set_zero<vbool>()).reg);
+    const auto mmask = get_top_bits(
+        greater_pairwise(loaded_mask, set_zero<vbool>()));
 
     const int non_zero_count = size - std::count(mask.begin(), mask.end(), 0);
 

@@ -669,11 +669,13 @@ python script to generate mm.h
 `not_` <br/>
 `operator&|^~`
 
-`all_true`<br/>
-`any_true`<br/>
-`any_true_ignore_first_n`<br/>
+`top_bits` <br/>
+`get_top_bits` <br/>
+`ignore_first_n` <br/>
+`ignore_last_n` <br/>
 `first_true` <br/>
-`first_true_ignore_first_n`<br/>
+`all_true` <br/>
+`all_true`<br/>
 
 `end_of_page(addr)` <br/>
 `previous_aligned_address<Pack>(addr)`<br/>
@@ -707,7 +709,6 @@ We can read till `end_of_page` and we always OK to read from `previous_aligned_a
 Based on the idea from `strlen`, see more here: https://stackoverflow.com/questions/25566302/vectorized-strlen-getting-away-with-reading-unallocated-memory<br/>
 Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strlen.s.auto.html<br/>
 
-
 `blend(pack, pack, vbool)`
 
 Same as intel, if true take second.
@@ -739,6 +740,13 @@ _TODO_: can probably do better, using a supplied type.
 Same semantics as `*compressstore*` from AVX-512 emulated in AVX2. <br/>
 `compress_store_masked` is one for one the same semantics, <br/>
 `compress_store_unsafe` relies on the ability to write the whole register => will override whatever is there for at most the length of the register.
+
+`top_bits`
+
+top bits is an abstruction over the result of movemask (get_top_bits in this library).
+In many respects alternative to vbool, that is useful in cases where vbool isn't. <br/>
+Potential usecase: when looking for element via simd - use `first_true(top_bits)` to find at what position. <br/>
+One useful design decision: ignore_*_ functions have overload that doesn't take a parameter of how much to ignore, which allows usage in a templte context.
 
 ## Test
 

@@ -23,27 +23,21 @@
 namespace unsq {
 namespace _remove {
 
-template <typename T, std::size_t W>
-std::uint32_t movemask(const simd::pack<T, W>& x) {
-  return static_cast<std::uint32_t>(mm::movemask<std::uint8_t>(x.reg));
-}
-
 // Figure out a safe load. (| - page boundary)
 // [f  |  l]  => Ok from f, Ok from l - width
 // [|f  l] => Ok from f, Not Ok from l - width
 // [f, l|] => Not ok from f, Ok from l - width
-template <std::size_t width, typename T>
-std::pair<T*, std::uint32_t> figure_out_safe_load(T* f, T* l) {
+template <typename Pack, typename T>
+std::pair<T*, simd::top_bits<simd::vbool_t<Pack>>> figure_out_safe_load(T* f, T* l) {
+  using vbool = simd::vbool_t<Pack>;
   T* page_boundary = simd::end_of_page(f);
 
   if (page_boundary - f) {
-    T* safe = l - width;
-    std::uint32_t mmask_filter = ~simd::set_lower_n_bits((f - safe) * sizeof(T));
-    return {safe, mmask_filter};
+    T* safe = l - simd::size_v<Pack>;
+    return {safe, simd::ignore_first_n_mask<vbool>(f - safe)};
   }
 
-  std::uint32_t mmask_filter = simd::set_lower_n_bits((l - f) * sizeof(T));
-  return {f, mmask_filter};
+  return {f, simd::ignore_last_n_mask<vbool>(l - f)};
 }
 
 }  // namespace _remove
@@ -64,21 +58,21 @@ I remove_if(I _f, I _l, PV p) {
 
   auto get_mmask = [&](const pack& ts) {
     const vbool test = p(ts);
-    return ~_remove::movemask(test); // p marks trues to remove
+    return ~get_top_bits(test); // p marks trues to remove
   };
 
   while ((l - f) >= static_cast<std::ptrdiff_t>(width))
   {
     const pack ts = simd::load_unaligned<pack>(f);
-    const std::uint32_t mmask = get_mmask(ts);
+    const auto mmask = get_mmask(ts);
     o = simd::compress_store_unsafe(o, ts, mmask);
     f += width;
   }
 
-  auto [safe, mmask_filter] = _remove::figure_out_safe_load<width>(f, l);
+  auto [safe, mmask_filter] = _remove::figure_out_safe_load<pack>(f, l);
 
   const pack ts = simd::load_unaligned<pack>(safe);
-  std::uint32_t mmask = get_mmask(ts);
+  auto mmask = get_mmask(ts);
   mmask &= mmask_filter;
 
   o = simd::compress_store_masked(o, ts, mmask);
