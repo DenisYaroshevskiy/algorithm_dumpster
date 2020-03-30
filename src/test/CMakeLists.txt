@@ -50,6 +50,7 @@ target_sources(tests PRIVATE
                simd/mm.t.cc
                simd/pack.t.cc
                unsq/remove.t.cc
+               unsq/unsq.t.cc
                catch_main.cc)
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -Og -g

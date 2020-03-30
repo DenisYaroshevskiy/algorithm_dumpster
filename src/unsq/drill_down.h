@@ -17,6 +17,7 @@
 #ifndef UNSQ_DRILL_DOWN_H_
 #define UNSQ_DRILL_DOWN_H_
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -70,13 +71,17 @@ constexpr auto equivalent() {
 
 }  // namespace _drill_down
 
+template <typename I>
+using ValueType = typename std::iterator_traits<I>::value_type;
+
+
 template <typename T>
 using equivalent = typename decltype(_drill_down::equivalent<T>())::type;
 
 template <typename I>
 // require ContigiousIterator<I>
 auto drill_down_range(I _f, I _l) {
-  using T = equivalent<typename I::value_type>;
+  using T = equivalent<ValueType<I>>;
 
   T* f = reinterpret_cast<T*>(&*_f);
   T* l = f + (_l - _f);
@@ -86,7 +91,7 @@ auto drill_down_range(I _f, I _l) {
 
 template <typename I>
 auto* drill_down(I _it) {
-  using T = equivalent<typename I::value_type>;
+  using T = equivalent<ValueType<I>>;
   return reinterpret_cast<T*>(&*_it);
 }
 

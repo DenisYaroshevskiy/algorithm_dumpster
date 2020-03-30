@@ -45,7 +45,7 @@ std::pair<T*, simd::top_bits<simd::vbool_t<Pack>>> figure_out_safe_load(T* f, T*
 template <std::size_t width, typename I, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, equivalent<ValueType<I>>
 I remove_if(I _f, I _l, PV p) {
-  using T = equivalent<typename I::value_type>;
+  using T = equivalent<ValueType<I>>;
   auto [f, l] = unsq::drill_down_range(_f, _l);
   T* o = f;
 
@@ -81,7 +81,7 @@ I remove_if(I _f, I _l, PV p) {
 
 template <std::size_t width, typename I, typename T>
 I remove(I f, I l, const T& x) {
-  using U = equivalent<typename I::value_type>;
+  using U = equivalent<ValueType<I>>;
   using pack = simd::pack<U, width>;
 
   auto xs = simd::set_all<pack>((U)x);

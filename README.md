@@ -788,14 +788,28 @@ int/8/16/32/64, uint/8/16/32/64.
 
 Uses simd library to actually do pack operations.
 
+### concepts
+
+_TODO_
+
 ### remove
 
 `remove`,<br/>
 `remove_if`
 
-(very first prototype)
+Implementation of std::remove/std::remove_if.<br/>
+Using bigger register to do simd operations might be questionable,<br/>
+since the main operation is compress (before measurements guess) and<br/>
+it actually splits the stored register in 2, though might make sense for<br/>
+expensive predicate or if I get around to implementing compress, where possible<br/>
+more efficiently for bigger types.
 
-_TODO_ descriptions.
+There is a tradeoff between doing unaligned loads and aligned loads but with<br/>
+one more compress, I don't know yet where it is.
+
+Another trade off is to first do find (for the first true) and only then<br/>
+do stores. In an std::remove this is a requirement since self-move assignment,
+however for a simd one it's not, so, at least for now, I don't do the first find.
 
 ## Scripts
 
