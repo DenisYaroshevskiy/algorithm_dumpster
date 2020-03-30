@@ -1,0 +1,292 @@
+{
+  "context": {
+    "date": "2020-03-31 00:13:18",
+    "host_name": "dyarosh-u",
+    "executable": "build/src/bench_runnable/remove_0_int_1000/unsq_remove_16",
+    "num_cpus": 8,
+    "mhz_per_cpu": 4900,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 262144,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 12582912,
+        "num_sharing": 8
+      }
+    ],
+    "load_avg": [0.99,0.61,0.5],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/0",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/0",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 967038,
+      "real_time": 7.2232927454770629e+02,
+      "cpu_time": 7.2234256151257762e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/5",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/5",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 971336,
+      "real_time": 7.2180426855380892e+02,
+      "cpu_time": 7.2181606364841809e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/10",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/10",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 967983,
+      "real_time": 7.2252159077157398e+02,
+      "cpu_time": 7.2253434822719021e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/15",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/15",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 969547,
+      "real_time": 7.2391617322325089e+02,
+      "cpu_time": 7.2392921642787803e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/20",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/20",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 948652,
+      "real_time": 7.3917523496465355e+02,
+      "cpu_time": 7.3918774218575413e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/25",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/25",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 970194,
+      "real_time": 7.2289000138106826e+02,
+      "cpu_time": 7.2289978396073388e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/30",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/30",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 951336,
+      "real_time": 7.3704847183316315e+02,
+      "cpu_time": 7.3706036247971292e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/35",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/35",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 952212,
+      "real_time": 7.4304637412716659e+02,
+      "cpu_time": 7.4305993833305968e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/40",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/40",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 967765,
+      "real_time": 7.2394980496268352e+02,
+      "cpu_time": 7.2396070946975772e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/45",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/45",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 947944,
+      "real_time": 7.4003355261502077e+02,
+      "cpu_time": 7.4004893432523465e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/50",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/50",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 969044,
+      "real_time": 7.2300121356739078e+02,
+      "cpu_time": 7.2301252574702482e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/55",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/55",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 968218,
+      "real_time": 7.2403351931062798e+02,
+      "cpu_time": 7.2404400145421812e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/60",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/60",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 949493,
+      "real_time": 7.3721243231923825e+02,
+      "cpu_time": 7.3722576996354860e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/65",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/65",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 901800,
+      "real_time": 7.7712937125703911e+02,
+      "cpu_time": 7.7713930139720514e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/70",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/70",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 969054,
+      "real_time": 7.2330722126900139e+02,
+      "cpu_time": 7.2332189743812080e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/75",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/75",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 953419,
+      "real_time": 7.3421385351041022e+02,
+      "cpu_time": 7.3422609157149168e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/80",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/80",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 901503,
+      "real_time": 7.7717613807174655e+02,
+      "cpu_time": 7.7718535157398378e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/85",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/85",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 968557,
+      "real_time": 7.2280193731514430e+02,
+      "cpu_time": 7.2281323350097080e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/90",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/90",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 901529,
+      "real_time": 7.7720287866535625e+02,
+      "cpu_time": 7.7721534415420967e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/95",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/95",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 973921,
+      "real_time": 7.1945136823178427e+02,
+      "cpu_time": 7.1946408178897570e+02,
+      "time_unit": "ns"
+    },
+    {
+      "name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/100",
+      "run_name": "remove_0<SELECTED_ALGORITHM, SELECTED_TYPE>/1000/100",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 946985,
+      "real_time": 7.3991447066214903e+02,
+      "cpu_time": 7.3992672745608422e+02,
+      "time_unit": "ns"
+    }
+  ]
+}

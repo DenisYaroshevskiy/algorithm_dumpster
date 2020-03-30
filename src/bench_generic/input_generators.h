@@ -265,6 +265,24 @@ auto shuffled_positions(std::vector<T>& data, size_t size, int percentage) {
   return positions;
 }
 
+template <typename T>
+auto vector_with_zeroes(std::size_t size, int percentage) {
+  static auto gen = algo::memoized_function<std::pair<std::size_t, int>>(
+    [](std::pair<std::size_t, int> param) {
+      auto [size, percentage] = param;
+
+      std::vector<T> res = detail::generate_random_vector<T>(size, detail::uniform_src(size));
+
+      int zero_count = static_cast<int>(size) * percentage / 100;
+      std::fill(res.begin(), res.begin() + zero_count, 0);
+      std::shuffle(res.begin(), res.end(), detail::static_generator());
+
+      return res;
+  });
+
+  return gen({size, percentage});
+}
+
 }  // namespace bench
 
 #endif  // BENCH_GENERIC_INPUT_GENERATORS_H

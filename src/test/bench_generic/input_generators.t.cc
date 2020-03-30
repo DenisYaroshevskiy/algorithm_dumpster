@@ -173,6 +173,27 @@ TEST_CASE("bench.input_generators.shuffled_vector", "[bench]") {
   }
 }
 
+TEST_CASE("bench.input_generators.vector_with_zeros", "[bench]") {
+  auto run = [](int percentage) {
+    return vector_with_zeroes<int>(100, percentage);
+  };
+
+  {
+    auto test = run(0);
+    REQUIRE(0 == std::count(test.begin(), test.end(), 0));
+  }
+
+  {
+    auto test = run(50);
+    REQUIRE(50 == std::count(test.begin(), test.end(), 0));
+  }
+
+  {
+    auto test = run(100);
+    REQUIRE(100 == std::count(test.begin(), test.end(), 0));
+  }
+}
+
 }  // namespace
 }  // namespace detail
 }  // namespace bench

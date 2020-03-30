@@ -1,0 +1,24 @@
+{
+  "base": "data/plots/remove_base.json",
+  "general": {
+    "title": "remove 0 char 1000"
+  },
+  "measurements": [
+    {
+      "name": "std_remove",
+      "url": "data/remove_0_char_1000/std_remove.json"
+    },
+    {
+      "name": "baseline_remove",
+      "url": "data/remove_0_char_1000/baseline_remove.json"
+    },
+    {
+      "name": "unsq_remove_16",
+      "url": "data/remove_0_char_1000/unsq_remove_16.json"
+    },
+    {
+      "name": "unsq_remove_32",
+      "url": "data/remove_0_char_1000/unsq_remove_32.json"
+    }
+  ]
+}
