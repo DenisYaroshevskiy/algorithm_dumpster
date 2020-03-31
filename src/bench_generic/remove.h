@@ -27,11 +27,11 @@
 namespace bench {
 
 template <typename Alg, typename R>
-BENCH_DECL_ATTRIBUTES void remove_0_common(benchmark::State& state, R&& r) {
+BENCH_DECL_ATTRIBUTES void remove_0_common(benchmark::State& state, R& r, R& r_copy) {
   for (auto _ : state) {
-    R copy = r;
-    Alg{}(copy.begin(), copy.end(), 0);
-    benchmark::DoNotOptimize(copy);
+    std::copy(r.begin(), r.end(), r_copy.begin());
+    Alg{}(r_copy.begin(), r_copy.end(), 0);
+    benchmark::DoNotOptimize(r_copy);
   }
 }
 
@@ -41,7 +41,8 @@ void remove_0(benchmark::State& state) {
   const int percentage = static_cast<int>(state.range(1));
 
   auto data = vector_with_zeroes<T>(size, percentage);
-  remove_0_common<Alg>(state, data);
+  auto buffer = data;
+  remove_0_common<Alg>(state, data, buffer);
 }
 
 }  // namespace bench
