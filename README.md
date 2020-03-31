@@ -798,6 +798,13 @@ _TODO_
 `remove_if`
 
 Implementation of std::remove/std::remove_if.<br/>
+
+So far really slow) (for chars less slow than for shors/ints, still slower then one by one). <br/>
+I don't yet know why, experimenting with perf, it says that this unaligned load:
+https://github.com/DenisYaroshevskiy/algorithm_dumpster/blob/80d242003efc235f80e873e8356e85e61a9ed965/src/unsq/remove.h#L66
+is 32% of all runtime. I don't know how much I believe that to be honest.
+Surpirsingly doesn't complain about all of my pdeps/pext and similar insane instructions.
+
 Using bigger register to do simd operations might be questionable,<br/>
 since the main operation is compress (before measurements guess) and<br/>
 it actually splits the stored register in 2, though might make sense for<br/>
