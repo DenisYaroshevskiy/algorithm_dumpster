@@ -88,16 +88,27 @@ struct unsq_remove_256 {
 
 struct remove_0s {
   const char* name() const { return "remove 0s"; }
-  std::size_t size() const { return 1000; }
+
+  remove_driver driver() const { return remove_driver{}; }
+
+  std::vector<std::size_t> sizes() const { return {50, 1000, 10000}; }
 
   std::vector<std::size_t> percentage_points() const {
     return {0, 5, 20, 50, 80, 95, 100};
   }
 
-  auto input(std::size_t size, std::size_t percentage) const {
-    return remove_params<char>{
-        bench::vector_with_zeroes<char>(size, percentage),
-        std::vector<char>(size), 0};
+  bench::type_list<std_remove, unsq_remove_128, unsq_remove_256> algorithms()
+      const {
+    return {};
+  }
+
+  bench::type_list<char, short, int> types() const { return {}; }
+
+  template <typename T>
+  auto input(struct bench::type_t<T>, std::size_t size, std::size_t percentage) const {
+    return remove_params<T>{
+        bench::vector_with_zeroes<T>(size, percentage),
+        std::vector<T>(size), 0};
   }
 };
 
@@ -107,9 +118,7 @@ int main(int argc, char** argv) {
   benchmark::Initialize(&argc, argv);
   if (benchmark::ReportUnrecognizedArguments(argc, argv)) return 1;
 
-  bench::register_benchmark(remove_0s{}, remove_driver{}, std_remove{});
-  bench::register_benchmark(remove_0s{}, remove_driver{}, unsq_remove_128{});
-  bench::register_benchmark(remove_0s{}, remove_driver{}, unsq_remove_256{});
+  bench::register_benchmark(remove_0s{});
 
   benchmark::RunSpecifiedBenchmarks();
 }

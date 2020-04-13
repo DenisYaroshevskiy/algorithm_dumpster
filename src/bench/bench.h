@@ -28,6 +28,34 @@ namespace bench {
 template <std::size_t n>
 using index_c = std::integral_constant<std::size_t, n>;
 
+template <typename... Ts>
+struct type_list {};
+
+template <typename T>
+struct type_t {
+  using type = T;
+};
+
+template <typename T>
+struct type_name;
+
+template <>
+struct type_name<char> {
+  const char* operator()() const { return "char"; }
+};
+
+template <>
+struct type_name<short> {
+  const char* operator()() const { return "short"; }
+};
+
+template <>
+struct type_name<int> {
+  const char* operator()() const { return "int"; }
+};
+
+constexpr std::size_t kTestAlignmentLimit = 65;
+
 namespace _bench {
 
 template <typename Op, std::size_t... idx>
@@ -40,38 +68,74 @@ constexpr void unroll(Op op) {
   unroll_impl(op, std::make_index_sequence<n>{});
 }
 
-}  // namespace _bench
+template <typename Op, typename... Bs>
+void cortesian_product(type_list<>, type_list<Bs...>, Op) {}
 
-constexpr std::size_t kTestAlignmentLimit = 65;
+template <typename Op, typename A, typename... As, typename... Bs>
+void cortesian_product(type_list<A, As...>, type_list<Bs...>, Op op) {
+  ((void)op(type_t<A>{}, type_t<Bs>{}), ...);
+  cortesian_product(type_list<As...>{}, type_list<Bs...>{}, op);
+}
+
+template <typename Op, typename... As, typename... Bs, typename... Cs>
+void cortesian_product(type_list<As...> as, type_list<Bs...> bs,
+                       type_list<Cs...>, Op op) {
+  cortesian_product(
+      as, bs, [&](auto a, auto b) { ((void)op(a, b, type_t<Cs>{}), ...); });
+}
+
+template <std::size_t... idxs>
+constexpr auto do_all_paddings(std::index_sequence<idxs...>) {
+  return type_list<index_c<idxs>...>{};
+}
+
+constexpr auto all_paddings() {
+  return do_all_paddings(std::make_index_sequence<kTestAlignmentLimit>{});
+}
+
+template <typename BenchmarkDescription, typename Type, typename Algorithm>
+std::string benchmark_name(BenchmarkDescription description, std::size_t size,
+                           Type, Algorithm algorithm, std::size_t percentage,
+                           std::size_t padding) {
+  std::string res = std::string("/name:") + description.name();
+  res += "/size:" + std::to_string(size);
+  res += std::string("/type:") + type_name<typename Type::type>{}();
+  res += std::string("/algorithm:") + algorithm.name();
+  res += "/percentage:" + std::to_string(percentage);
+  res += "/padding:" + std::to_string(padding);
+  return res;
+}
+
+}  // namespace _bench
 
 template <std::size_t n>
 BENCH_ALWAYS_INLINE void noop_slide(index_c<n>) {
   _bench::unroll<n>([](auto) { asm volatile("nop"); });
 }
 
-template <typename BenchGenerator, typename Driver, typename Algorithm>
-void register_benchmark(BenchGenerator generator, Driver driver,
-                        Algorithm algorithm) {
-  auto percentage_points = generator.percentage_points();
+template <typename BenchDescription>
+void register_benchmark(BenchDescription description) {
+  for (auto size : description.sizes()) {
+    _bench::cortesian_product(
+        description.types(), description.algorithms(), _bench::all_paddings(),
+        [&](auto type, auto algorithm_wrapped, auto padding_wrapped) {
+          for (auto percentage : description.percentage_points()) {
+            constexpr auto algorighm =
+                typename decltype(algorithm_wrapped)::type{};
+            constexpr auto padding = typename decltype(padding_wrapped)::type{};
 
-  const std::string common_prefix =
-      generator.name() + std::string("/algorihtm:") + algorithm.name() +
-      "/size:" + std::to_string(generator.size()) + "/percentage_point:";
+            auto name = _bench::benchmark_name(description, size, type,
+                                               algorighm, percentage, padding);
 
-  for (auto percentage_point : percentage_points) {
-    const std::string prefix =
-        common_prefix + std::to_string(percentage_point) + "/padding:";
-    auto input = generator.input(generator.size(), percentage_point);
+            auto driver = description.driver();
+            auto input = description.input(type, size, percentage);
 
-    _bench::unroll<kTestAlignmentLimit>([&](auto slide) {
-      const std::string name = prefix + std::to_string(slide);
-
-      benchmark::RegisterBenchmark(
-          name.c_str(),
-          [slide, driver, algorithm, input](benchmark::State& state) mutable {
-            driver(slide, state, algorithm, input);
-          });
-    });
+            benchmark::RegisterBenchmark(
+                name.c_str(), [=](benchmark::State& state) mutable {
+                  driver(padding, state, algorighm, input);
+                });
+          }
+        });
   }
 }
 
