@@ -1,5 +1,5 @@
 #
-# Copyright 2019 Denis Yaroshevskiy
+# Copyright 2020 Denis Yaroshevskiy
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
 # limitations under the License.
 #
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif(NOT CMAKE_BUILD_TYPE)
-
-include_directories(./)
-add_subdirectory(test)
-add_subdirectory(bench_runnable)
-add_subdirectory(bench_runnable2)
+find_package(benchmark)
+set(compiler_options --std=c++17 --stdlib=libc++ -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native -mllvm -align-all-functions=6)
+add_executable(remove_alignment)
+target_sources(remove_alignment PRIVATE
+               remove.cc)
+target_compile_options(remove_alignment PRIVATE ${compiler_options})
+target_link_libraries(remove_alignment PUBLIC benchmark pthread)
+target_link_options(remove_alignment PRIVATE -stdlib=libc++)
