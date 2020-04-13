@@ -87,11 +87,11 @@ struct unsq_remove_256 {
 // Benchmarks ------------------------------------------------------
 
 struct remove_0s {
-  const char* name() const { return "remove_0s"; }
+  const char* name() const { return "remove 0s"; }
   std::size_t size() const { return 1000; }
 
   std::vector<std::size_t> percentage_points() const {
-    return {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    return {0, 5, 20, 50, 80, 95, 100};
   }
 
   auto input(std::size_t size, std::size_t percentage) const {

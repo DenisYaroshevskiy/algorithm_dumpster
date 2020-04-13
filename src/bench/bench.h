@@ -60,7 +60,7 @@ void register_benchmark(BenchGenerator generator, Driver driver,
 
   for (auto percentage_point : percentage_points) {
     const std::string prefix =
-        common_prefix + std::to_string(percentage_point) + "/slide:";
+        common_prefix + std::to_string(percentage_point) + "/padding:";
     auto input = generator.input(generator.size(), percentage_point);
 
     _bench::unroll<kTestAlignmentLimit>([&](auto slide) {
