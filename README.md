@@ -792,6 +792,14 @@ Uses simd library to actually do pack operations.
 
 _TODO_
 
+### find
+
+`find_if_unguarded`, <br/>
+`find_unguarded`
+
+`_unguarded` is a generalization on std::strlen from a C standard. <br/>
+Complelty based on: https://stackoverflow.com/questions/25566302/
+
 ### remove
 
 `remove`,<br/>

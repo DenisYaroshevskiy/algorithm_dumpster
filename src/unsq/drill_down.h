@@ -32,7 +32,7 @@ struct type_t {
 };
 
 template <typename T>
-constexpr auto equivalent_of_size() {
+constexpr auto equivalent() {
   if constexpr (std::is_integral_v<T>)
     return type_t<T>{};
   else if constexpr (std::is_enum_v<T>)
@@ -54,45 +54,38 @@ constexpr auto equivalent_of_size() {
     return error_t{};
 }
 
-template <typename T>
-constexpr auto equivalent() {
-  auto picked_size = equivalent_of_size<T>();
-  if constexpr (std::is_same_v<decltype(picked_size), error_t>)
-    return error_t{};
-  else {
-    using type = typename decltype(picked_size)::type;
+template <typename>
+struct is_const_pointer : std::false_type {};
 
-    if constexpr (std::is_const_v<T>)
-      return std::add_const<type>{};
-    else
-      return type_t<type>{};
-  }
-}
+template <typename T>
+struct is_const_pointer<const T*> : std::true_type {};
 
 }  // namespace _drill_down
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;
 
-
 template <typename T>
 using equivalent = typename decltype(_drill_down::equivalent<T>())::type;
 
 template <typename I>
-// require ContigiousIterator<I>
-auto drill_down_range(I _f, I _l) {
+auto* drill_down(I _it) {
   using T = equivalent<ValueType<I>>;
-
-  T* f = reinterpret_cast<T*>(&*_f);
-  T* l = f + (_l - _f);
-
-  return std::pair{f, l};
+  auto* res = &*_it;
+  if constexpr (_drill_down::is_const_pointer<decltype(res)>{}) {
+    return reinterpret_cast<const T*>(&*_it);
+  } else {
+    return reinterpret_cast<T*>(&*_it);
+  }
 }
 
 template <typename I>
-auto* drill_down(I _it) {
-  using T = equivalent<ValueType<I>>;
-  return reinterpret_cast<T*>(&*_it);
+// require ContigiousIterator<I>
+auto drill_down_range(I _f, I _l) {
+  auto* f = drill_down(_f);
+  auto* l = f + (_l - _f);
+
+  return std::pair{f, l};
 }
 
 template <typename I, typename T>

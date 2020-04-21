@@ -49,6 +49,8 @@ target_sources(tests PRIVATE
                simd/bits.t.cc
                simd/mm.t.cc
                simd/pack.t.cc
+               unsq/drill_down.t.cc
+               unsq/find.t.cc
                unsq/remove.t.cc
                unsq/unsq.t.cc
                catch_main.cc)

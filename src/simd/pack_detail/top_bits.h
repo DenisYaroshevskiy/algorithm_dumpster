@@ -84,6 +84,12 @@ top_bits<Pack> get_top_bits(const Pack& x) {
 }
 
 template <typename Pack>
+top_bits<Pack> get_top_bits(const Pack& x, top_bits<Pack> ignore) {
+  top_bits<Pack> res = get_top_bits(x);
+  return res & ignore;
+}
+
+template <typename Pack>
 top_bits<Pack> ignore_first_n_mask() {
   return top_bits<Pack>{set_lower_n_bits(sizeof(Pack))};
 }

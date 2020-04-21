@@ -17,8 +17,8 @@
 #ifndef UNSQ_REMOVE_H_
 #define UNSQ_REMOVE_H_
 
-#include "unsq/drill_down.h"
 #include "simd/pack.h"
+#include "unsq/drill_down.h"
 
 namespace unsq {
 namespace _remove {
