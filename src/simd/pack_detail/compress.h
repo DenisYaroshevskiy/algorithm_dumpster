@@ -65,12 +65,12 @@ T* compress_store_unsafe(T* out, const pack<T, W>& x,
     out = compress_store_unsafe(out, top, half_bits{mmask.raw & 0xffff});
     return compress_store_unsafe(out, bottom, half_bits{mmask.raw >> 16});
   } else {
-    auto [mask, offset] = compress_mask(mmask.raw);
+    auto [mask, offset] = compress_mask(mmask);
 
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
     mm::storeu(reinterpret_cast<reg_t*>(out), shuffled);
 
-    return reinterpret_cast<T*>(reinterpret_cast<std::int8_t*>(out) + offset);
+    return out + offset;
   }
 }
 
@@ -92,13 +92,13 @@ T* compress_store_masked(T* out, const pack<T, W>& x,
     // just taking the first element and not taking any elements.
     if (!mmask) return out;
 
-    auto [mask, offset] = compress_mask(mmask.raw);
+    auto [mask, offset] = compress_mask(mmask);
 
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
-    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask);
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
+    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask.reg);
 
     mm::maskmoveu(reinterpret_cast<reg_t*>(out), shuffled, store_mask);
-    return reinterpret_cast<T*>(reinterpret_cast<std::int8_t*>(out) + offset);
+    return out + offset;
   }
 }
 

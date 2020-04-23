@@ -713,7 +713,7 @@ Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strle
 
 Same as intel, if true take second.
 
-`compress_mask(mm::registry_i)`
+`compress_mask(top_bits)`
 
 In avx-512 there are intrinsics `*compressstore*` - which are very useful. <br/>
 This is an approximation of this for avx-2. <br/>
@@ -721,19 +721,15 @@ This is an approximation of this for avx-2. <br/>
 The solutions is based on: https://stackoverflow.com/a/36951611/5021064 <br/>
 This was also very instrumental: https://stackoverflow.com/questions/18971401/sparse-array-compression-using-simd-avx2
 
-Input - a mask obtained from mm::movemask.<br/>
 Output: a pair: <br/>
- 1) compressed array of indexes where bits were true, followed by zeros.
- 2) popcount of the input mask - computed as a by-product and is a very useful thing when <br/>
-    using compress.
+ 1) compressed array of indexes where bits were true, followed by zeros. <br/>
+ 2) popcount of the input mask - computed as a by-product and is a very useful thing when using compress.
 
 _TODO_: This is purely an mm hand written code, that doesn't get generated from python. <br/>
 I need to figure out what do I do with code like that - probably mm should become it's own <br/>
 stand alone folder and this should go there. It's not really a part of the pack interface.
 
 _TODO_: there are various tradeoffs for using lookup tables vs computation, I need to measure those after implementing remove_if.
-
-_TODO_: can probably do better, using a supplied type.
 
 `compress_store_unsafe/compress_store_masked`
 

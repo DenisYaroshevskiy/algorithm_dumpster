@@ -706,114 +706,84 @@ TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
   }
 }
 
-TEST_CASE("simd.pack.compress_mask", "[simd]") {
-  using pack_t = pack<std::uint8_t, 16>;
+TEMPLATE_TEST_CASE("simd.pack.compress_mask_epi8", "[simd]",
+                   (pack<std::int8_t, 16>), (pack<std::uint8_t, 16>)) {
+  using pack_t = TestType;
+  using vbool = vbool_t<pack_t>;
   using scalar = scalar_t<pack_t>;
-  constexpr size_t size = size_v<pack_t>;
+  constexpr std::size_t size = size_v<pack_t>;
 
-  alignas(pack_t) std::array<scalar, size> a, b, actual;
+  alignas(pack_t) std::array<scalar, size> a;
 
-  auto run = [&]() mutable {
-    pack_t loaded_a = load<pack_t>(a.data());
-    pack_t loaded_b = load<pack_t>(b.data());
-    auto eq = equal_pairwise(loaded_a, loaded_b);
-    auto compressed = compress_mask(mm::movemask<std::uint8_t>(eq.reg));
+  a.fill(0);
 
-    store(actual.data(), pack_t{compressed.first});
+  auto run = [&] {
+    alignas(vbool) std::array<scalar, size> expected;
+    expected.fill(0);
 
-    return compressed.second;
+    std::uint8_t o = 0;
+    for (std::uint8_t i = 0; i < size; ++i) {
+      if (a[i] == 0) continue;
+      expected[o++] = i;
+    }
+
+    const pack_t a_loaded = load<pack_t>(a.data());
+
+    const vbool test = simd::greater_pairwise(a_loaded, set_zero<pack_t>());
+    const auto mmask = get_top_bits(test);
+    auto res = compress_mask(mmask);
+    REQUIRE(load<vbool>(expected.data()) == res.first);
+    REQUIRE(res.second == o);
   };
 
-  auto test_for_rest_is_zeros = [&](std::uint8_t popcount) {
-    return std::all_of(actual.begin() + popcount, actual.end(),
-                       [](auto x) { return x == 0; });
+  auto test = [&] (auto& self, std::size_t i) mutable {
+    if (i == size) { run(); return; };
+    self(self, i + 1);
+    a[i] = 1;
+    self(self, i + 1);
+  };
+  test(test, 0);
+}
+
+TEMPLATE_TEST_CASE("simd.pack.compress_mask_epi16", "[simd]",
+                   (pack<std::int16_t, 8>), (pack<std::uint16_t, 8>)) {
+  using pack_t = TestType;
+  using vbool = vbool_t<pack_t>;
+  using scalar = scalar_t<pack_t>;
+  constexpr std::size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> a;
+
+  alignas(vbool) const std::array<scalar, size> element_indexes {
+    0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e
   };
 
-  a.fill(1);
-  b.fill(2);
+  auto run = [&] {
+    alignas(vbool) std::array<scalar, size> expected;
+    expected.fill(0);
 
-  SECTION("only first 8 has trues") {
-    REQUIRE(0 == run());
-
-    b[0] = 1;
-    REQUIRE(1 == run());
-    REQUIRE(0 == actual[0]);
-    REQUIRE(test_for_rest_is_zeros(1));
-
-    b.fill(2);
-    b[2] = 1;
-    b[3] = 1;
-    b[9] = 1;
-    REQUIRE(3 == run());
-    REQUIRE(2 == actual[0]);
-    REQUIRE(3 == actual[1]);
-    REQUIRE(9 == actual[2]);
-    REQUIRE(test_for_rest_is_zeros(3));
-
-    b.fill(2);
-    b[1] = 1;
-    REQUIRE(1 == run());
-    REQUIRE(1 == actual[0]);
-    REQUIRE(test_for_rest_is_zeros(1));
-
-    b.fill(2);
-    b[0] = 1;
-    b[1] = 1;
-    REQUIRE(2 == run());
-    REQUIRE(0 == actual[0]);
-    REQUIRE(1 == actual[1]);
-    REQUIRE(test_for_rest_is_zeros(2));
-
-    b.fill(2);
-    b[0] = 1;
-    b[4] = 1;
-    REQUIRE(2 == run());
-    REQUIRE(0 == actual[0]);
-    REQUIRE(4 == actual[1]);
-    REQUIRE(test_for_rest_is_zeros(2));
-  }
-
-  SECTION("mixed first/second 8s have trues") {
-    b[8] = 1;
-    REQUIRE(1 == run());
-    REQUIRE(8 == actual[0]);
-    REQUIRE(test_for_rest_is_zeros(1));
-
-    b.fill(2);
-    b[0] = 1;
-    b[8] = 1;
-    REQUIRE(2 == run());
-    REQUIRE(0 == actual[0]);
-    REQUIRE(8 == actual[1]);
-    REQUIRE(test_for_rest_is_zeros(2));
-
-    b.fill(2);
-    b[0] = 1;
-    b[2] = 1;
-    b[9] = 1;
-    b[15] = 1;
-    REQUIRE(4 == run());
-    REQUIRE(0 == actual[0]);
-    REQUIRE(2 == actual[1]);
-    REQUIRE(9 == actual[2]);
-    REQUIRE(15 == actual[3]);
-    REQUIRE(test_for_rest_is_zeros(4));
-
-    b.fill(2);
-    std::fill(b.begin() + 8, b.begin() + 15, 1);
-    REQUIRE(7 == run());
-    for (std::uint8_t i = 0; i < 7; ++i) {
-      REQUIRE(i + 8 == actual[i]);
+    std::uint8_t o = 0;
+    for (std::uint8_t i = 0; i < size; ++i) {
+      if (a[i] == 0) continue;
+      expected[o++] = element_indexes[i];
     }
-    REQUIRE(test_for_rest_is_zeros(7));
 
-    std::fill(b.begin(), b.begin() + 16, 1);
-    REQUIRE(16 == run());
-    for (std::uint8_t i = 0; i < 16; ++i) {
-      REQUIRE(i == actual[i]);
-    }
-    REQUIRE(test_for_rest_is_zeros(16));
-  }
+    const pack_t a_loaded = load<pack_t>(a.data());
+
+    const vbool test = simd::greater_pairwise(a_loaded, set_zero<pack_t>());
+    const auto mmask = get_top_bits(test);
+    auto res = compress_mask(mmask);
+    REQUIRE(load<vbool>(expected.data()) == res.first);
+    REQUIRE(res.second == o);
+  };
+
+  auto test = [&] (auto& self, std::size_t i) mutable {
+    if (i == size) { run(); return; };
+    self(self, i + 1);
+    a[i] = 1;
+    self(self, i + 1);
+  };
+  test(test, 0);
 }
 
 TEST_CASE("simd.pack.understanding_shuffle", "[simd]") {
@@ -869,8 +839,8 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_unsafe", "[simd]",
 
   auto run = [&]() mutable {
     const vbool loaded_mask = load<vbool>(mask.data());
-    const auto mmask = get_top_bits(
-        greater_pairwise(loaded_mask, set_zero<vbool>()));
+    const auto mmask =
+        get_top_bits(greater_pairwise(loaded_mask, set_zero<vbool>()));
 
     const int non_zero_count = size - std::count(mask.begin(), mask.end(), 0);
 
@@ -937,8 +907,8 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_masked", "[simd]",
 
   auto run = [&](std::size_t offset = 0) mutable {
     const vbool loaded_mask = load<vbool>(mask.data());
-    const auto mmask = get_top_bits(
-        greater_pairwise(loaded_mask, set_zero<vbool>()));
+    const auto mmask =
+        get_top_bits(greater_pairwise(loaded_mask, set_zero<vbool>()));
 
     const int non_zero_count = size - std::count(mask.begin(), mask.end(), 0);
 

@@ -14,145 +14,6 @@
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_BITS_H_
-#define SIMD_PACK_DETAIL_BITS_H_
-
-#include <cstdint>
-#include <type_traits>
-
-namespace simd {
-
-inline std::int32_t count_trailing_zeroes(std::uint32_t x) {
-  return __builtin_ctz(x);
-}
-
-// https://stackoverflow.com/questions/18806481/how-can-i-get-the-position-of-the-least-significant-bit-in-a-number
-inline std::uint32_t lsb(std::uint32_t x) {
-  return x & -x;
-}
-
-// Like a regular < but a less significant bit is treated as
-// more significant.
-inline bool lsb_less(std::uint32_t x, std::uint32_t y) {
-  // zero out common bits.
-  const std::uint32_t unequal_bits = x ^ y;
-  x &= unequal_bits;
-  y &= unequal_bits;
-
-  if (y == 0) return false;
-  if (x == 0) return true;
-
-  return lsb(x) > lsb(y);
-}
-
-constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
-  std::uint64_t res{1};
-  res <<= n;
-  res -= 1;
-  return static_cast<std::uint32_t>(res);
-}
-
-template <typename N>
-constexpr N set_highest_4_bits() {
-  N res = 0x80;
-  res <<= (sizeof(N) - 1) * 8;
-  return res;
-}
-
-template <typename N>
-constexpr N all_ones() {
-  return ~N{0};
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_BITS_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_MASKS_H_
-#define SIMD_PACK_DETAIL_MASKS_H_
-
-#include <array>
-#include <cstdint>
-#include <type_traits>
-
-namespace simd {
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_MASKS_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
-#define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
-
-#include <cstddef>
-
-namespace simd {
-
-constexpr std::ptrdiff_t page_size() { return 1 << 12; }
-
-template <typename T>
-T* end_of_page(T* addr) {
-  std::uintptr_t upage_size = page_size();
-  std::uintptr_t mask = ~(upage_size - 1);
-  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) +
-                              upage_size);
-}
-
-template <typename Pack, typename T>
-T* previous_aligned_address(T* addr) {
-  constexpr std::uintptr_t mask = ~(alignof(Pack) - 1);
-  return reinterpret_cast<T*>(reinterpret_cast<std::uintptr_t>(addr) & mask);
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /*
  * ================================================================
  *
@@ -687,6 +548,145 @@ inline auto andnot(Register a, Register b) {
  * limitations under the License.
  */
 
+#ifndef SIMD_PACK_DETAIL_BITS_H_
+#define SIMD_PACK_DETAIL_BITS_H_
+
+#include <cstdint>
+#include <type_traits>
+
+namespace simd {
+
+inline std::int32_t count_trailing_zeroes(std::uint32_t x) {
+  return __builtin_ctz(x);
+}
+
+// https://stackoverflow.com/questions/18806481/how-can-i-get-the-position-of-the-least-significant-bit-in-a-number
+inline std::uint32_t lsb(std::uint32_t x) {
+  return x & -x;
+}
+
+// Like a regular < but a less significant bit is treated as
+// more significant.
+inline bool lsb_less(std::uint32_t x, std::uint32_t y) {
+  // zero out common bits.
+  const std::uint32_t unequal_bits = x ^ y;
+  x &= unequal_bits;
+  y &= unequal_bits;
+
+  if (y == 0) return false;
+  if (x == 0) return true;
+
+  return lsb(x) > lsb(y);
+}
+
+constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
+  std::uint64_t res{1};
+  res <<= n;
+  res -= 1;
+  return static_cast<std::uint32_t>(res);
+}
+
+template <typename N>
+constexpr N set_highest_4_bits() {
+  N res = 0x80;
+  res <<= (sizeof(N) - 1) * 8;
+  return res;
+}
+
+template <typename N>
+constexpr N all_ones() {
+  return ~N{0};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_BITS_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
+#define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
+
+#include <cstddef>
+
+namespace simd {
+
+constexpr std::ptrdiff_t page_size() { return 1 << 12; }
+
+template <typename T>
+T* end_of_page(T* addr) {
+  std::uintptr_t upage_size = page_size();
+  std::uintptr_t mask = ~(upage_size - 1);
+  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) +
+                              upage_size);
+}
+
+template <typename Pack, typename T>
+T* previous_aligned_address(T* addr) {
+  constexpr std::uintptr_t mask = ~(alignof(Pack) - 1);
+  return reinterpret_cast<T*>(reinterpret_cast<std::uintptr_t>(addr) & mask);
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_MASKS_H_
+#define SIMD_PACK_DETAIL_MASKS_H_
+
+#include <array>
+#include <cstdint>
+#include <type_traits>
+
+namespace simd {
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_MASKS_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef SIMD_PACK_DETAIL_PACK_DECLARATION_H_
 #define SIMD_PACK_DETAIL_PACK_DECLARATION_H_
 
@@ -752,230 +752,6 @@ using unsigned_equivalent =
 }  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_PACK_DECLARATION_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_COMPRESS_MASK_H_
-#define SIMD_PACK_DETAIL_COMPRESS_MASK_H_
-
-
-#include <algorithm>
-#include <tuple>
-
-namespace simd {
-namespace _compress_mask {
-
-// Some magic I stole from: https://stackoverflow.com/a/36951611/5021064
-inline std::pair<std::uint64_t, std::uint8_t> mask8(std::uint8_t mask,
-                                                    std::uint64_t all_idxes) {
-  const std::uint64_t mask_expanded =
-      _pdep_u64(mask, 0x0101010101010101) * 0xff;
-
-  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mask));
-  const std::uint64_t compressed_idxs = _pext_u64(all_idxes, mask_expanded);
-
-  return {compressed_idxs, offset};
-}
-
-constexpr std::uint64_t make_8_idexes(std::uint8_t offset) {
-  const std::uint64_t basic = 0x0706050403020100;
-  const std::uint64_t plus1 = 0x0101010101010101;
-  return basic + plus1 * offset;
-}
-
-inline std::pair<mm::register_i<128>, std::uint8_t> mask16(std::uint16_t mask) {
-  auto [first_mask, first_n] = mask8(mask & 0xff, make_8_idexes(0));
-  auto [second_mask, second_n] = mask8(mask >> 8, make_8_idexes(8));
-
-  first_mask |= first_n == 8 ? 0 : second_mask << (first_n * 8);
-  second_mask = first_n == 0 ? 0 : second_mask >> ((8 - first_n) * 8);
-
-  return {_mm_set_epi64x(second_mask, first_mask), first_n + second_n};
-}
-
-}  // namespace _compress_mask
-
-inline std::pair<mm::register_i<128>, std::uint8_t> compress_mask(
-    std::uint32_t mmask) {
-  return _compress_mask::mask16(static_cast<std::uint16_t>(mmask));
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_COMPRESS_MASK_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_STORE_H_
-#define SIMD_PACK_DETAIL_STORE_H_
-
-
-namespace simd {
-
-template <typename T, std::size_t W>
-void store(T* addr, const pack<T, W>& a) {
-  using reg_t = register_t<pack<T, W>>;
-  mm::store(reinterpret_cast<reg_t*>(addr), a.reg);
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_STORE_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
-#define SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
-
-
-namespace simd {
-
-template <typename T, std::size_t W>
-pack<T, W> add_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return pack<T, W>{mm::add<T>(x.reg, y.reg)};
-}
-
-template <typename T, std::size_t W>
-pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
-  return pack<T, W>{mm::sub<T>(x.reg, y.reg)};
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
-#ifndef SIMD_PACK_DETAIL_PACK_CAST_H_
-#define SIMD_PACK_DETAIL_PACK_CAST_H_
-
-#include <type_traits>
-
-
-namespace simd {
-
-template <typename Pack, typename T, std::size_t W>
-Pack cast(const pack<T, W>& x) {
-  static_assert(std::is_same_v<register_t<Pack>, register_t<pack<T, W>>>);
-  return Pack{x.reg};
-}
-
-template <typename U, typename T, std::size_t W>
-auto cast_elements(const pack<T, W>& x) {
-  return cast<pack<U, W>>(x);
-}
-
-template <typename T, std::size_t W>
-auto cast_to_bytes(const pack<T, W>& x) {
-  return cast<pack<std::uint8_t, W * sizeof(T)>>(x);
-}
-
-template <typename T, std::size_t W>
-auto cast_to_signed(const pack<T, W>& x) {
-  return cast_elements<signed_equivalent<T>>(x);
-}
-
-template <typename T, std::size_t W>
-auto cast_to_unsigned(const pack<T, W>& x) {
-  return cast_elements<unsigned_equivalent<T>>(x);
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_PACK_CAST_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_LOAD_H_
-#define SIMD_PACK_DETAIL_LOAD_H_
-
-#include <cstdint>
-#include <utility>
-
-
-namespace simd {
-
-template <typename Pack, typename T>
-Pack load(const T* addr) {
-  using reg_t = register_t<Pack>;
-  return Pack{mm::load(reinterpret_cast<const reg_t*>(addr))};
-}
-
-template <typename Pack, typename T>
-Pack load_unaligned(const T* addr) {
-  using reg_t = register_t<Pack>;
-  return Pack{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_LOAD_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1060,6 +836,12 @@ top_bits<Pack> get_top_bits(const Pack& x) {
 }
 
 template <typename Pack>
+top_bits<Pack> get_top_bits(const Pack& x, top_bits<Pack> ignore) {
+  top_bits<Pack> res = get_top_bits(x);
+  return res & ignore;
+}
+
+template <typename Pack>
 top_bits<Pack> ignore_first_n_mask() {
   return top_bits<Pack>{set_lower_n_bits(sizeof(Pack))};
 }
@@ -1130,6 +912,37 @@ bool all_true(const top_bits<Pack>& x) {
  * limitations under the License.
  */
 
+#ifndef SIMD_PACK_DETAIL_STORE_H_
+#define SIMD_PACK_DETAIL_STORE_H_
+
+
+namespace simd {
+
+template <typename T, std::size_t W>
+void store(T* addr, const pack<T, W>& a) {
+  using reg_t = register_t<pack<T, W>>;
+  mm::store(reinterpret_cast<reg_t*>(addr), a.reg);
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_STORE_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef SIMD_PACK_DETAIL_SET_H_
 #define SIMD_PACK_DETAIL_SET_H_
 
@@ -1165,21 +978,238 @@ Pack set_zero() {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_BLEND_H_
-#define SIMD_PACK_DETAIL_BLEND_H_
+
+#ifndef SIMD_PACK_DETAIL_PACK_CAST_H_
+#define SIMD_PACK_DETAIL_PACK_CAST_H_
+
+#include <type_traits>
+
+
+namespace simd {
+
+template <typename Pack, typename T, std::size_t W>
+Pack cast(const pack<T, W>& x) {
+  static_assert(std::is_same_v<register_t<Pack>, register_t<pack<T, W>>>);
+  return Pack{x.reg};
+}
+
+template <typename U, typename T, std::size_t W>
+auto cast_elements(const pack<T, W>& x) {
+  return cast<pack<U, W>>(x);
+}
+
+template <typename T, std::size_t W>
+auto cast_to_bytes(const pack<T, W>& x) {
+  return cast<pack<std::uint8_t, W * sizeof(T)>>(x);
+}
+
+template <typename T, std::size_t W>
+auto cast_to_signed(const pack<T, W>& x) {
+  return cast_elements<signed_equivalent<T>>(x);
+}
+
+template <typename T, std::size_t W>
+auto cast_to_unsigned(const pack<T, W>& x) {
+  return cast_elements<unsigned_equivalent<T>>(x);
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_PACK_CAST_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+#define SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
 
 
 namespace simd {
 
 template <typename T, std::size_t W>
-pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
-                 const vbool_t<pack<T, W>>& mask) {
-  return pack<T, W>{mm::blendv<std::uint8_t>(x.reg, y.reg, mask.reg)};
+pack<T, W> add_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::add<T>(x.reg, y.reg)};
+}
+
+template <typename T, std::size_t W>
+pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
+  return pack<T, W>{mm::sub<T>(x.reg, y.reg)};
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_BLEND_H_
+#endif  // SIMD_PACK_DETAIL_ARITHMETIC_PAIRWISE_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_LOAD_H_
+#define SIMD_PACK_DETAIL_LOAD_H_
+
+#include <cstdint>
+#include <utility>
+
+
+namespace simd {
+
+template <typename Pack, typename T>
+Pack load(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::load(reinterpret_cast<const reg_t*>(addr))};
+}
+
+template <typename Pack, typename T>
+Pack load_unaligned(const T* addr) {
+  using reg_t = register_t<Pack>;
+  return Pack{mm::loadu(reinterpret_cast<const reg_t*>(addr))};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_LOAD_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+#define SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+
+
+#include <algorithm>
+#include <tuple>
+#include <type_traits>
+
+#include <iostream>
+
+namespace simd {
+namespace _compress_mask {
+
+// Based on: https://stackoverflow.com/a/36951611/5021064
+// Mask functions return the compressed indexes and the popcount.
+
+// all_indexes - indexes either from 0 to 7 or from 8 to f
+inline std::pair<std::uint64_t, std::uint8_t> mask64_epi8(
+    std::uint8_t mmask, std::uint64_t all_idxes) {
+  const std::uint64_t mmask_expanded =
+      _pdep_u64(mmask, 0x0101010101010101) * 0xff;
+
+  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
+
+  const std::uint64_t compressed_idxs = _pext_u64(all_idxes, mmask_expanded);
+
+  return {compressed_idxs, offset};
+}
+
+inline std::pair<mm::register_i<128>, std::uint8_t> mask128_epi8(
+    std::uint16_t mmask) {
+  auto [first_mask, first_n] = mask64_epi8(mmask & 0xff, 0x0706050403020100);
+  auto [second_mask, second_n] = mask64_epi8(mmask >> 8, 0x0f0e0d0c0b0a0908);
+
+  first_mask |= first_n == 8 ? 0 : second_mask << (first_n * 8);
+  second_mask = first_n == 0 ? 0 : second_mask >> ((8 - first_n) * 8);
+
+  return {_mm_set_epi64x(second_mask, first_mask), first_n + second_n};
+}
+
+/*
+  For uint16_t, element byte indexes
+  0 => 0x0100, 256
+  1 => 0x0302, 770
+  2 => 0x0504, 1284
+  3 => 0x0706, 1798
+  4 => 0x0908, 2312
+  5 => 0x0b0a, 2826
+  6 => 0x0d0c, 3340
+  7 => 0x0f0e, 3854
+
+We can write 0xfe into the 7th
+Then to get => 0x0f0e:
+ (x << 4) | x & 0x0f0f
+ */
+
+inline std::pair<mm::register_i<128>, std::uint8_t> mask128_epi16(
+    std::uint16_t mmask) {
+  const std::uint64_t mmask_expanded =
+      _pdep_u64(mmask, 0x1111111111111111) * 0xf;
+
+  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
+
+  const std::uint64_t compressed_idxes =
+      _pext_u64(0xfedcba9876543210, mmask_expanded);
+
+  const mm::register_i<128> as_lower_8byte = _mm_cvtsi64_si128(compressed_idxes);
+  const mm::register_i<128> as_16bit = _mm_cvtepu8_epi16(as_lower_8byte);
+  const mm::register_i<128> shift_by_4 = _mm_slli_epi16(as_16bit, 4);
+  const mm::register_i<128> combined = _mm_or_si128(shift_by_4, as_16bit);
+  const mm::register_i<128> filter = _mm_set1_epi16(0x0f0f);
+  const mm::register_i<128> res = _mm_and_si128(combined, filter);
+
+  return {res, offset};
+}
+
+}  // namespace _compress_mask
+
+template <typename T, std::size_t W>
+constexpr bool compress_mask_is_supported() {
+  return W * sizeof(T) == 16;
+}
+
+template <typename T, std::size_t W>
+inline std::pair<pack<T, W>, std::uint8_t> compress_mask(
+    top_bits<pack<T, W>> mmask) {
+  static_assert(compress_mask_is_supported<T, W>());
+
+  auto [mm_compressed, count] = [&] {
+    if constexpr(sizeof(T) >= 2) {
+      return _compress_mask::mask128_epi16(static_cast<std::uint16_t>(mmask.raw));
+    } else {
+      return _compress_mask::mask128_epi8(static_cast<std::uint16_t>(mmask.raw));
+    }
+  }();
+
+  count /= sizeof(T);
+  return {pack<T, W>{mm_compressed}, count};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_COMPRESS_MASK_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1296,6 +1326,37 @@ pack<T, W> not_(const pack<T, W>& x) {
  * limitations under the License.
  */
 
+#ifndef SIMD_PACK_DETAIL_BLEND_H_
+#define SIMD_PACK_DETAIL_BLEND_H_
+
+
+namespace simd {
+
+template <typename T, std::size_t W>
+pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
+                 const vbool_t<pack<T, W>>& mask) {
+  return pack<T, W>{mm::blendv<std::uint8_t>(x.reg, y.reg, mask.reg)};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_BLEND_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef SIMD_PACK_DETAIL_COMPRESS_H_
 #define SIMD_PACK_DETAIL_COMPRESS_H_
 
@@ -1342,12 +1403,12 @@ T* compress_store_unsafe(T* out, const pack<T, W>& x,
     out = compress_store_unsafe(out, top, half_bits{mmask.raw & 0xffff});
     return compress_store_unsafe(out, bottom, half_bits{mmask.raw >> 16});
   } else {
-    auto [mask, offset] = compress_mask(mmask.raw);
+    auto [mask, offset] = compress_mask(mmask);
 
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
     mm::storeu(reinterpret_cast<reg_t*>(out), shuffled);
 
-    return reinterpret_cast<T*>(reinterpret_cast<std::int8_t*>(out) + offset);
+    return out + offset;
   }
 }
 
@@ -1369,13 +1430,13 @@ T* compress_store_masked(T* out, const pack<T, W>& x,
     // just taking the first element and not taking any elements.
     if (!mmask) return out;
 
-    auto [mask, offset] = compress_mask(mmask.raw);
+    auto [mask, offset] = compress_mask(mmask);
 
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
-    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask);
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
+    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask.reg);
 
     mm::maskmoveu(reinterpret_cast<reg_t*>(out), shuffled, store_mask);
-    return reinterpret_cast<T*>(reinterpret_cast<std::int8_t*>(out) + offset);
+    return out + offset;
   }
 }
 
