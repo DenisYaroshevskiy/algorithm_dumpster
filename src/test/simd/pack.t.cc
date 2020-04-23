@@ -707,56 +707,32 @@ TEMPLATE_TEST_CASE("simd.pack.bit", "[simd]", ALL_TEST_PACKS) {
 }
 
 TEMPLATE_TEST_CASE("simd.pack.compress_mask_epi8", "[simd]",
-                   (pack<std::int8_t, 16>), (pack<std::uint8_t, 16>)) {
+                   (pack<std::int8_t, 16>), (pack<std::uint8_t, 16>),
+                   (pack<std::int16_t, 8>), (pack<std::uint16_t, 8>),
+                   (pack<std::int32_t, 8>), (pack<std::uint32_t, 8>)) {
   using pack_t = TestType;
   using vbool = vbool_t<pack_t>;
   using scalar = scalar_t<pack_t>;
   constexpr std::size_t size = size_v<pack_t>;
 
   alignas(pack_t) std::array<scalar, size> a;
+
+  alignas(vbool) std::array<scalar, size> element_indexes;
+  std::iota(element_indexes.begin(), element_indexes.end(), 0);
+
+  if constexpr (sizeof(scalar) == 2) {
+    element_indexes = {0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e};
+  }
+
+  auto run_compress = [] (std::uint32_t mmask) {
+    if constexpr (sizeof(pack_t) == 16) {
+      return compress_mask_for_shuffle_epi8<scalar>(mmask);
+    } else {
+      return compress_mask_for_permutevar8x32<scalar>(mmask);
+    }
+  };
 
   a.fill(0);
-
-  auto run = [&] {
-    alignas(vbool) std::array<scalar, size> expected;
-    expected.fill(0);
-
-    std::uint8_t o = 0;
-    for (std::uint8_t i = 0; i < size; ++i) {
-      if (a[i] == 0) continue;
-      expected[o++] = i;
-    }
-
-    const pack_t a_loaded = load<pack_t>(a.data());
-
-    const vbool test = simd::greater_pairwise(a_loaded, set_zero<pack_t>());
-    const auto mmask = get_top_bits(test);
-    auto res = compress_mask(mmask);
-    REQUIRE(load<vbool>(expected.data()) == res.first);
-    REQUIRE(res.second == o);
-  };
-
-  auto test = [&] (auto& self, std::size_t i) mutable {
-    if (i == size) { run(); return; };
-    self(self, i + 1);
-    a[i] = 1;
-    self(self, i + 1);
-  };
-  test(test, 0);
-}
-
-TEMPLATE_TEST_CASE("simd.pack.compress_mask_epi16", "[simd]",
-                   (pack<std::int16_t, 8>), (pack<std::uint16_t, 8>)) {
-  using pack_t = TestType;
-  using vbool = vbool_t<pack_t>;
-  using scalar = scalar_t<pack_t>;
-  constexpr std::size_t size = size_v<pack_t>;
-
-  alignas(pack_t) std::array<scalar, size> a;
-
-  alignas(vbool) const std::array<scalar, size> element_indexes {
-    0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e
-  };
 
   auto run = [&] {
     alignas(vbool) std::array<scalar, size> expected;
@@ -771,9 +747,9 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask_epi16", "[simd]",
     const pack_t a_loaded = load<pack_t>(a.data());
 
     const vbool test = simd::greater_pairwise(a_loaded, set_zero<pack_t>());
-    const auto mmask = get_top_bits(test);
-    auto res = compress_mask(mmask);
-    REQUIRE(load<vbool>(expected.data()) == res.first);
+    const auto mmask = get_top_bits(test).raw;
+    auto res = run_compress(mmask);
+    REQUIRE(load<vbool>(expected.data()) == vbool{res.first});
     REQUIRE(res.second == o);
   };
 

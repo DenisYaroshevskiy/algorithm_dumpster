@@ -680,7 +680,8 @@ python script to generate mm.h
 `end_of_page(addr)` <br/>
 `previous_aligned_address<Pack>(addr)`<br/>
 
-`compress_mask` <br/>
+`compress_mask_for_shuffle_epi8` <br/>
+`compress_mask_for_permutevar8x32` <br/>
 `compress_store_unsafe(T*, pack, mmask) -> T*` <br/>
 `compress_store_maskedT*, pack, mmask) -> T*` <br/>
 
@@ -713,29 +714,35 @@ Code: https://opensource.apple.com/source/Libc/Libc-997.90.3/x86_64/string/strle
 
 Same as intel, if true take second.
 
-`compress_mask(top_bits)`
+`compress_mask`
 
 In avx-512 there are intrinsics `*compressstore*` - which are very useful. <br/>
 This is an approximation of this for avx-2. <br/>
+There are 2 avaliable shuffle instructions:
+`_mm_shuffle_epi8` - works for anything for 128 bit register
+and `_mm256_permutevar8x32_epi32` - works for 256 bit register, but the types has to
+be at least 4 bytes.
 
 The solutions is based on: https://stackoverflow.com/a/36951611/5021064 <br/>
 This was also very instrumental: https://stackoverflow.com/questions/18971401/sparse-array-compression-using-simd-avx2
 
 Output: a pair: <br/>
  1) compressed array of indexes where bits were true, followed by zeros. <br/>
- 2) popcount of the input mask - computed as a by-product and is a very useful thing when using compress.
+ 2) number of selected elements - computed as a by-product and is a very useful thing when using compress.
 
 _TODO_: This is purely an mm hand written code, that doesn't get generated from python. <br/>
 I need to figure out what do I do with code like that - probably mm should become it's own <br/>
 stand alone folder and this should go there. It's not really a part of the pack interface.
 
-_TODO_: there are various tradeoffs for using lookup tables vs computation, I need to measure those after implementing remove_if.
+_TODO_: right now I only use BMI2 extensions (3 different implementations). There is also a possibility to use precomputed masks. I need to measure that at some point.
 
 `compress_store_unsafe/compress_store_masked`
 
 Same semantics as `*compressstore*` from AVX-512 emulated in AVX2. <br/>
 `compress_store_masked` is one for one the same semantics, <br/>
 `compress_store_unsafe` relies on the ability to write the whole register => will override whatever is there for at most the length of the register.
+
+TODO: analyze if I can use `_mm256_permutevar8x32_epi32` for `compress_store_masked`.
 
 `top_bits`
 

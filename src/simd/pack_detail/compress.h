@@ -58,16 +58,21 @@ T* compress_store_unsafe(T* out, const pack<T, W>& x,
                          top_bits<vbool_t<pack<T, W>>> mmask) {
   using reg_t = register_t<pack<T, W>>;
 
-  if constexpr (mm::bit_width<reg_t>() == 256) {
+  if constexpr (mm::bit_width<reg_t>() == 256 && sizeof(T) >= 4) {
+    auto [mask, offset] = compress_mask_for_permutevar8x32<T>(mmask.raw);
+    const reg_t shuffled = _mm256_permutevar8x32_epi32(x.reg, mask);
+    mm::storeu(reinterpret_cast<reg_t*>(out), shuffled);
+    return out + offset;
+  } else if constexpr(mm::bit_width<reg_t>() == 256) {
     auto [top, bottom] = _compress::split(x);
     using half_bits = top_bits<vbool_t<pack<T, W / 2>>>;
 
     out = compress_store_unsafe(out, top, half_bits{mmask.raw & 0xffff});
     return compress_store_unsafe(out, bottom, half_bits{mmask.raw >> 16});
   } else {
-    auto [mask, offset] = compress_mask(mmask);
+    auto [mask, offset] = compress_mask_for_shuffle_epi8<T>(mmask.raw);
 
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
     mm::storeu(reinterpret_cast<reg_t*>(out), shuffled);
 
     return out + offset;
@@ -75,6 +80,8 @@ T* compress_store_unsafe(T* out, const pack<T, W>& x,
 }
 
 // Copy pasting because of different checks for mmask != 0
+// Also for compress_store_masked I don't utilize _mm256_permutevar8x32_epi32
+// Should think more.
 
 template <typename T, std::size_t W>
 T* compress_store_masked(T* out, const pack<T, W>& x,
@@ -92,10 +99,10 @@ T* compress_store_masked(T* out, const pack<T, W>& x,
     // just taking the first element and not taking any elements.
     if (!mmask) return out;
 
-    auto [mask, offset] = compress_mask(mmask);
+    auto [mask, offset] = compress_mask_for_shuffle_epi8<T>(mmask.raw);
 
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
-    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask.reg);
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
+    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask);
 
     mm::maskmoveu(reinterpret_cast<reg_t*>(out), shuffled, store_mask);
     return out + offset;

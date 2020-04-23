@@ -17,14 +17,7 @@
 #ifndef SIMD_PACK_DETAIL_COMPRESS_MASK_H_
 #define SIMD_PACK_DETAIL_COMPRESS_MASK_H_
 
-#include "simd/pack_detail/pack_declaration.h"
-#include "simd/pack_detail/top_bits.h"
-
-#include <algorithm>
-#include <tuple>
-#include <type_traits>
-
-#include <iostream>
+#include <immintrin.h>
 
 namespace simd {
 namespace _compress_mask {
@@ -45,7 +38,7 @@ inline std::pair<std::uint64_t, std::uint8_t> mask64_epi8(
   return {compressed_idxs, offset};
 }
 
-inline std::pair<mm::register_i<128>, std::uint8_t> mask128_epi8(
+inline std::pair<__m128i, std::uint8_t> mask128_epi8(
     std::uint16_t mmask) {
   auto [first_mask, first_n] = mask64_epi8(mmask & 0xff, 0x0706050403020100);
   auto [second_mask, second_n] = mask64_epi8(mmask >> 8, 0x0f0e0d0c0b0a0908);
@@ -72,7 +65,7 @@ Then to get => 0x0f0e:
  (x << 4) | x & 0x0f0f
  */
 
-inline std::pair<mm::register_i<128>, std::uint8_t> mask128_epi16(
+inline std::pair<__m128i, std::uint8_t> mask128_epi16(
     std::uint16_t mmask) {
   const std::uint64_t mmask_expanded =
       _pdep_u64(mmask, 0x1111111111111111) * 0xf;
@@ -82,38 +75,58 @@ inline std::pair<mm::register_i<128>, std::uint8_t> mask128_epi16(
   const std::uint64_t compressed_idxes =
       _pext_u64(0xfedcba9876543210, mmask_expanded);
 
-  const mm::register_i<128> as_lower_8byte = _mm_cvtsi64_si128(compressed_idxes);
-  const mm::register_i<128> as_16bit = _mm_cvtepu8_epi16(as_lower_8byte);
-  const mm::register_i<128> shift_by_4 = _mm_slli_epi16(as_16bit, 4);
-  const mm::register_i<128> combined = _mm_or_si128(shift_by_4, as_16bit);
-  const mm::register_i<128> filter = _mm_set1_epi16(0x0f0f);
-  const mm::register_i<128> res = _mm_and_si128(combined, filter);
+  const __m128i as_lower_8byte =
+      _mm_cvtsi64_si128(compressed_idxes);
+  const __m128i as_16bit = _mm_cvtepu8_epi16(as_lower_8byte);
+  const __m128i shift_by_4 = _mm_slli_epi16(as_16bit, 4);
+  const __m128i combined = _mm_or_si128(shift_by_4, as_16bit);
+  const __m128i filter = _mm_set1_epi16(0x0f0f);
+  const __m128i res = _mm_and_si128(combined, filter);
 
   return {res, offset};
 }
 
-}  // namespace _compress_mask
+inline std::pair<__m256i, std::uint8_t> mask256_epi32(
+    std::uint32_t mmask) {
+  const std::uint64_t mmask_expanded =
+      _pdep_u64(mmask, 0x5555'5555'5555'5555) * 3;
 
-template <typename T, std::size_t W>
-constexpr bool compress_mask_is_supported() {
-  return W * sizeof(T) == 16;
+  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
+
+  const std::uint64_t compressed_idxes =
+      _pext_u64(0x0706050403020100, mmask_expanded);
+
+  const __m128i as_lower_8byte =
+      _mm_cvtsi64_si128(compressed_idxes);
+  const __m256i expanded = _mm256_cvtepu8_epi32(as_lower_8byte);
+  return {expanded, offset};
 }
 
-template <typename T, std::size_t W>
-inline std::pair<pack<T, W>, std::uint8_t> compress_mask(
-    top_bits<pack<T, W>> mmask) {
-  static_assert(compress_mask_is_supported<T, W>());
+}  // namespace _compress_mask
 
-  auto [mm_compressed, count] = [&] {
-    if constexpr(sizeof(T) >= 2) {
-      return _compress_mask::mask128_epi16(static_cast<std::uint16_t>(mmask.raw));
+template <typename T>
+std::pair<__m128i, std::uint8_t> compress_mask_for_shuffle_epi8(
+    std::uint32_t mmask) {
+
+  auto res = [&]{
+    if constexpr (sizeof(T) == 1) {
+      return _compress_mask::mask128_epi8(mmask);
     } else {
-      return _compress_mask::mask128_epi8(static_cast<std::uint16_t>(mmask.raw));
+      return _compress_mask::mask128_epi16(mmask);
     }
   }();
 
-  count /= sizeof(T);
-  return {pack<T, W>{mm_compressed}, count};
+  res.second /= sizeof(T);
+  return res;
+}
+
+template <typename T>
+std::pair<__m256i, std::uint8_t> compress_mask_for_permutevar8x32(
+    std::uint32_t mmask) {
+  static_assert(sizeof(T) >= 4);
+  auto res = _compress_mask::mask256_epi32(mmask);
+  res.second /= sizeof(T);
+  return res;
 }
 
 }  // namespace simd
