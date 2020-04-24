@@ -207,12 +207,12 @@ async function entryPoint(elementID) {
       time: 'y',
       padding: 'minmax',
       algorithm: 'selection',
+      type: 'selection'
     },
     {
 
       name: "remove 0s",
-      type: "char",
-      size: 50
+      size:1000
     },
     measurements
   );
