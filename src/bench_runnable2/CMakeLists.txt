@@ -15,10 +15,10 @@
 #
 
 find_package(benchmark)
-set(compiler_options --std=c++17 --stdlib=libc++ -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native -mllvm -align-all-functions=6)
-add_executable(remove_alignment)
-target_sources(remove_alignment PRIVATE
+set(compiler_options --std=c++17 --stdlib=libc++ -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native -mllvm -align-all-functions=7)
+add_executable(remove)
+target_sources(remove PRIVATE
                remove.cc)
-target_compile_options(remove_alignment PRIVATE ${compiler_options})
-target_link_libraries(remove_alignment PUBLIC benchmark pthread)
-target_link_options(remove_alignment PRIVATE -stdlib=libc++)
+target_compile_options(remove PRIVATE ${compiler_options})
+target_link_libraries(remove PUBLIC benchmark pthread)
+target_link_options(remove PRIVATE -stdlib=libc++)

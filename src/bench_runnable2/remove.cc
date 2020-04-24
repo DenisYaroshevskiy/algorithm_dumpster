@@ -91,7 +91,7 @@ struct remove_0s {
 
   remove_driver driver() const { return remove_driver{}; }
 
-  std::vector<std::size_t> sizes() const { return {50, 1000, 10000}; }
+  std::vector<std::size_t> sizes() const { return {1000}; }
 
   std::vector<std::size_t> percentage_points() const {
     return {0, 5, 20, 50, 80, 95, 100};
@@ -106,9 +106,10 @@ struct remove_0s {
 
   template <typename T>
   auto input(struct bench::type_t<T>, std::size_t size, std::size_t percentage) const {
+    std::size_t size_in_elements = size / sizeof(T);
     return remove_params<T>{
-        bench::vector_with_zeroes<T>(size, percentage),
-        std::vector<T>(size), 0};
+        bench::vector_with_zeroes<T>(size_in_elements, percentage),
+        std::vector<T>(size_in_elements), 0};
   }
 };
 

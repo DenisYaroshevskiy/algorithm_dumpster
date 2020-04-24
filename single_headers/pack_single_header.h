@@ -617,6 +617,140 @@ constexpr N all_ones() {
  * limitations under the License.
  */
 
+#ifndef SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+#define SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+
+#include <immintrin.h>
+
+namespace simd {
+namespace _compress_mask {
+
+// Based on: https://stackoverflow.com/a/36951611/5021064
+// Mask functions return the compressed indexes and the popcount.
+
+// all_indexes - indexes either from 0 to 7 or from 8 to f
+inline std::pair<std::uint64_t, std::uint8_t> mask64_epi8(
+    std::uint8_t mmask, std::uint64_t all_idxes) {
+  const std::uint64_t mmask_expanded =
+      _pdep_u64(mmask, 0x0101010101010101) * 0xff;
+
+  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
+
+  const std::uint64_t compressed_idxs = _pext_u64(all_idxes, mmask_expanded);
+
+  return {compressed_idxs, offset};
+}
+
+inline std::pair<__m128i, std::uint8_t> mask128_epi8(
+    std::uint16_t mmask) {
+  auto [first_mask, first_n] = mask64_epi8(mmask & 0xff, 0x0706050403020100);
+  auto [second_mask, second_n] = mask64_epi8(mmask >> 8, 0x0f0e0d0c0b0a0908);
+
+  first_mask |= first_n == 8 ? 0 : second_mask << (first_n * 8);
+  second_mask = first_n == 0 ? 0 : second_mask >> ((8 - first_n) * 8);
+
+  return {_mm_set_epi64x(second_mask, first_mask), first_n + second_n};
+}
+
+/*
+  For uint16_t, element byte indexes
+  0 => 0x0100, 256
+  1 => 0x0302, 770
+  2 => 0x0504, 1284
+  3 => 0x0706, 1798
+  4 => 0x0908, 2312
+  5 => 0x0b0a, 2826
+  6 => 0x0d0c, 3340
+  7 => 0x0f0e, 3854
+
+We can write 0xfe into the 7th
+Then to get => 0x0f0e:
+ (x << 4) | x & 0x0f0f
+ */
+
+inline std::pair<__m128i, std::uint8_t> mask128_epi16(
+    std::uint16_t mmask) {
+  const std::uint64_t mmask_expanded =
+      _pdep_u64(mmask, 0x1111111111111111) * 0xf;
+
+  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
+
+  const std::uint64_t compressed_idxes =
+      _pext_u64(0xfedcba9876543210, mmask_expanded);
+
+  const __m128i as_lower_8byte =
+      _mm_cvtsi64_si128(compressed_idxes);
+  const __m128i as_16bit = _mm_cvtepu8_epi16(as_lower_8byte);
+  const __m128i shift_by_4 = _mm_slli_epi16(as_16bit, 4);
+  const __m128i combined = _mm_or_si128(shift_by_4, as_16bit);
+  const __m128i filter = _mm_set1_epi16(0x0f0f);
+  const __m128i res = _mm_and_si128(combined, filter);
+
+  return {res, offset};
+}
+
+inline std::pair<__m256i, std::uint8_t> mask256_epi32(
+    std::uint32_t mmask) {
+  const std::uint64_t mmask_expanded =
+      _pdep_u64(mmask, 0x5555'5555'5555'5555) * 3;
+
+  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
+
+  const std::uint64_t compressed_idxes =
+      _pext_u64(0x0706050403020100, mmask_expanded);
+
+  const __m128i as_lower_8byte =
+      _mm_cvtsi64_si128(compressed_idxes);
+  const __m256i expanded = _mm256_cvtepu8_epi32(as_lower_8byte);
+  return {expanded, offset};
+}
+
+}  // namespace _compress_mask
+
+template <typename T>
+std::pair<__m128i, std::uint8_t> compress_mask_for_shuffle_epi8(
+    std::uint32_t mmask) {
+
+  auto res = [&]{
+    if constexpr (sizeof(T) == 1) {
+      return _compress_mask::mask128_epi8(mmask);
+    } else {
+      return _compress_mask::mask128_epi16(mmask);
+    }
+  }();
+
+  res.second /= sizeof(T);
+  return res;
+}
+
+template <typename T>
+std::pair<__m256i, std::uint8_t> compress_mask_for_permutevar8x32(
+    std::uint32_t mmask) {
+  static_assert(sizeof(T) >= 4);
+  auto res = _compress_mask::mask256_epi32(mmask);
+  res.second /= sizeof(T);
+  return res;
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 #define SIMD_PACK_DETAIL_ADDRESS_MANIPULATION_H_
 
@@ -1107,109 +1241,99 @@ Pack load_unaligned(const T* addr) {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_COMPRESS_MASK_H_
-#define SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+#ifndef SIMD_PACK_DETAIL_COMPRESS_H_
+#define SIMD_PACK_DETAIL_COMPRESS_H_
 
+#include <utility>
 
-#include <algorithm>
-#include <tuple>
-#include <type_traits>
-
-#include <iostream>
 
 namespace simd {
-namespace _compress_mask {
-
-// Based on: https://stackoverflow.com/a/36951611/5021064
-// Mask functions return the compressed indexes and the popcount.
-
-// all_indexes - indexes either from 0 to 7 or from 8 to f
-inline std::pair<std::uint64_t, std::uint8_t> mask64_epi8(
-    std::uint8_t mmask, std::uint64_t all_idxes) {
-  const std::uint64_t mmask_expanded =
-      _pdep_u64(mmask, 0x0101010101010101) * 0xff;
-
-  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
-
-  const std::uint64_t compressed_idxs = _pext_u64(all_idxes, mmask_expanded);
-
-  return {compressed_idxs, offset};
-}
-
-inline std::pair<mm::register_i<128>, std::uint8_t> mask128_epi8(
-    std::uint16_t mmask) {
-  auto [first_mask, first_n] = mask64_epi8(mmask & 0xff, 0x0706050403020100);
-  auto [second_mask, second_n] = mask64_epi8(mmask >> 8, 0x0f0e0d0c0b0a0908);
-
-  first_mask |= first_n == 8 ? 0 : second_mask << (first_n * 8);
-  second_mask = first_n == 0 ? 0 : second_mask >> ((8 - first_n) * 8);
-
-  return {_mm_set_epi64x(second_mask, first_mask), first_n + second_n};
-}
-
-/*
-  For uint16_t, element byte indexes
-  0 => 0x0100, 256
-  1 => 0x0302, 770
-  2 => 0x0504, 1284
-  3 => 0x0706, 1798
-  4 => 0x0908, 2312
-  5 => 0x0b0a, 2826
-  6 => 0x0d0c, 3340
-  7 => 0x0f0e, 3854
-
-We can write 0xfe into the 7th
-Then to get => 0x0f0e:
- (x << 4) | x & 0x0f0f
- */
-
-inline std::pair<mm::register_i<128>, std::uint8_t> mask128_epi16(
-    std::uint16_t mmask) {
-  const std::uint64_t mmask_expanded =
-      _pdep_u64(mmask, 0x1111111111111111) * 0xf;
-
-  const std::uint8_t offset = static_cast<std::uint8_t>(_mm_popcnt_u32(mmask));
-
-  const std::uint64_t compressed_idxes =
-      _pext_u64(0xfedcba9876543210, mmask_expanded);
-
-  const mm::register_i<128> as_lower_8byte = _mm_cvtsi64_si128(compressed_idxes);
-  const mm::register_i<128> as_16bit = _mm_cvtepu8_epi16(as_lower_8byte);
-  const mm::register_i<128> shift_by_4 = _mm_slli_epi16(as_16bit, 4);
-  const mm::register_i<128> combined = _mm_or_si128(shift_by_4, as_16bit);
-  const mm::register_i<128> filter = _mm_set1_epi16(0x0f0f);
-  const mm::register_i<128> res = _mm_and_si128(combined, filter);
-
-  return {res, offset};
-}
-
-}  // namespace _compress_mask
+namespace _compress {
 
 template <typename T, std::size_t W>
-constexpr bool compress_mask_is_supported() {
-  return W * sizeof(T) == 16;
+std::pair<pack<T, W / 2>, pack<T, W / 2>> split(const pack<T, W>& x) {
+  return {{_mm256_extracti128_si256(x.reg, 0)},
+          {_mm256_extracti128_si256(x.reg, 1)}};
 }
 
+template <typename T, typename Register>
+inline Register blend_mask_from_shuffle(const Register& mask) {
+  static constexpr std::size_t fits_count =
+      mm::bit_width<Register>() / (8 * sizeof(T));
+  using prepared_array = std::array<unsigned_equivalent<T>, fits_count>;
+
+  // Not a load, get's optimized.
+  alignas(Register) static constexpr prepared_array first_one_arr = {1};
+  const auto first_one =
+      mm::load(reinterpret_cast<const Register*>(first_one_arr.data()));
+
+  const auto add_one_to_first = mm::add<std::int8_t>(mask, first_one);
+  const auto zero = mm::setzero<Register>();
+
+  return mm::cmpgt<std::int8_t>(add_one_to_first, zero);
+}
+
+}  // namespace _compress
+
 template <typename T, std::size_t W>
-inline std::pair<pack<T, W>, std::uint8_t> compress_mask(
-    top_bits<pack<T, W>> mmask) {
-  static_assert(compress_mask_is_supported<T, W>());
+T* compress_store_unsafe(T* out, const pack<T, W>& x,
+                         top_bits<vbool_t<pack<T, W>>> mmask) {
+  using reg_t = register_t<pack<T, W>>;
 
-  auto [mm_compressed, count] = [&] {
-    if constexpr(sizeof(T) >= 2) {
-      return _compress_mask::mask128_epi16(static_cast<std::uint16_t>(mmask.raw));
-    } else {
-      return _compress_mask::mask128_epi8(static_cast<std::uint16_t>(mmask.raw));
-    }
-  }();
+  if constexpr (mm::bit_width<reg_t>() == 256 && sizeof(T) >= 4) {
+    auto [mask, offset] = compress_mask_for_permutevar8x32<T>(mmask.raw);
+    const reg_t shuffled = _mm256_permutevar8x32_epi32(x.reg, mask);
+    mm::storeu(reinterpret_cast<reg_t*>(out), shuffled);
+    return out + offset;
+  } else if constexpr(mm::bit_width<reg_t>() == 256) {
+    auto [top, bottom] = _compress::split(x);
+    using half_bits = top_bits<vbool_t<pack<T, W / 2>>>;
 
-  count /= sizeof(T);
-  return {pack<T, W>{mm_compressed}, count};
+    out = compress_store_unsafe(out, top, half_bits{mmask.raw & 0xffff});
+    return compress_store_unsafe(out, bottom, half_bits{mmask.raw >> 16});
+  } else {
+    auto [mask, offset] = compress_mask_for_shuffle_epi8<T>(mmask.raw);
+
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
+    mm::storeu(reinterpret_cast<reg_t*>(out), shuffled);
+
+    return out + offset;
+  }
+}
+
+// Copy pasting because of different checks for mmask != 0
+// Also for compress_store_masked I don't utilize _mm256_permutevar8x32_epi32
+// Should think more.
+
+template <typename T, std::size_t W>
+T* compress_store_masked(T* out, const pack<T, W>& x,
+                         top_bits<vbool_t<pack<T, W>>> mmask) {
+  using reg_t = register_t<pack<T, W>>;
+
+  if constexpr (mm::bit_width<reg_t>() == 256) {
+    auto [top, bottom] = _compress::split(x);
+    using half_bits = top_bits<vbool_t<pack<T, W / 2>>>;
+
+    out = compress_store_masked(out, top, half_bits{mmask.raw & 0xffff});
+    return compress_store_masked(out, bottom, half_bits{mmask.raw >> 16});
+  } else {
+    // We have to do this check, since we can't in the end distinguish between
+    // just taking the first element and not taking any elements.
+    if (!mmask) return out;
+
+    auto [mask, offset] = compress_mask_for_shuffle_epi8<T>(mmask.raw);
+
+    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask);
+    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask);
+
+    mm::maskmoveu(reinterpret_cast<reg_t*>(out), shuffled, store_mask);
+    return out + offset;
+  }
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_COMPRESS_MASK_H_
+#endif  // SIMD_PACK_DETAIL_COMPRESS_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1341,108 +1465,6 @@ pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
 }  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_BLEND_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#ifndef SIMD_PACK_DETAIL_COMPRESS_H_
-#define SIMD_PACK_DETAIL_COMPRESS_H_
-
-#include <utility>
-
-
-namespace simd {
-namespace _compress {
-
-template <typename T, std::size_t W>
-std::pair<pack<T, W / 2>, pack<T, W / 2>> split(const pack<T, W>& x) {
-  return {{_mm256_extracti128_si256(x.reg, 0)},
-          {_mm256_extracti128_si256(x.reg, 1)}};
-}
-
-template <typename T, typename Register>
-inline Register blend_mask_from_shuffle(const Register& mask) {
-  static constexpr std::size_t fits_count =
-      mm::bit_width<Register>() / (8 * sizeof(T));
-  using prepared_array = std::array<unsigned_equivalent<T>, fits_count>;
-
-  // Not a load, get's optimized.
-  alignas(Register) static constexpr prepared_array first_one_arr = {1};
-  const auto first_one =
-      mm::load(reinterpret_cast<const Register*>(first_one_arr.data()));
-
-  const auto add_one_to_first = mm::add<std::int8_t>(mask, first_one);
-  const auto zero = mm::setzero<Register>();
-
-  return mm::cmpgt<std::int8_t>(add_one_to_first, zero);
-}
-
-}  // namespace _compress
-
-template <typename T, std::size_t W>
-T* compress_store_unsafe(T* out, const pack<T, W>& x,
-                         top_bits<vbool_t<pack<T, W>>> mmask) {
-  using reg_t = register_t<pack<T, W>>;
-
-  if constexpr (mm::bit_width<reg_t>() == 256) {
-    auto [top, bottom] = _compress::split(x);
-    using half_bits = top_bits<vbool_t<pack<T, W / 2>>>;
-
-    out = compress_store_unsafe(out, top, half_bits{mmask.raw & 0xffff});
-    return compress_store_unsafe(out, bottom, half_bits{mmask.raw >> 16});
-  } else {
-    auto [mask, offset] = compress_mask(mmask);
-
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
-    mm::storeu(reinterpret_cast<reg_t*>(out), shuffled);
-
-    return out + offset;
-  }
-}
-
-// Copy pasting because of different checks for mmask != 0
-
-template <typename T, std::size_t W>
-T* compress_store_masked(T* out, const pack<T, W>& x,
-                         top_bits<vbool_t<pack<T, W>>> mmask) {
-  using reg_t = register_t<pack<T, W>>;
-
-  if constexpr (mm::bit_width<reg_t>() == 256) {
-    auto [top, bottom] = _compress::split(x);
-    using half_bits = top_bits<vbool_t<pack<T, W / 2>>>;
-
-    out = compress_store_masked(out, top, half_bits{mmask.raw & 0xffff});
-    return compress_store_masked(out, bottom, half_bits{mmask.raw >> 16});
-  } else {
-    // We have to do this check, since we can't in the end distinguish between
-    // just taking the first element and not taking any elements.
-    if (!mmask) return out;
-
-    auto [mask, offset] = compress_mask(mmask);
-
-    const reg_t shuffled = _mm_shuffle_epi8(x.reg, mask.reg);
-    const reg_t store_mask = _compress::blend_mask_from_shuffle<T>(mask.reg);
-
-    mm::maskmoveu(reinterpret_cast<reg_t*>(out), shuffled, store_mask);
-    return out + offset;
-  }
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_COMPRESS_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
