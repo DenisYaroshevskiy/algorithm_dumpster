@@ -85,6 +85,7 @@ function processVaryingKeys(varying) {
   let y = undefined;
   let selection = [];
   let reduce = undefined;
+  let reduction_keys = [];
   for (const [key, value] of Object.entries(varying)) {
     if (value == 'x') {
       if (x) throw new Error(`duplicated x: ${x}, ${key}`);
@@ -101,7 +102,7 @@ function processVaryingKeys(varying) {
       continue;
     }
     if (REDUCE_OPERATIONS.indexOf(value) !== -1) {
-      if (reduce) throw new Error(`more then one reduce operation! Last one: ${key}`);
+      reduction_keys.push(key);
       reduce = value;
       continue;
     }
@@ -111,7 +112,7 @@ function processVaryingKeys(varying) {
   if (!x) throw new Error('x is not defined');
   if (!y) throw new Error('y is not defined');
   if (selection.length == 0) throw new Error('selection options are not specified');
-  return { x, y, selection, reduce };
+  return { x, y, selection, reduce, reduction_keys };
 }
 
 function minByKey(xs, key) {
@@ -164,17 +165,31 @@ function makeSelectionObject(ms, varying) {
   return { name, x, y };
 }
 
+function makeTitle(varying, fixed) {
+  let title_elements = Object.entries(fixed).map(key_value => `${key_value[0]} : ${key_value[1]}`);
+  if (varying.reduce) {
+    let reduction_key = varying.reduction_keys.join(',');
+    title_elements.push(`${reduction_key} : ${varying.reduce}`);
+  }
+  return title_elements.join(' | ');
+}
+
 function visualizationDataFromMeasurements(varying, fixed, measurements) {
   measurements = measurements.filter(e => isSubset(fixed, e));
   measurements = measurements.map(e => setDifference(e, fixed));
   varying = processVaryingKeys(varying);
   let selections = partitionByKeys(measurements, varying.selection);
   selections = applyReduction(selections, varying);
-  return selections.map(ms => makeSelectionObject(ms, varying));
+  return {
+    title: makeTitle(varying, fixed),
+    x_title : varying.x,
+    y_title : varying.y,
+    lines: selections.map(ms => makeSelectionObject(ms, varying))
+  };
 }
 
 function drawBenchmark(element, data) {
-  const traces = data.map(line => {
+  const traces = data.lines.map(line => {
     return {
       name: line.name,
       x: line.x,
@@ -185,13 +200,24 @@ function drawBenchmark(element, data) {
     };
   });
 
+  console.log(data);
+
   const layout = {
-    width: 800,
-    height: 600,
+    title: data.title,
+    xaxis : {
+      title : {
+        text : data.x_title,
+      }
+    },
     yaxis: {
+      title : {
+        text : data.y_title,
+      },
       rangemode: 'tozero',
       autorange: true
-    }
+    },
+    width: 800,
+    height: 600,
   };
 
   Plotly.newPlot(element, traces, layout);
@@ -201,18 +227,18 @@ async function entryPoint(elementID) {
   const element = document.getElementById(elementID);
   const loaded = await fetch("data/bench/remove.json").then(async (raw) => raw.json());
   const measurements = loaded.benchmarks.map(parseMeasurement);
-  const asVisualized = visualizationDataFromMeasurements(
+  const asVisualized =visualizationDataFromMeasurements
+  (
     {
       percentage: 'x',
       time: 'y',
-      padding: 'minmax',
+      padding: 'min',
       algorithm: 'selection',
       type: 'selection'
     },
     {
-
       name: "remove 0s",
-      size:1000
+      size:10000
     },
     measurements
   );
@@ -401,8 +427,11 @@ function visualizationDataFromMeasurementsTests() {
     size: 1000
   };
 
-  const expected = [
-    {
+  const expected = {
+    title: "name : bench1 | size : 1000 | padding : min",
+    x_title: "percentage",
+    y_title: "time",
+    lines: [{
       name: 'alg1/0',
       x: [5],
       y: [0.1]
@@ -411,8 +440,8 @@ function visualizationDataFromMeasurementsTests() {
       name: 'alg2/1',
       x: [5],
       y: [0.3]
-    }
-  ];
+    }]
+  };
 
   expectEqual(expected, visualizationDataFromMeasurements(varying, fixed, data));
 }
