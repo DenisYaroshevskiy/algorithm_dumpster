@@ -720,7 +720,7 @@ In avx-512 there are intrinsics `*compressstore*` - which are very useful. <br/>
 This is an approximation of this for avx-2. <br/>
 There are 2 avaliable shuffle instructions:
 `_mm_shuffle_epi8` - works for anything for 128 bit register
-and `_mm256_permutevar8x32_epi32` - works for 256 bit register, but the types has to
+and `_mm256_permutevar8x32_epi32` - works for 256 bit register, but the types have to
 be at least 4 bytes.
 
 The solutions is based on: https://stackoverflow.com/a/36951611/5021064 <br/>
@@ -734,7 +734,7 @@ _TODO_: This is purely an mm hand written code, that doesn't get generated from 
 I need to figure out what do I do with code like that - probably mm should become it's own <br/>
 stand alone folder and this should go there. It's not really a part of the pack interface.
 
-_TODO_: right now I only use BMI2 extensions (3 different implementations). There is also a possibility to use precomputed masks. I need to measure that at some point.
+_TODO_: right now I only use BMI2 extensions (2 different implementations). There is also a possibility to use precomputed masks. I need to measure that at some point.
 
 `compress_store_unsafe/compress_store_masked`
 
