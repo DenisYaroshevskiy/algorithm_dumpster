@@ -91,7 +91,7 @@ struct remove_0s {
 
   remove_driver driver() const { return remove_driver{}; }
 
-  std::vector<std::size_t> sizes() const { return {1000}; }
+  std::vector<std::size_t> sizes() const { return {40, 1000, 10'000}; }
 
   std::vector<std::size_t> percentage_points() const {
     return {0, 5, 20, 50, 80, 95, 100};
