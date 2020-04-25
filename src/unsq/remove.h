@@ -30,14 +30,16 @@ namespace _remove {
 template <typename Pack, typename T>
 std::pair<T*, simd::top_bits<simd::vbool_t<Pack>>> figure_out_safe_load(T* f, T* l) {
   using vbool = simd::vbool_t<Pack>;
+  constexpr std::ptrdiff_t width = simd::size_v<Pack>;
+
   T* page_boundary = simd::end_of_page(f);
 
-  if (page_boundary - f) {
-    T* safe = l - simd::size_v<Pack>;
+  if (page_boundary - f < width) {
+    T* safe = l - width;
     return {safe, simd::ignore_first_n_mask<vbool>(f - safe)};
   }
 
-  return {f, simd::ignore_last_n_mask<vbool>(l - f)};
+  return {f, simd::ignore_last_n_mask<vbool>(f + width - l)};
 }
 
 }  // namespace _remove
