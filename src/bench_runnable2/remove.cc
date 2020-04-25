@@ -67,7 +67,7 @@ struct std_remove {
 };
 
 struct unsq_remove_128 {
-  const char* name() const { return "unsq::remove<16>"; }
+  const char* name() const { return "unsq::remove<128>"; }
 
   template <typename I, typename T>
   I operator()(I f, I l, const T& v) const {
@@ -76,7 +76,7 @@ struct unsq_remove_128 {
 };
 
 struct unsq_remove_256 {
-  const char* name() const { return "unsq::remove<32>"; }
+  const char* name() const { return "unsq::remove<256>"; }
 
   template <typename I, typename T>
   I operator()(I f, I l, const T& v) const {
