@@ -18,6 +18,7 @@
 #define SIMD_PACK_DETAIL_COMPRESS_MASK_H_
 
 #include <immintrin.h>
+#include <utility>
 
 namespace simd {
 namespace _compress_mask {
