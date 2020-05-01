@@ -54,6 +54,11 @@ struct type_name<int> {
   const char* operator()() const { return "int"; }
 };
 
+template <>
+struct type_name<float> {
+  const char* operator()() const { return "float"; }
+};
+
 constexpr std::size_t kTestAlignmentLimit = 65;
 
 namespace _bench {
