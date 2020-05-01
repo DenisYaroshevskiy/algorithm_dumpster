@@ -83,7 +83,7 @@ struct std_lower_bound {
 
 // Benchmarks ------------------------------------------------------
 
-struct find_lower_bound {
+struct lower_bound_common {
   const char* name() const { return "find lower bound"; }
 
   lower_bound_driver driver() const { return {}; }
@@ -101,6 +101,10 @@ struct find_lower_bound {
   }
 
   bench::type_list<int, float> types() const { return {}; }
+};
+
+struct lower_bound_whole_range : lower_bound_common {
+  const char* name() const { return "lower bound whole range"; }
 
   template <typename T>
   auto input(struct bench::type_t<T>, std::size_t size,
@@ -114,13 +118,30 @@ struct find_lower_bound {
   }
 };
 
+struct lower_bound_first_5_percent : lower_bound_common {
+  const char* name() const { return "lower bound first 5 percent"; }
+
+  template <typename T>
+  auto input(struct bench::type_t<T>, std::size_t size,
+             std::size_t percentage) const {
+    std::size_t size_in_elements = size / sizeof(T);
+
+    auto input = bench::sorted_vector<T>(size_in_elements);
+    T value = input[(size_in_elements / 20 - 1) * percentage / 100];;
+
+    return lower_bound_params<T>{input, value};
+  }
+};
+
+
 }  // namespace
 
 int main(int argc, char** argv) {
   benchmark::Initialize(&argc, argv);
   if (benchmark::ReportUnrecognizedArguments(argc, argv)) return 1;
 
-  bench::register_benchmark(find_lower_bound{});
+  bench::register_benchmark(lower_bound_whole_range{});
+  bench::register_benchmark(lower_bound_first_5_percent{});
 
   benchmark::RunSpecifiedBenchmarks();
 }
