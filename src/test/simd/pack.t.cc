@@ -945,5 +945,34 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_masked", "[simd]",
   }
 }
 
+TEMPLATE_TEST_CASE("simd.pack.reduce", "[simd]",
+                   ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> input, expected;
+
+  auto run = [&] {
+    if constexpr(sizeof(scalar) == 1) return;
+    else {
+      const pack_t x = load<pack_t>(input.data());
+
+      // sum
+      if constexpr (!std::is_pointer_v<scalar>) {
+        scalar expected_value = std::accumulate(input.begin(), input.end(), 0);
+        expected.fill(expected_value);
+
+        auto actual =
+            reduce(x, [](const pack_t& x, const pack_t& y) { return x + y; });
+        REQUIRE(load<pack_t>(expected.data()) == actual);
+      }
+    }
+  };
+
+  std::iota(input.begin(), input.end(), (scalar)0);
+  run();
+}
+
 }  // namespace
 }  // namespace simd

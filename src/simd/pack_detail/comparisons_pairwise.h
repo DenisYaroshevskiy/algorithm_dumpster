@@ -17,8 +17,6 @@
 #ifndef SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_
 #define SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_
 
-#include <type_traits>
-
 #include "simd/bits.h"
 #include "simd/pack_detail/pack_declaration.h"
 #include "simd/pack_detail/pack_cast.h"
