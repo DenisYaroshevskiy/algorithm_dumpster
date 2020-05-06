@@ -685,6 +685,10 @@ python script to generate mm.h
 `compress_store_unsafe(T*, pack, mmask) -> T*` <br/>
 `compress_store_maskedT*, pack, mmask) -> T*` <br/>
 
+`swap_adjacent_groups<group_size>(pack) -> pack` <br/>
+
+`reduce(pack, op) -> pack` <br/>
+
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
 
@@ -750,6 +754,19 @@ top bits is an abstruction over the result of movemask (get_top_bits in this lib
 In many respects alternative to vbool, that is useful in cases where vbool isn't. <br/>
 Potential usecase: when looking for element via simd - use `first_true(top_bits)` to find at what position. <br/>
 One useful design decision: ignore_*_ functions have overload that doesn't take a parameter of how much to ignore, which allows usage in a templte context.
+
+`swap_adjacent_groups<group_size>`
+
+If group_size == 1 => you get elements next to each other swapped (like 0s and 1st).
+For group_size == 2 it's going to be [0, 1] swapped with [2, 3]
+etc -> up to group size == width / 2. (only supports powers of 2).
+Main driving horse for reduce.
+
+`reduce`
+
+Given a pairwise operation (needs to associate and commute) -> compute a reduction.<br/>
+Operations example: `+`, `min_pairwise`.<br/>
+Returns a pack with all the elements equal to result.
 
 ## Test
 

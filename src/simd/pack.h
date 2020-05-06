@@ -40,6 +40,8 @@
 #include "simd/pack_detail/compress_mask.h"
 #include "simd/pack_detail/compress.h"
 
+#include "simd/pack_detail/shuffle.h"
+
 #include "simd/pack_detail/reduce.h"
 
 #endif  // SIMD_PACK_H_

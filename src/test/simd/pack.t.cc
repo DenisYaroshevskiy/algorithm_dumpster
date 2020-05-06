@@ -721,10 +721,11 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask_epi8", "[simd]",
   std::iota(element_indexes.begin(), element_indexes.end(), 0);
 
   if constexpr (sizeof(scalar) == 2) {
-    element_indexes = {0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e};
+    element_indexes = {0x0100, 0x0302, 0x0504, 0x0706,
+                       0x0908, 0x0b0a, 0x0d0c, 0x0f0e};
   }
 
-  auto run_compress = [] (std::uint32_t mmask) {
+  auto run_compress = [](std::uint32_t mmask) {
     if constexpr (sizeof(pack_t) == 16) {
       return compress_mask_for_shuffle_epi8<scalar>(mmask);
     } else {
@@ -753,8 +754,11 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask_epi8", "[simd]",
     REQUIRE(res.second == o);
   };
 
-  auto test = [&] (auto& self, std::size_t i) mutable {
-    if (i == size) { run(); return; };
+  auto test = [&](auto& self, std::size_t i) mutable {
+    if (i == size) {
+      run();
+      return;
+    };
     self(self, i + 1);
     a[i] = 1;
     self(self, i + 1);
@@ -945,8 +949,61 @@ TEMPLATE_TEST_CASE("simd.pack.compress_store_masked", "[simd]",
   }
 }
 
-TEMPLATE_TEST_CASE("simd.pack.reduce", "[simd]",
-                   ALL_TEST_PACKS) {
+TEMPLATE_TEST_CASE("simd.pack.swap_adjacent", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> input, expected;
+
+  std::iota(input.begin(), input.end(), (scalar)0);
+  expected = input;
+
+  auto run = [&](auto constant) {
+    pack_t loaded = load<pack_t>(input.data());
+    const pack_t actual = swap_adjacent_groups<decltype(constant){}()>(loaded);
+    REQUIRE(load<pack_t>(expected.data()) == actual);
+  };
+
+  SECTION("1") {
+    for (std::size_t i = 0; i < size; i += 2) {
+      std::swap(expected[i], expected[i + 1]);
+    }
+    run(std::integral_constant<std::size_t, 1u>{});
+  }
+
+  SECTION("2") {
+    if constexpr (size >= 4) {
+      for (std::size_t i = 0; i < size; i += 4) {
+        auto f = expected.begin() + i;
+        std::swap_ranges(f, f + 2, f + 2);
+      }
+      run(std::integral_constant<std::size_t, 2u>{});
+    }
+  }
+
+  SECTION("4") {
+    if constexpr (size >= 8) {
+      for (std::size_t i = 0; i < size; i += 8) {
+        auto f = expected.begin() + i;
+        std::swap_ranges(f, f + 4, f + 4);
+      }
+      run(std::integral_constant<std::size_t, 4u>{});
+    }
+  }
+
+  SECTION("8") {
+    if constexpr (size >= 16) {
+      for (std::size_t i = 0; i < size; i += 16) {
+        auto f = expected.begin() + i;
+        std::swap_ranges(f, f + 8, f + 8);
+      }
+      run(std::integral_constant<std::size_t, 8u>{});
+    }
+  }
+}
+
+TEMPLATE_TEST_CASE("simd.pack.reduce", "[simd]", ALL_TEST_PACKS) {
   using pack_t = TestType;
   using scalar = scalar_t<pack_t>;
   constexpr size_t size = size_v<pack_t>;
@@ -954,19 +1011,27 @@ TEMPLATE_TEST_CASE("simd.pack.reduce", "[simd]",
   alignas(pack_t) std::array<scalar, size> input, expected;
 
   auto run = [&] {
-    if constexpr(sizeof(scalar) == 1) return;
-    else {
-      const pack_t x = load<pack_t>(input.data());
+    const pack_t x = load<pack_t>(input.data());
 
-      // sum
-      if constexpr (!std::is_pointer_v<scalar>) {
-        scalar expected_value = std::accumulate(input.begin(), input.end(), 0);
-        expected.fill(expected_value);
+    // sum
+    if constexpr (!std::is_pointer_v<scalar>) {
+      scalar expected_value = std::accumulate(input.begin(), input.end(), 0);
+      expected.fill(expected_value);
 
-        auto actual =
-            reduce(x, [](const pack_t& x, const pack_t& y) { return x + y; });
-        REQUIRE(load<pack_t>(expected.data()) == actual);
-      }
+      auto actual =
+          reduce(x, [](const pack_t& x, const pack_t& y) { return x + y; });
+      REQUIRE(load<pack_t>(expected.data()) == actual);
+    }
+
+    // min
+    {
+      scalar expected_value = *std::min_element(input.begin(), input.end());
+      expected.fill(expected_value);
+
+      auto actual = reduce(x, [](const pack_t& x, const pack_t& y) {
+        return min_pairwise(x, y);
+      });
+      REQUIRE(load<pack_t>(expected.data()) == actual);
     }
   };
 
