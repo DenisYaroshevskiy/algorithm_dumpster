@@ -28,6 +28,7 @@ inline mm::register_i<128> swap_adjacent_16_bytes_mask() {
   return _mm_set_epi8(14, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1);
 }
 
+// Gets optimized out to just loading a constant
 inline mm::register_i<256> swap_adjacent_32_bytes_mask() {
   return _mm256_set_m128(swap_adjacent_16_bytes_mask(),
                          swap_adjacent_16_bytes_mask());
@@ -43,9 +44,11 @@ Register swap_adjacent(Register x) {
   } else if constexpr (byte_width == 1 && mm::bit_width<Register>() == 256) {
     return _mm256_shuffle_epi8(x, swap_adjacent_32_bytes_mask());
   } else if constexpr (byte_width == 2 && mm::bit_width<Register>() == 128) {
+    // Optimized to one load + shuffle
     x = _mm_shufflehi_epi16(x, four_element_shuffle);
     return _mm_shufflelo_epi16(x, four_element_shuffle);
   } else if constexpr (byte_width == 2 && mm::bit_width<Register>() == 256) {
+    // Optimized to one load + shuffle
     x = _mm256_shufflehi_epi16(x, four_element_shuffle);
     return _mm256_shufflelo_epi16(x, four_element_shuffle);
   } else if constexpr (byte_width == 4 && mm::bit_width<Register>() == 128) {
