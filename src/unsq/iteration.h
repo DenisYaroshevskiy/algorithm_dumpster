@@ -24,7 +24,7 @@ namespace unsq {
 
 template <std::size_t width, typename I, typename P>
 // require ContigiousIterator<I> && VectorCheck<P, ValueType<I>>
-void iteration_aligned_unguarded(I _f, P p) {
+P iteration_aligned_unguarded(I _f, P p) {
   using T = equivalent<ValueType<I>>;
   using pack = simd::pack<T, width>;
   using vbool = simd::vbool_t<pack>;
@@ -38,7 +38,7 @@ void iteration_aligned_unguarded(I _f, P p) {
   {
     const std::uint32_t offset = static_cast<std::uint32_t>(f - aligned_f);
     auto ignore = simd::ignore_first_n_mask<vbool>(offset);
-    if (p(aligned_f, cur, ignore)) return;
+    if (p(aligned_f, cur, ignore)) return p;
   }
 
   // After that no offset checks for us.
@@ -46,6 +46,34 @@ void iteration_aligned_unguarded(I _f, P p) {
     aligned_f += width;
     cur = simd::load<pack>(aligned_f);
   } while (!p(aligned_f, cur));
+
+  return p;
+}
+
+template <std::size_t width, typename I, typename P>
+// require ContigiousIterator<I> && VectorCheck<P, ValueType<I>>
+P iteration_aligned(I _f, I _l, P p) {
+  using pack = simd::pack<equivalent<ValueType<I>>, width>;
+  using vbool = simd::vbool_t<pack>;
+
+  // Not necessary but prevents a weird call with ignore everything
+  if (_f == _l) return p;
+
+
+  auto* l = unsq::drill_down(_l);
+
+  auto loop_body = [&](auto* from, const pack& read, auto... ignore) {
+    if (l - from < static_cast<std::ptrdiff_t>(width)) {
+      auto mask = simd::ignore_last_n_mask<vbool>(from + width - l);
+      mask = combine_ignore(mask, ignore...);
+      p(from, read, mask);
+      return true;
+    }
+    return p(from, read, ignore...);
+  };
+
+  iteration_aligned_unguarded<width>(_f, loop_body);
+  return p;
 }
 
 }  // namespace unsq

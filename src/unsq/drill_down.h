@@ -80,6 +80,10 @@ auto* drill_down(I _it) {
 }
 
 template <typename I>
+using equivalent_iterator = decltype(drill_down(std::declval<I>()));
+
+
+template <typename I>
 // require ContigiousIterator<I>
 auto drill_down_range(I _f, I _l) {
   auto* f = drill_down(_f);
@@ -91,6 +95,14 @@ auto drill_down_range(I _f, I _l) {
 template <typename I, typename T>
 I undo_drill_down(I _f, T* f) {
   return _f + (f - drill_down(_f));
+}
+
+template <typename T>
+equivalent<T> equivalent_cast(const T& x) {
+  equivalent<T> res;
+  static_assert(sizeof(T) == sizeof(equivalent<T>));
+  std::memcpy(&res, &x, sizeof(x)); // Just a bit_cast, evaporates
+  return res;
 }
 
 }  // namespace unsq

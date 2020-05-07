@@ -131,6 +131,16 @@ top_bits<Pack> ignore_last_n(const top_bits<Pack>& x, std::uint32_t n) {
 }
 
 template <typename Pack>
+top_bits<Pack> combine_ignore(const top_bits<Pack>& x) {
+  return x;
+}
+
+template <typename Pack>
+top_bits<Pack> combine_ignore(const top_bits<Pack>& x, const top_bits<Pack>& ignore) {
+  return x | ignore;
+}
+
+template <typename Pack>
 std::optional<std::uint32_t> first_true(const top_bits<Pack>& x) {
   if (!x) return std::nullopt;
   return count_trailing_zeroes(x.raw) / sizeof(scalar_t<Pack>);
