@@ -240,14 +240,14 @@ TEMPLATE_TEST_CASE("simd.pack.top_bits", "[simd]", ALL_TEST_PACKS) {
 
   alignas(pack_t) std::array<scalar, size> a, b;
 
-  auto run = [&] {
+  auto run = [&] (auto ... ignore) {
     pack_t loaded = load<pack_t>(a.data());
-    return get_top_bits(loaded);
+    return get_top_bits(loaded, ignore ...);
   };
 
-  auto run_b = [&] {
+  auto run_b = [&](auto ... ignore) {
     pack_t loaded = load<pack_t>(b.data());
-    return get_top_bits(loaded);
+    return get_top_bits(loaded, ignore...);
   };
 
   SECTION("get top bits/ignore") {
@@ -261,6 +261,8 @@ TEMPLATE_TEST_CASE("simd.pack.top_bits", "[simd]", ALL_TEST_PACKS) {
     a[0] = FF;
 
     REQUIRE(set_lower_n_bits(sizeof(scalar)) == run().raw);
+
+    REQUIRE(0 == run(ignore_first_n_mask<pack_t>(1)).raw);
   }
 
   SECTION("ignore first n") {
@@ -312,6 +314,20 @@ TEMPLATE_TEST_CASE("simd.pack.top_bits", "[simd]", ALL_TEST_PACKS) {
     }
 
     REQUIRE(run_b().raw == run_and_ignore_last(size).raw);
+  }
+
+  SECTION("combine ignore") {
+    a.fill(zero);
+    REQUIRE(0 == run().raw);
+
+    a[0] = FF;
+    a[1] = FF;
+    a.back() = FF;
+
+    auto mask = combine_ignore(ignore_first_n_mask<pack_t>(2),
+                               ignore_last_n_mask<pack_t>(1));
+
+    REQUIRE(0 == run(mask).raw);
   }
 
   SECTION("first true/all_true") {

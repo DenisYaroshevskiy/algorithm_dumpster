@@ -815,10 +815,27 @@ _TODO_
 ### find
 
 `find_if_unguarded`, <br/>
-`find_unguarded`
+`find_unguarded` <br/>
+`find_if` <br/>
+`find` <br/>
 
 `_unguarded` is a generalization on std::strlen from a C standard. <br/>
 Complelty based on: https://stackoverflow.com/questions/25566302/
+
+### iteration
+
+`iteration_aligned_unguarded` <br/>
+`iteration_aligned`
+
+Isolation of specific iteration patterns that are used in multiple algorithms.
+Accepts a predicate that accepts address (where the pack was loaded from),
+loaded register and an optional ignore mask (will be invoked with 2 parameters if no mask). Predicate should return true if the iteration should be aborted.
+
+`iteration_aligned_unguarded` - iteration over one range, using aligned reads.
+Every address is loaded at most once. Algorithm will figure out a mask for a first load might be partial, after that there are no masks.
+Examples of algorithms that use this: `find_if_unguarded`
+
+`iteration_algined`- iteration over one range, using aligned reads. Based on `unguarded` version. Will stop when the iteration when hits `last`. First and last reads might be partial (it can be the same read).
 
 ### remove
 

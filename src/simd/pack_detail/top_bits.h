@@ -137,7 +137,7 @@ top_bits<Pack> combine_ignore(const top_bits<Pack>& x) {
 
 template <typename Pack>
 top_bits<Pack> combine_ignore(const top_bits<Pack>& x, const top_bits<Pack>& ignore) {
-  return x | ignore;
+  return x & ignore;
 }
 
 template <typename Pack>

@@ -32,38 +32,32 @@ void one_range_find_unguarded_test(I f, I l) {
 
   while (f != l) {
     *--l = 4;
+    //log(f, l + 1, 4);
     REQUIRE(l == unsq::find_unguarded<width>(f, 4));
   }
-}
-
-template <typename I, typename T>
-void log(I f, I l, const T& x) {
-  std::cout << '[';
-  while (f != l) std::cout << *f++ << ' ';
-  std::cout << ']';
-
-  std::cout << " x: " << x << std::endl;
 }
 
 template <std::size_t width, typename I>
 void one_range_find_test(I f, I l) {
   std::iota(f, l, ValueType<I>(0));
 
-  auto run = [](auto _f, auto _l, const auto& x) {
-    log(_f, _l, x);
-    auto expected = std::find(_f, _l, x);
-    auto actual = unsq::find<width>(_f, _l, x);
-    REQUIRE(expected - _f == actual - _f);
+  auto call_find = [](auto f, auto l, const auto& x) {
+    return unsq::find<width>(f, l, x);
   };
 
-  run(f, l, ValueType<I>{});
+  REQUIRE(std::find(f, l, ValueType<I>{}) ==
+          call_find(f, l, ValueType<I>{}));
 
   for (I cur = f; cur != l; ++cur) {
-    run(f, l, *cur);
+    REQUIRE(call_find(f, l, *cur) == cur);
+  }
 
-    // masks are working
-    for (I after = cur; after != l; ++after) {
-      run(f, cur, *after);
+  if (l - f < 35) return;
+
+  // masks are working
+  for (I cur = f; cur != f + 35; ++cur) {
+    for (I after = cur + 1; after != f + 35; ++after) {
+      REQUIRE(call_find(f, cur, *after) == cur);
     }
   }
 }
