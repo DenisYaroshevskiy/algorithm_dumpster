@@ -877,7 +877,7 @@ inline mm::register_i<128> swap_adjacent_16_bytes_mask() {
   return _mm_set_epi8(14, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1);
 }
 
-// Get's optimized out to just loading a constant
+// Gets optimized out to just loading a constant
 inline mm::register_i<256> swap_adjacent_32_bytes_mask() {
   return _mm256_set_m128(swap_adjacent_16_bytes_mask(),
                          swap_adjacent_16_bytes_mask());
@@ -1053,6 +1053,16 @@ top_bits<Pack> ignore_last_n(const top_bits<Pack>& x) {
 template <typename Pack>
 top_bits<Pack> ignore_last_n(const top_bits<Pack>& x, std::uint32_t n) {
   return x & ignore_last_n_mask<Pack>(n);
+}
+
+template <typename Pack>
+top_bits<Pack> combine_ignore(const top_bits<Pack>& x) {
+  return x;
+}
+
+template <typename Pack>
+top_bits<Pack> combine_ignore(const top_bits<Pack>& x, const top_bits<Pack>& ignore) {
+  return x & ignore;
 }
 
 template <typename Pack>
