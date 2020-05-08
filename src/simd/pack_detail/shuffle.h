@@ -30,8 +30,8 @@ inline mm::register_i<128> swap_adjacent_16_bytes_mask() {
 
 // Gets optimized out to just loading a constant
 inline mm::register_i<256> swap_adjacent_32_bytes_mask() {
-  return _mm256_set_m128(swap_adjacent_16_bytes_mask(),
-                         swap_adjacent_16_bytes_mask());
+  return _mm256_set_m128i(swap_adjacent_16_bytes_mask(),
+                          swap_adjacent_16_bytes_mask());
 }
 
 template <std::size_t byte_width, typename Register>
