@@ -36,6 +36,7 @@
 
 #include "simd/pack_detail/address_manipulation.h"
 #include "simd/pack_detail/top_bits.h"
+#include "simd/pack_detail/spread_top_bits.h"
 
 #include "simd/pack_detail/compress_mask.h"
 #include "simd/pack_detail/compress.h"

@@ -17,8 +17,6 @@
 #ifndef SIMD_PACK_DETAIL_BLEND_H_
 #define SIMD_PACK_DETAIL_BLEND_H_
 
-#include "simd/pack_detail/load.h"
-#include "simd/pack_detail/masks.h"
 #include "simd/pack_detail/pack_declaration.h"
 
 namespace simd {

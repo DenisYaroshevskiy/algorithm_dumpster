@@ -19,7 +19,6 @@
 
 #include "simd/bits.h"
 #include "simd/pack_detail/comparisons_pairwise.h"
-#include "simd/pack_detail/masks.h"
 #include "simd/pack_detail/minmax_pairwise.h"
 #include "simd/pack_detail/pack_cast.h"
 #include "simd/pack_detail/pack_declaration.h"

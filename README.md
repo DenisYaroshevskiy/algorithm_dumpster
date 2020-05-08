@@ -687,6 +687,8 @@ python script to generate mm.h
 
 `swap_adjacent_groups<group_size>(pack) -> pack` <br/>
 
+`spread_top_bits(top_bits) -> pack` <br/>
+
 `reduce(pack, op) -> pack` <br/>
 
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
@@ -761,6 +763,14 @@ If group_size == 1 => you get elements next to each other swapped (like 0s and 1
 For group_size == 2 it's going to be [0, 1] swapped with [2, 3]
 etc -> up to group size == width / 2. (only supports powers of 2).
 Main driving horse for reduce.
+
+`spread_top_bits(top_bits) -> pack` <br/>
+
+Reverse to get_top_bits. Well - will spread the bit into every bit of the element.
+2 fundamental versions: one for bytes and an optimized one if we have under 8 elements (just turned out like that - basically we can do better if the mask can fit into an element).
+Relevant stack overflows:
+https://stackoverflow.com/a/24242696/5021064
+https://stackoverflow.com/a/36491672/5021064
 
 `reduce`
 

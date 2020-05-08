@@ -240,12 +240,12 @@ TEMPLATE_TEST_CASE("simd.pack.top_bits", "[simd]", ALL_TEST_PACKS) {
 
   alignas(pack_t) std::array<scalar, size> a, b;
 
-  auto run = [&] (auto ... ignore) {
+  auto run = [&](auto... ignore) {
     pack_t loaded = load<pack_t>(a.data());
-    return get_top_bits(loaded, ignore ...);
+    return get_top_bits(loaded, ignore...);
   };
 
-  auto run_b = [&](auto ... ignore) {
+  auto run_b = [&](auto... ignore) {
     pack_t loaded = load<pack_t>(b.data());
     return get_top_bits(loaded, ignore...);
   };
@@ -386,6 +386,66 @@ TEMPLATE_TEST_CASE("simd.pack.top_bits", "[simd]", ALL_TEST_PACKS) {
 
       REQUIRE(y >= y);
       REQUIRE(y >= x);
+    }
+  }
+}
+
+TEMPLATE_TEST_CASE("simd.pack.spread_top_bits", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  using uscalar = unsigned_equivalent<scalar>;
+
+  const scalar zero = (scalar)0;
+  const scalar FF = (scalar)all_ones<uscalar>();
+
+  alignas(pack_t) std::array<scalar, size> in;
+
+  auto run = [&] {
+    auto loaded = load<pack_t>(in.data());
+    auto top_bits = get_top_bits(loaded);
+    REQUIRE(loaded == spread_top_bits(top_bits));
+  };
+
+  in.fill(zero);
+
+  SECTION("everything under 18 elements") {
+    std::size_t until = std::min(std::size_t{18}, size);
+    auto test = [&](auto& self, std::size_t i) mutable {
+      if (i == until) {
+        run();
+        return;
+      };
+      self(self, i + 1);
+      in[i] = FF;
+      self(self, i + 1);
+    };
+    test(test, 0);
+  }
+
+  SECTION("every other is set") {
+    for (std::size_t i = 0; i < size; i += 2) {
+      in[i] = zero;
+      in[i + 1] = FF;
+    }
+    run();
+
+    for (std::size_t i = 0; i < size; i += 2) {
+      in[i] = FF;
+      in[i + 1] = zero;
+    }
+    run();
+  }
+
+  SECTION("last elements") {
+    for (std::size_t i = size - 1; i; --i) {
+      in[i] = FF;
+      run();
+    }
+    for (std::size_t i = size - 1; i; --i) {
+      in[i] = zero;
+      run();
     }
   }
 }
