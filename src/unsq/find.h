@@ -42,6 +42,7 @@ struct find_if_body {
   bool operator()(I from, const pack& read, Ignore... ignore) {
     const vbool test = p(read);
     const simd::top_bits<vbool> mmask = simd::get_top_bits(test, ignore...);
+
     const std::optional match = simd::first_true(mmask);
     if (!match) return false;
     found = from + *match;

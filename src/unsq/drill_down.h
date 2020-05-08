@@ -17,6 +17,7 @@
 #ifndef UNSQ_DRILL_DOWN_H_
 #define UNSQ_DRILL_DOWN_H_
 
+#include <cstring>
 #include <iterator>
 #include <type_traits>
 #include <utility>

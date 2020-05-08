@@ -210,8 +210,8 @@ void one_range_test_one_type(Op op) {
 
 template <typename Op>
 void one_range_test(Op op) {
- // one_range_test_one_type<std::int8_t>(op);
- // one_range_test_one_type<std::uint8_t>(op);
+  one_range_test_one_type<std::int8_t>(op);
+  one_range_test_one_type<std::uint8_t>(op);
   one_range_test_one_type<std::int16_t>(op);
   one_range_test_one_type<std::uint16_t>(op);
   one_range_test_one_type<std::int32_t>(op);

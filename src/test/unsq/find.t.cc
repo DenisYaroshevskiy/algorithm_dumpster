@@ -18,7 +18,6 @@
 
 #include <numeric>
 #include <type_traits>
-#include <iostream>
 
 #include "test/catch.h"
 #include "test/unsq/test_input.h"
@@ -27,66 +26,47 @@ namespace unsq {
 namespace {
 
 template <std::size_t width, typename I>
-void one_range_find_unguarded_test(I f, I l) {
-  std::fill(f, l, 5);
-
-  while (f != l) {
-    *--l = 4;
-    //log(f, l + 1, 4);
-    REQUIRE(l == unsq::find_unguarded<width>(f, 4));
-  }
-}
-
-template <std::size_t width, typename I>
 void one_range_find_test(I f, I l) {
+  if (sizeof(ValueType<I>) == 1) {
+    l = std::min(l, f + 128);
+  }
+
   std::iota(f, l, ValueType<I>(0));
 
-  auto call_find = [](auto f, auto l, const auto& x) {
-    return unsq::find<width>(f, l, x);
-  };
-
-  REQUIRE(std::find(f, l, ValueType<I>{}) ==
-          call_find(f, l, ValueType<I>{}));
+  REQUIRE(unsq::find<width>(f, l, ValueType<I>{}) ==
+          std::find(f, l, ValueType<I>{}));
 
   for (I cur = f; cur != l; ++cur) {
-    REQUIRE(call_find(f, l, *cur) == cur);
+    REQUIRE(unsq::find<width>(f, l, *cur) == cur);
+    REQUIRE(unsq::find_unguarded<width>(f, *cur) == cur);
   }
 
-  if (l - f < 35) return;
+  if (l - f < 36) return;
+
+  l = f + 35;  // l is writable
 
   // masks are working
+  // before mask
+  for (I cur = f + 1; cur != l; ++cur) {
+    for (I before = f; before != cur; ++before) {
+      REQUIRE(unsq::find<width>(cur, l, *before) - f == l - f);
+      auto tmp = *l;
+      *l = *before;
+      REQUIRE(unsq::find_unguarded<width>(cur, *before) - f == l - f);
+      *l = tmp;
+    }
+  }
+
+  // after mask
   for (I cur = f; cur != f + 35; ++cur) {
-    for (I after = cur + 1; after != f + 35; ++after) {
-      REQUIRE(call_find(f, cur, *after) == cur);
+    for (I after = cur; after != f + 35; ++after) {
+      REQUIRE(unsq::find<width>(f, cur, *after) == cur);
     }
   }
 }
 
-TEMPLATE_TEST_CASE("find_unguarded", "[simd]",
+TEMPLATE_TEST_CASE("find/find_unguarded", "[simd]",
                    (std::integral_constant<std::size_t, 16>),
-                   (std::integral_constant<std::size_t, 32>)) {
-  constexpr std::size_t byte_width = TestType{};
-
-  one_range_test([](auto f, auto l) {
-    static constexpr std::size_t width =
-        byte_width / sizeof(ValueType<decltype(f)>);
-    one_range_find_unguarded_test<width>(f, l);
-  });
-
-  {
-    const char* some_str = "abc";
-    auto* end = unsq::find_unguarded<byte_width>(some_str, 0);
-    STATIC_REQUIRE(std::is_same_v<decltype(end), const char*>);
-    REQUIRE(std::strlen(some_str) == static_cast<std::size_t>(end - some_str));
-  }
-  {
-    const std::vector<const int*> v = {nullptr, nullptr};
-    REQUIRE(v.begin() ==
-            unsq::find_unguarded<byte_width / 8>(v.begin(), nullptr));
-  }
-}
-
-TEMPLATE_TEST_CASE("find", "[simd]", (std::integral_constant<std::size_t, 16>),
                    (std::integral_constant<std::size_t, 32>)) {
   constexpr std::size_t byte_width = TestType{};
 
@@ -107,6 +87,17 @@ TEMPLATE_TEST_CASE("find", "[simd]", (std::integral_constant<std::size_t, 16>),
     const std::vector<const int*> v = {nullptr, nullptr};
     REQUIRE(v.begin() ==
             unsq::find<byte_width / 8>(v.begin(), v.end(), nullptr));
+  }
+  {
+    const char* some_str = "abc";
+    auto* end = unsq::find_unguarded<byte_width>(some_str, 0);
+    STATIC_REQUIRE(std::is_same_v<decltype(end), const char*>);
+    REQUIRE(std::strlen(some_str) == static_cast<std::size_t>(end - some_str));
+  }
+  {
+    const std::vector<const int*> v = {nullptr, nullptr};
+    REQUIRE(v.begin() ==
+            unsq::find_unguarded<byte_width / 8>(v.begin(), nullptr));
   }
 }
 }  // namespace
