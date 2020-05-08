@@ -106,6 +106,14 @@ equivalent<T> equivalent_cast(const T& x) {
   return res;
 }
 
+template <typename T>
+T from_equivalent_cast(const equivalent<T>& x) {
+  T res;
+  static_assert(sizeof(T) == sizeof(equivalent<T>));
+  std::memcpy(&res, &x, sizeof(x)); // Just a bit_cast, evaporates
+  return res;
+}
+
 }  // namespace unsq
 
 #endif  // UNSQ_DRILL_DOWN_H_

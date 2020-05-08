@@ -54,5 +54,19 @@ TEST_CASE("unsq drill down", "[simd]") {
   pointer_type_test<const std::uint16_t*>(drill_down(data.cbegin()));
 }
 
+TEST_CASE("unsq equivalent cast", "[simd]")  {
+  struct S {
+    std::uint16_t x;
+  } test {123};
+
+  STATIC_REQUIRE(std::is_same_v<std::uint16_t, equivalent<S>>);
+
+  std::uint16_t down = equivalent_cast(test);
+  REQUIRE(down == std::uint16_t{123});
+
+  S up = from_equivalent_cast<S>(down);
+  REQUIRE(up.x == test.x);
+}
+
 }  // namespace
 }  // namespace unsq

@@ -65,7 +65,7 @@ void one_range_find_test(I f, I l) {
   }
 }
 
-TEMPLATE_TEST_CASE("find/find_unguarded", "[simd]",
+TEMPLATE_TEST_CASE("unsq.find/unsq.find_unguarded", "[simd]",
                    (std::integral_constant<std::size_t, 16>),
                    (std::integral_constant<std::size_t, 32>)) {
   constexpr std::size_t byte_width = TestType{};

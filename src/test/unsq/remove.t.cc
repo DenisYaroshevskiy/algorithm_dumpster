@@ -77,7 +77,7 @@ void one_range_remove_zero_test(I f, I l) {
   }
 }
 
-TEST_CASE("remove very basic", "[simd]") {
+TEST_CASE("unsq.remove very basic", "[unsq][simd]") {
   one_range_test([](auto f, auto l) {
     constexpr std::size_t small_pack_size = 16 / sizeof(ValueType<decltype(f)>);
     constexpr std::size_t big_pack_size = small_pack_size * 2;

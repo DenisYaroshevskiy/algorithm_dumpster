@@ -44,5 +44,8 @@
 #include "simd/pack_detail/shuffle.h"
 
 #include "simd/pack_detail/reduce.h"
+#include "simd/pack_detail/replace_ignored.h"
+
+#include "simd/pack_detail/to_array.h"
 
 #endif  // SIMD_PACK_H_

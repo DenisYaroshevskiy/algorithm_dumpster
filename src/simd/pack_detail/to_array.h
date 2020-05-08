@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef UNSQ_UNSQ_H_
-#define UNSQ_UNSQ_H_
+#ifndef SIMD_PACK_DETAIL_TO_ARRAY_H_
+#define SIMD_PACK_DETAIL_TO_ARRAY_H_
 
-#include "unsq/remove.h"
+#include <array>
 
-#endif  // UNSQ_UNSQ_H_
+#include "simd/pack_detail/pack_declaration.h"
+#include "simd/pack_detail/store.h"
+
+namespace simd {
+
+template <typename T, std::size_t W>
+std::array<T, W> to_array(const pack<T, W>& x) {
+  alignas(pack<T, W>) std::array<T, W> res;
+  simd::store(res.data(), x);
+  return res;
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_TO_ARRAY_H_

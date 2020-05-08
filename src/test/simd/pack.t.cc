@@ -1115,5 +1115,55 @@ TEMPLATE_TEST_CASE("simd.pack.reduce", "[simd]", ALL_TEST_PACKS) {
   run();
 }
 
+TEMPLATE_TEST_CASE("simd.pack.replace_ignored", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  using vbool = vbool_t<pack_t>;
+
+  constexpr size_t size = size_v<pack_t>;
+
+  const auto One = (scalar)1;
+  const auto Two = (scalar)2;
+
+  alignas(pack_t) std::array<scalar, size> input, expected;
+
+  input.fill(One);
+  expected = input;
+  auto ignore = ignore_first_n_mask<vbool>();
+
+  auto run = [&] {
+    auto loaded = load<pack_t>(input.data());
+    auto with = set_all<pack_t>(Two);
+    REQUIRE(replace_ignored(loaded, with) == loaded);
+
+    REQUIRE(load<pack_t>(expected.data()) ==
+            replace_ignored(loaded, ignore, with));
+  };
+
+  run();
+
+  expected[0] = Two;
+  expected[1] = Two;
+  ignore = ignore_first_n_mask<vbool>(2);
+
+  run();
+
+  expected.back() = Two;
+  ignore = ignore & ignore_last_n_mask<vbool>(1);
+  run();
+}
+
+TEMPLATE_TEST_CASE("simd.pack.to_array", "[simd]", ALL_TEST_PACKS) {
+  using pack_t = TestType;
+  using scalar = scalar_t<pack_t>;
+  constexpr size_t size = size_v<pack_t>;
+
+  alignas(pack_t) std::array<scalar, size> input;
+  std::iota(input.begin(), input.end(), (scalar)0);
+  auto loaded = simd::load<pack_t>(input.data());
+
+  REQUIRE(input == to_array(loaded));
+}
+
 }  // namespace
 }  // namespace simd

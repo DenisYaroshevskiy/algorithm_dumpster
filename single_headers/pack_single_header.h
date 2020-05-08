@@ -836,67 +836,21 @@ using unsigned_equivalent =
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_SHUFFLE_H
-#define SIMD_PACK_DETAIL_SHUFFLE_H
-
-#include <array>
+#ifndef SIMD_PACK_DETAIL_STORE_H_
+#define SIMD_PACK_DETAIL_STORE_H_
 
 
 namespace simd {
-namespace _shuffle {
 
-inline mm::register_i<128> swap_adjacent_16_bytes_mask() {
-  return _mm_set_epi8(14, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1);
-}
-
-// Gets optimized out to just loading a constant
-inline mm::register_i<256> swap_adjacent_32_bytes_mask() {
-  return _mm256_set_m128i(swap_adjacent_16_bytes_mask(),
-                          swap_adjacent_16_bytes_mask());
-}
-
-template <std::size_t byte_width, typename Register>
-Register swap_adjacent(Register x) {
-  static constexpr auto two_elements_4_parts_shuffle = _MM_SHUFFLE(1, 0, 3, 2);
-  static constexpr auto four_element_shuffle = _MM_SHUFFLE(2, 3, 0, 1);
-
-  if constexpr (byte_width == 1 && mm::bit_width<Register>() == 128) {
-    return _mm_shuffle_epi8(x, swap_adjacent_16_bytes_mask());
-  } else if constexpr (byte_width == 1 && mm::bit_width<Register>() == 256) {
-    return _mm256_shuffle_epi8(x, swap_adjacent_32_bytes_mask());
-  } else if constexpr (byte_width == 2 && mm::bit_width<Register>() == 128) {
-    // Optimized to one load + shuffle
-    x = _mm_shufflehi_epi16(x, four_element_shuffle);
-    return _mm_shufflelo_epi16(x, four_element_shuffle);
-  } else if constexpr (byte_width == 2 && mm::bit_width<Register>() == 256) {
-    // Optimized to one load + shuffle
-    x = _mm256_shufflehi_epi16(x, four_element_shuffle);
-    return _mm256_shufflelo_epi16(x, four_element_shuffle);
-  } else if constexpr (byte_width == 4 && mm::bit_width<Register>() == 128) {
-    return _mm_shuffle_epi32(x, four_element_shuffle);
-  } else if constexpr (byte_width == 4 && mm::bit_width<Register>() == 256) {
-    return _mm256_shuffle_epi32(x, four_element_shuffle);
-  } else if constexpr (byte_width == 8 && mm::bit_width<Register>() == 128) {
-    return _mm_shuffle_epi32(x, two_elements_4_parts_shuffle);
-  } else if constexpr (byte_width == 8 && mm::bit_width<Register>() == 256) {
-    return _mm256_permute4x64_epi64(x, four_element_shuffle);
-  } else if constexpr (byte_width == 16 && mm::bit_width<Register>() == 256) {
-    return _mm256_permute4x64_epi64(x, two_elements_4_parts_shuffle);
-  } else {
-    return error_t{};
-  }
-}
-
-}  // namespace _shuffle
-
-template <std::size_t group_size, typename T, std::size_t W>
-pack<T, W> swap_adjacent_groups(const pack<T, W>& x) {
-  return pack<T, W>{_shuffle::swap_adjacent<group_size * sizeof(T)>(x.reg)};
+template <typename T, std::size_t W>
+void store(T* addr, const pack<T, W>& a) {
+  using reg_t = register_t<pack<T, W>>;
+  mm::store(reinterpret_cast<reg_t*>(addr), a.reg);
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_SHUFFLE_H
+#endif  // SIMD_PACK_DETAIL_STORE_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1067,21 +1021,98 @@ bool all_true(const top_bits<Pack>& x) {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_STORE_H_
-#define SIMD_PACK_DETAIL_STORE_H_
+#ifndef SIMD_PACK_DETAIL_BLEND_H_
+#define SIMD_PACK_DETAIL_BLEND_H_
 
 
 namespace simd {
 
 template <typename T, std::size_t W>
-void store(T* addr, const pack<T, W>& a) {
-  using reg_t = register_t<pack<T, W>>;
-  mm::store(reinterpret_cast<reg_t*>(addr), a.reg);
+pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
+                 const vbool_t<pack<T, W>>& mask) {
+  return pack<T, W>{mm::blendv<std::uint8_t>(x.reg, y.reg, mask.reg)};
 }
 
 }  // namespace simd
 
-#endif  // SIMD_PACK_DETAIL_STORE_H_
+#endif  // SIMD_PACK_DETAIL_BLEND_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_SHUFFLE_H
+#define SIMD_PACK_DETAIL_SHUFFLE_H
+
+#include <array>
+
+
+namespace simd {
+namespace _shuffle {
+
+inline mm::register_i<128> swap_adjacent_16_bytes_mask() {
+  return _mm_set_epi8(14, 15, 12, 13, 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1);
+}
+
+// Gets optimized out to just loading a constant
+inline mm::register_i<256> swap_adjacent_32_bytes_mask() {
+  return _mm256_set_m128i(swap_adjacent_16_bytes_mask(),
+                          swap_adjacent_16_bytes_mask());
+}
+
+template <std::size_t byte_width, typename Register>
+Register swap_adjacent(Register x) {
+  static constexpr auto two_elements_4_parts_shuffle = _MM_SHUFFLE(1, 0, 3, 2);
+  static constexpr auto four_element_shuffle = _MM_SHUFFLE(2, 3, 0, 1);
+
+  if constexpr (byte_width == 1 && mm::bit_width<Register>() == 128) {
+    return _mm_shuffle_epi8(x, swap_adjacent_16_bytes_mask());
+  } else if constexpr (byte_width == 1 && mm::bit_width<Register>() == 256) {
+    return _mm256_shuffle_epi8(x, swap_adjacent_32_bytes_mask());
+  } else if constexpr (byte_width == 2 && mm::bit_width<Register>() == 128) {
+    // Optimized to one load + shuffle
+    x = _mm_shufflehi_epi16(x, four_element_shuffle);
+    return _mm_shufflelo_epi16(x, four_element_shuffle);
+  } else if constexpr (byte_width == 2 && mm::bit_width<Register>() == 256) {
+    // Optimized to one load + shuffle
+    x = _mm256_shufflehi_epi16(x, four_element_shuffle);
+    return _mm256_shufflelo_epi16(x, four_element_shuffle);
+  } else if constexpr (byte_width == 4 && mm::bit_width<Register>() == 128) {
+    return _mm_shuffle_epi32(x, four_element_shuffle);
+  } else if constexpr (byte_width == 4 && mm::bit_width<Register>() == 256) {
+    return _mm256_shuffle_epi32(x, four_element_shuffle);
+  } else if constexpr (byte_width == 8 && mm::bit_width<Register>() == 128) {
+    return _mm_shuffle_epi32(x, two_elements_4_parts_shuffle);
+  } else if constexpr (byte_width == 8 && mm::bit_width<Register>() == 256) {
+    return _mm256_permute4x64_epi64(x, four_element_shuffle);
+  } else if constexpr (byte_width == 16 && mm::bit_width<Register>() == 256) {
+    return _mm256_permute4x64_epi64(x, two_elements_4_parts_shuffle);
+  } else {
+    return error_t{};
+  }
+}
+
+}  // namespace _shuffle
+
+template <std::size_t group_size, typename T, std::size_t W>
+pack<T, W> swap_adjacent_groups(const pack<T, W>& x) {
+  return pack<T, W>{_shuffle::swap_adjacent<group_size * sizeof(T)>(x.reg)};
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_SHUFFLE_H
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1222,37 +1253,6 @@ pack<T, W> sub_pairwise(const pack<T, W>& x, const pack<T, W>& y) {
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_BLEND_H_
-#define SIMD_PACK_DETAIL_BLEND_H_
-
-
-namespace simd {
-
-template <typename T, std::size_t W>
-pack<T, W> blend(const pack<T, W>& x, const pack<T, W>& y,
-                 const vbool_t<pack<T, W>>& mask) {
-  return pack<T, W>{mm::blendv<std::uint8_t>(x.reg, y.reg, mask.reg)};
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_BLEND_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 #ifndef SIMD_PACK_DETAIL_LOAD_H_
 #define SIMD_PACK_DETAIL_LOAD_H_
 
@@ -1277,6 +1277,138 @@ Pack load_unaligned(const T* addr) {
 }  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_LOAD_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_TO_ARRAY_H_
+#define SIMD_PACK_DETAIL_TO_ARRAY_H_
+
+#include <array>
+
+
+namespace simd {
+
+template <typename T, std::size_t W>
+std::array<T, W> to_array(const pack<T, W>& x) {
+  alignas(pack<T, W>) std::array<T, W> res;
+  simd::store(res.data(), x);
+  return res;
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_TO_ARRAY_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_SPREAD_TOP_BITS_H_
+#define SIMD_PACK_DETAIL_SPREAD_TOP_BITS_H_
+
+
+namespace simd {
+namespace _spread_top_bits {
+
+// Based on https://stackoverflow.com/a/24242696/5021064
+// This one also has information: https://stackoverflow.com/a/36491672/5021064
+
+inline __m128i spread_16_chars(std::uint16_t mmask) {
+  const __m128i cast = _mm_cvtsi32_si128(mmask);
+
+  const __m128i shuffle_mask = _mm_set_epi64x(0x0101010101010101, 0);
+  const __m128i spread = _mm_shuffle_epi8(cast, shuffle_mask);
+
+  const __m128i bits_for_bytes = _mm_set1_epi64x(0x8040201008040201);
+  auto isolated = _mm_and_si128(spread, bits_for_bytes);
+
+  return _mm_cmpeq_epi8(bits_for_bytes, isolated);
+}
+
+inline __m128i spread_8_shorts(std::uint16_t mmask) {
+  // Mask repeated
+  auto spread = _mm_set1_epi16(mmask);
+  auto bits_for_bytes = _mm_set_epi16(1 << 14, 1 << 12, 1 << 10, 1 << 8, 1 << 6,
+                                      1 << 4, 1 << 2, 1);
+  auto isolated = _mm_and_si128(spread, bits_for_bytes);
+  return _mm_cmpeq_epi16(bits_for_bytes, isolated);
+}
+
+inline __m256i spread_32_chars(std::uint32_t mmask) {
+  // we only use the low 32bits of each lane
+  __m256i xbcast = _mm256_set1_epi32(mmask);
+
+  // Each byte gets the source byte containing the corresponding bit
+  __m256i shufmask = _mm256_set_epi64x(0x0303030303030303, 0x0202020202020202,
+                                       0x0101010101010101, 0x0000000000000000);
+  __m256i shuf = _mm256_shuffle_epi8(xbcast, shufmask);
+
+  // mark bits that are responsible for each byte
+  __m256i bits_for_bytes = _mm256_set1_epi64x(0x8040201008040201);
+  __m256i isolated = _mm256_and_si256(shuf, bits_for_bytes);
+
+  // If a bit in a byte was selected, select the whole byte.
+  return _mm256_cmpeq_epi8(bits_for_bytes, isolated);
+}
+
+inline __m256i spread_8_ints(std::uint32_t mmask) {
+  auto spread = _mm256_set1_epi32(mmask);
+  auto bits_for_bytes = _mm256_set_epi32(1 << 28, 1 << 24, 1 << 20, 1 << 16,
+                                         1 << 12, 1 << 8, 1 << 4, 1);
+  auto isolated = _mm256_and_si256(spread, bits_for_bytes);
+  return _mm256_cmpeq_epi32(bits_for_bytes, isolated);
+}
+
+}  // namespace _spread_top_bits
+
+template <typename Pack>
+Pack spread_top_bits(top_bits<Pack> mmask) {
+  using reg_t = register_t<Pack>;
+  using scalar = scalar_t<Pack>;
+
+  if constexpr (mm::bit_width<reg_t>() == 128) {
+    const std::uint16_t mmask_raw = static_cast<std::uint16_t>(mmask.raw);
+    if constexpr (sizeof(scalar) >= 2) {
+      return Pack{_spread_top_bits::spread_8_shorts(mmask_raw)};
+    } else {
+      return Pack{_spread_top_bits::spread_16_chars(mmask_raw)};
+    }
+  } else {
+    if constexpr (sizeof(scalar) >= 4) {
+      return Pack{_spread_top_bits::spread_8_ints(mmask.raw)};
+    } else {
+      return Pack{_spread_top_bits::spread_32_chars(mmask.raw)};
+    }
+  }
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_SPREAD_TOP_BITS_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1454,104 +1586,6 @@ T* compress_store_masked(T* out, const pack<T, W>& x,
  * limitations under the License.
  */
 
-#ifndef SIMD_PACK_DETAIL_SPREAD_TOP_BITS_H_
-#define SIMD_PACK_DETAIL_SPREAD_TOP_BITS_H_
-
-
-namespace simd {
-namespace _spread_top_bits {
-
-// Based on https://stackoverflow.com/a/24242696/5021064
-// This one also has information: https://stackoverflow.com/a/36491672/5021064
-
-inline __m128i spread_16_chars(std::uint16_t mmask) {
-  const __m128i cast = _mm_cvtsi32_si128(mmask);
-
-  const __m128i shuffle_mask = _mm_set_epi64x(0x0101010101010101, 0);
-  const __m128i spread = _mm_shuffle_epi8(cast, shuffle_mask);
-
-  const __m128i bits_for_bytes = _mm_set1_epi64x(0x8040201008040201);
-  auto isolated = _mm_and_si128(spread, bits_for_bytes);
-
-  return _mm_cmpeq_epi8(bits_for_bytes, isolated);
-}
-
-inline __m128i spread_8_shorts(std::uint16_t mmask) {
-  // Mask repeated
-  auto spread = _mm_set1_epi16(mmask);
-  auto bits_for_bytes = _mm_set_epi16(1 << 14, 1 << 12, 1 << 10, 1 << 8, 1 << 6,
-                                      1 << 4, 1 << 2, 1);
-  auto isolated = _mm_and_si128(spread, bits_for_bytes);
-  return _mm_cmpeq_epi16(bits_for_bytes, isolated);
-}
-
-inline __m256i spread_32_chars(std::uint32_t mmask) {
-  // we only use the low 32bits of each lane
-  __m256i xbcast = _mm256_set1_epi32(mmask);
-
-  // Each byte gets the source byte containing the corresponding bit
-  __m256i shufmask = _mm256_set_epi64x(0x0303030303030303, 0x0202020202020202,
-                                       0x0101010101010101, 0x0000000000000000);
-  __m256i shuf = _mm256_shuffle_epi8(xbcast, shufmask);
-
-  // mark bits that are responsible for each byte
-  __m256i bits_for_bytes = _mm256_set1_epi64x(0x8040201008040201);
-  __m256i isolated = _mm256_and_si256(shuf, bits_for_bytes);
-
-  // If a bit in a byte was selected, select the whole byte.
-  return _mm256_cmpeq_epi8(bits_for_bytes, isolated);
-}
-
-inline __m256i spread_8_ints(std::uint32_t mmask) {
-  auto spread = _mm256_set1_epi32(mmask);
-  auto bits_for_bytes = _mm256_set_epi32(1 << 28, 1 << 24, 1 << 20, 1 << 16,
-                                         1 << 12, 1 << 8, 1 << 4, 1);
-  auto isolated = _mm256_and_si256(spread, bits_for_bytes);
-  return _mm256_cmpeq_epi32(bits_for_bytes, isolated);
-}
-
-}  // namespace _spread_top_bits
-
-template <typename Pack>
-Pack spread_top_bits(top_bits<Pack> mmask) {
-  using reg_t = register_t<Pack>;
-  using scalar = scalar_t<Pack>;
-
-  if constexpr (mm::bit_width<reg_t>() == 128) {
-    const std::uint16_t mmask_raw = static_cast<std::uint16_t>(mmask.raw);
-    if constexpr (sizeof(scalar) >= 2) {
-      return Pack{_spread_top_bits::spread_8_shorts(mmask_raw)};
-    } else {
-      return Pack{_spread_top_bits::spread_16_chars(mmask_raw)};
-    }
-  } else {
-    if constexpr (sizeof(scalar) >= 4) {
-      return Pack{_spread_top_bits::spread_8_ints(mmask.raw)};
-    } else {
-      return Pack{_spread_top_bits::spread_32_chars(mmask.raw)};
-    }
-  }
-}
-
-}  // namespace simd
-
-#endif  // SIMD_PACK_DETAIL_SPREAD_TOP_BITS_H_
-/*
- * Copyright 2020 Denis Yaroshevskiy
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 #ifndef SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_
 #define SIMD_PACK_DETAIL_COMPARISONS_PAIRWISE_H_
 
@@ -1634,6 +1668,44 @@ pack<T, W> not_(const pack<T, W>& x) {
 }  // namespace simd
 
 #endif  // SIMD_PACK_DETAIL_BIT_OPERATIONS_H_
+/*
+ * Copyright 2020 Denis Yaroshevskiy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef SIMD_PACK_DETAIL_REPLACE_IGNORED_H_
+#define SIMD_PACK_DETAIL_REPLACE_IGNORED_H_
+
+
+namespace simd {
+
+template <typename T, std::size_t W>
+pack<T, W> replace_ignored(const pack<T, W>& x, const pack<T, W>&) {
+  return x;
+}
+
+template <typename T, std::size_t W>
+pack<T, W> replace_ignored(const pack<T, W>& x,
+                           const top_bits<vbool_t<pack<T, W>>>& ignore_mask,
+                           const pack<T, W>& with) {
+  const auto vmask = spread_top_bits(ignore_mask);
+  return blend(with, x, vmask);
+}
+
+}  // namespace simd
+
+#endif  // SIMD_PACK_DETAIL_REPLACE_IGNORED_H_
 /*
  * Copyright 2020 Denis Yaroshevskiy
  *
@@ -1899,6 +1971,7 @@ std::ostream& operator<<(std::ostream& out, const pack<T, W>& x) {
 
 #ifndef SIMD_PACK_H_
 #define SIMD_PACK_H_
+
 
 
 

@@ -690,6 +690,9 @@ python script to generate mm.h
 `spread_top_bits(top_bits) -> pack` <br/>
 
 `reduce(pack, op) -> pack` <br/>
+`replace_ignored(pack x, ignore (?), pack with) -> pack` <br/>
+
+`to_array(pack) -> std::array` <br/>
 
 A simd::pack of integer values, incapsulating `mm::register`.<br/>
 The only member is a corresponding register, which is public so that we can implement different operations on top. <br/>
@@ -778,6 +781,14 @@ Given a pairwise operation (needs to associate and commute) -> compute a reducti
 Operations example: `+`, `min_pairwise`.<br/>
 Returns a pack with all the elements equal to result.
 
+`replace_ignored(pack x, ignore (?), pack with) -> pack`
+
+Helper on top of blend/spread_top_bits to replace values marked to be ignored with a given one.
+
+`to_array(pack) -> std::array`
+
+Converts pack to std::array.
+
 ## Test
 
 Tests for everything. Has a few general purpose test utilities though.
@@ -847,9 +858,26 @@ Examples of algorithms that use this: `find_if_unguarded`
 
 `iteration_algined`- iteration over one range, using aligned reads. Will stop when the iteration when hits `last`. First and last reads might be partial (it can be the same read).
 
+### reduce
+
+`reduce` <br/>
+`min_value -> optional<ValueType<I>>` <br/>
+`max_value -> optional<ValueType<I>>`
+
+Implementation of a varations on `std::reduce`.
+Unlike `std::reduce` can't accept an arbitrary init value - you need
+to supply a `zero` - a value that can be reduced with anything and
+won't affect the result.
+
+Default value is `ValueType<I>{}` default opeartion is `simd::add_pairwise`.
+
+`min_value`/`max_value`
+
+Usage of `reduce`. Do not accept an operation - since that won't be less but `min_pairwise`/`max_pairwise` equivalents. The point is that you can do these faster then `min_element` because tracking an index is tricky.
+
 ### remove
 
-`remove`,<br/>
+`remove` <br/>
 `remove_if`
 
 Implementation of std::remove/std::remove_if.<br/>
