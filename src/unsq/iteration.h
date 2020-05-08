@@ -23,7 +23,7 @@
 namespace unsq {
 
 template <std::size_t width, typename I, typename P>
-// require ContigiousIterator<I> && VectorCheck<P, ValueType<I>>
+// require ContigiousIterator<I> && Predictate<P, equivalent_iterator<I>, ...ignore>
 P iteration_aligned_unguarded(I _f, P p) {
   using T = equivalent<ValueType<I>>;
   using pack = simd::pack<T, width>;
@@ -32,19 +32,16 @@ P iteration_aligned_unguarded(I _f, P p) {
   auto* f = unsq::drill_down(_f);
   auto* aligned_f = simd::previous_aligned_address<pack>(f);
 
-  auto cur = simd::load<pack>(aligned_f);
-
   // Deal with first bit, maybe not fully in the data
   {
     auto ignore = simd::ignore_first_n_mask<vbool>(f - aligned_f);
-    if (p(aligned_f, cur, ignore)) return p;
+    if (p(aligned_f, ignore)) return p;
   }
 
   // After that no offset checks for us.
   do {
     aligned_f += width;
-    cur = simd::load<pack>(aligned_f);
-  } while (!p(aligned_f, cur));
+  } while (!p(aligned_f));
 
   return p;
 }
@@ -53,7 +50,7 @@ P iteration_aligned_unguarded(I _f, P p) {
 // Index operations didn't get optimized well.
 
 template <std::size_t width, typename I, typename P>
-// require ContigiousIterator<I> && VectorCheck<P, ValueType<I>>
+// require ContigiousIterator<I> && Predictate<P, equivalent_iterator<I>, ...ignore>
 P iteration_aligned(I _f, I _l, P p) {
   using pack = simd::pack<equivalent<ValueType<I>>, width>;
   using vbool = simd::vbool_t<pack>;
@@ -68,30 +65,25 @@ P iteration_aligned(I _f, I _l, P p) {
   // Deal with first bit, maybe not fully in the data
   auto ignore = simd::ignore_first_n_mask<vbool>(f - aligned_f);
 
-  auto cur = simd::load<pack>(aligned_f);
-
   if (aligned_f != aligned_l) {
     // first bit check
-    if (p(aligned_f, cur, ignore)) return p;
+    if (p(aligned_f, ignore)) return p;
     ignore = simd::ignore_first_n_mask<vbool>(0);
 
     // Go fully in range
     while (true) {
       aligned_f += width;
       if (aligned_f == aligned_l) {
-        if (aligned_l == l) return p;
-        cur = simd::load<pack>(aligned_f);
         break;
       }
-      cur = simd::load<pack>(aligned_f);
-      if (p(aligned_f, cur)) return p;
+      if (p(aligned_f)) return p;
     }
+    if (aligned_l == l) return p;
   }
 
-  // cur is loaded from aligned_l
   auto ignore_last = simd::ignore_last_n_mask<vbool>(aligned_l + width - l);
   ignore = combine_ignore(ignore, ignore_last);
-  p(aligned_l, cur, ignore);
+  p(aligned_l, ignore);
   return p;
 }
 

@@ -828,14 +828,14 @@ Complelty based on: https://stackoverflow.com/questions/25566302/
 `iteration_aligned`
 
 Isolation of specific iteration patterns that are used in multiple algorithms.
-Accepts a predicate that accepts address (where the pack was loaded from),
-loaded register and an optional ignore mask (will be invoked with 2 parameters if no mask). Predicate should return true if the iteration should be aborted.
+Accepts a predicate that accepts an equivalent iterator (where to load from), and an optional ignore mask (will be invoked with 2 parameters if no mask). Predicate should return true if the iteration should be aborted.
+Whether one can use aligned or unaligned loads depends on the algorithm.
 
 `iteration_aligned_unguarded` - iteration over one range, using aligned reads.
 Every address is loaded at most once. Algorithm will figure out a mask for a first load might be partial, after that there are no masks.
 Examples of algorithms that use this: `find_if_unguarded`
 
-`iteration_algined`- iteration over one range, using aligned reads. Based on `unguarded` version. Will stop when the iteration when hits `last`. First and last reads might be partial (it can be the same read).
+`iteration_algined`- iteration over one range, using aligned reads. Will stop when the iteration when hits `last`. First and last reads might be partial (it can be the same read).
 
 ### remove
 

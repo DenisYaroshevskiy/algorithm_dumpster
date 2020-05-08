@@ -39,8 +39,8 @@ struct find_if_body {
   find_if_body(PV p, I not_found) : p{p}, found{not_found} {}
 
   template <typename... Ignore>
-  bool operator()(I from, const pack& read, Ignore... ignore) {
-    const vbool test = p(read);
+  bool operator()(I from, Ignore... ignore) {
+    const vbool test = p(simd::load<pack>(from));
     const simd::top_bits<vbool> mmask = simd::get_top_bits(test, ignore...);
 
     const std::optional match = simd::first_true(mmask);
