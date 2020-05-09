@@ -1,7 +1,6 @@
 #ifndef UNSQ_REDUCE_H_
 #define UNSQ_REDUCE_H_
 
-#include <array>
 #include <optional>
 
 #include "simd/pack.h"

@@ -27,3 +27,4 @@ endfunction()
 
 add_benchmark(remove remove.cc)
 add_benchmark(lower_bound lower_bound.cc)
+add_benchmark(min min.cc)
