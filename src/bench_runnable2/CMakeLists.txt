@@ -25,6 +25,10 @@ function(add_benchmark name source)
     target_link_options(${name} PRIVATE -stdlib=libc++)
 endfunction()
 
-add_benchmark(remove remove.cc)
 add_benchmark(lower_bound lower_bound.cc)
-add_benchmark(min min.cc)
+
+add_benchmark(std_remove std_remove.cc)
+add_benchmark(unsq_remove unsq_remove.cc)
+add_benchmark(unsq_reduce_v1 unsq_reduce_v1.cc)
+add_benchmark(std_min_element std_min_element.cc)
+add_benchmark(std_reduce std_reduce.cc)

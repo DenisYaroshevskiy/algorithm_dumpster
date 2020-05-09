@@ -144,4 +144,15 @@ void register_benchmark(BenchDescription description) {
   }
 }
 
+template <typename... Drivers>
+int bench_main(int argc, char** argv) {
+  benchmark::Initialize(&argc, argv);
+  if (benchmark::ReportUnrecognizedArguments(argc, argv)) return 1;
+
+  (bench::register_benchmark(Drivers{}), ...);
+
+  benchmark::RunSpecifiedBenchmarks();
+  return 0;
+}
+
 }  // namespace bench

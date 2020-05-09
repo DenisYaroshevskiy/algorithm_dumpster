@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include <string>
-#include <type_traits>
-
 #include "bench/bench.h"
-#include "bench_generic/declaration.h"
 #include "bench_generic/input_generators.h"
 
-#include "unsq/remove.h"
+namespace bench {
 
-namespace {
-
-// Driver ---------------------------------------------------------
+// Driver --------------------------------------------------------
 
 template <typename T>
 struct remove_params {
@@ -41,9 +34,9 @@ struct remove_driver {
 };
 
 template <typename Slide, typename Alg, typename T>
-BENCH_DECL_ATTRIBUTES void remove_driver::operator()(
-    Slide slide, benchmark::State& state, Alg alg,
-    remove_params<T>& params) const {
+BENCH_NOINLINE void remove_driver::operator()(Slide slide,
+                                              benchmark::State& state, Alg alg,
+                                              remove_params<T>& params) const {
   bench::noop_slide(slide);
 
   auto& [data, buffer, x] = params;
@@ -55,41 +48,13 @@ BENCH_DECL_ATTRIBUTES void remove_driver::operator()(
   }
 }
 
-// Algorithms -----------------------------------------------------
-
-struct std_remove {
-  const char* name() const { return "std::remove"; }
-
-  template <typename I, typename T>
-  I operator()(I f, I l, const T& v) const {
-    return std::remove(f, l, v);
-  }
-};
-
-struct unsq_remove_128 {
-  const char* name() const { return "unsq::remove<128>"; }
-
-  template <typename I, typename T>
-  I operator()(I f, I l, const T& v) const {
-    return unsq::remove<16 / sizeof(unsq::ValueType<I>)>(f, l, v);
-  }
-};
-
-struct unsq_remove_256 {
-  const char* name() const { return "unsq::remove<256>"; }
-
-  template <typename I, typename T>
-  I operator()(I f, I l, const T& v) const {
-    return unsq::remove<32 / sizeof(unsq::ValueType<I>)>(f, l, v);
-  }
-};
-
 // Benchmarks ------------------------------------------------------
 
-struct remove_0s {
-  const char* name() const { return "remove 0s"; }
+template <typename... Algorithms>
+struct remove_zeroes {
+  const char* name() const { return "remove zeroes"; }
 
-  remove_driver driver() const { return remove_driver{}; }
+  remove_driver driver() const { return {}; }
 
   std::vector<std::size_t> sizes() const { return {40, 1000, 10'000}; }
 
@@ -97,15 +62,13 @@ struct remove_0s {
     return {0, 5, 20, 50, 80, 95, 100};
   }
 
-  bench::type_list<std_remove, unsq_remove_128, unsq_remove_256> algorithms()
-      const {
-    return {};
-  }
+  bench::type_list<Algorithms...> algorithms() const { return {}; }
 
   bench::type_list<char, short, int> types() const { return {}; }
 
   template <typename T>
-  auto input(struct bench::type_t<T>, std::size_t size, std::size_t percentage) const {
+  auto input(struct bench::type_t<T>, std::size_t size,
+             std::size_t percentage) const {
     std::size_t size_in_elements = size / sizeof(T);
     return remove_params<T>{
         bench::vector_with_zeroes<T>(size_in_elements, percentage),
@@ -113,13 +76,4 @@ struct remove_0s {
   }
 };
 
-}  // namespace
-
-int main(int argc, char** argv) {
-  benchmark::Initialize(&argc, argv);
-  if (benchmark::ReportUnrecognizedArguments(argc, argv)) return 1;
-
-  bench::register_benchmark(remove_0s{});
-
-  benchmark::RunSpecifiedBenchmarks();
-}
+}  // namespace bench

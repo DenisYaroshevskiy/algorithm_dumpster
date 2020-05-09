@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Denis Yaroshevskiy
+ * Copyright 2020 Denis Yaroshevskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,45 +14,33 @@
  * limitations under the License.
  */
 
-#include "bench_generic/remove.h"
-
-#include <algorithm>
+#include "bench/algorithm_benchmarks/remove_zeroes.h"
 
 #include "unsq/remove.h"
 
-#include "bench_generic/set_parameters.h"
+namespace {
 
-namespace bench {
+struct unsq_remove_128 {
+  const char* name() const { return "unsq::remove<128>"; }
 
-struct baseline_remove {
   template <typename I, typename T>
-  I operator()(I f, I, const T&) {
-    return f;
-  }
-};
-
-struct std_remove {
-  template <typename I, typename T>
-  I operator()(I f, I l, const T& v) {
-    return std::remove(f, l, v);
-  }
-};
-
-struct unsq_remove_16 {
-  template <typename I, typename T>
-  I operator()(I f, I l, const T& v) {
+  I operator()(I f, I l, const T& v) const {
     return unsq::remove<16 / sizeof(unsq::ValueType<I>)>(f, l, v);
   }
 };
 
-struct unsq_remove_32 {
+struct unsq_remove_256 {
+  const char* name() const { return "unsq::remove<256>"; }
+
   template <typename I, typename T>
-  I operator()(I f, I l, const T& v) {
+  I operator()(I f, I l, const T& v) const {
     return unsq::remove<32 / sizeof(unsq::ValueType<I>)>(f, l, v);
   }
 };
 
-BENCHMARK_TEMPLATE(remove_0, SELECTED_ALGORITHM, SELECTED_TYPE)
-    ->Apply(set_every_5th_percent<SELECTED_NUMBER>);
+}  // namespace
 
-}  // namespace bench
+int main(int argc, char** argv) {
+  bench::bench_main<bench::remove_zeroes<unsq_remove_128, unsq_remove_256>>(
+      argc, argv);
+}

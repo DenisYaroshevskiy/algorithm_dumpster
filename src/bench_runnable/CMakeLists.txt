@@ -161,19 +161,3 @@ function(add_sort_types_benchmarks name type size)
 endfunction()
 
 add_sort_types_benchmarks(sort_type std_sort 1000)
-
-
-### UNSQ
-
-function(add_remove_benchmarks name type size)
-  foreach(remove baseline_remove
-                 std_remove
-                 unsq_remove_16
-                 unsq_remove_32)
-    add_benchmark(${name} ${remove} ${type} ${size})
-  endforeach()
-endfunction()
-
-add_remove_benchmarks(remove_0 char 1000)
-add_remove_benchmarks(remove_0 short 1000)
-add_remove_benchmarks(remove_0 int 1000)
