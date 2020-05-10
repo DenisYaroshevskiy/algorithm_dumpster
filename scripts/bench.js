@@ -16,22 +16,19 @@
 
 'use strict';
 
-function parseOneParameter(parameter) {
-  const split = parameter.split(':');
-  const key = split[0];
-  let value = split.slice(1).join(':');
-  if (!isNaN(value)) {
-    value = parseInt((value));
-  }
-  return [key, value];
+function replaceStringValuesWithNumbers(loaded) {
+  return Object.fromEntries(Object.entries(loaded).map(
+    ([key, value]) => {
+      if (isNaN(value)) { return [key, value]};
+      if (key == 'time') { return [key, parseFloat(value)]; }
+      return [key, parseInt(value)];
+    }
+  ));
 }
 
-function parseMeasurement(measurement) {
-  const parsed_parameters = measurement.name.split('/').slice(1).map(parseOneParameter);
-
-  let res = Object.fromEntries(parsed_parameters);
-  res.time = parseFloat(measurement.real_time);
-  return res;
+async function loadMeasurements() {
+  const loaded = await fetch("data/bench/all.json").then(async (raw) => raw.json());
+  return loaded.map(replaceStringValuesWithNumbers);
 }
 
 function isSubset(small, big) {
@@ -225,9 +222,8 @@ function drawBenchmark(element, data) {
 
 async function entryPoint(elementID) {
   const element = document.getElementById(elementID);
-  const loaded = await fetch("data/bench/remove.json").then(async (raw) => raw.json());
-  const measurements = loaded.benchmarks.map(parseMeasurement);
-  const asVisualized =visualizationDataFromMeasurements
+  const measurements = await loadMeasurements();
+  const asVisualized = visualizationDataFromMeasurements
   (
     {
       percentage: 'x',
@@ -237,7 +233,7 @@ async function entryPoint(elementID) {
       type: 'selection'
     },
     {
-      name: "remove 0s",
+      name: "remove zeroes",
       size:10000
     },
     measurements
@@ -259,38 +255,6 @@ function expectEqual(expected, actual, msg = '') {
   if (expectedStr !== actualStr) {
     throw new Error(`Expectation failed: expected=${expectedStr},  actual=${actualStr}\n${msg}`);
   }
-}
-
-function parseOneParameterTests() {
-  expectEqual(["name", "remove 0s"], parseOneParameter("name:remove 0s"));
-  expectEqual(["algorithm", "std::remove"], parseOneParameter("algorithm:std::remove"));
-}
-
-function parseMeasurementTests() {
-  const measurement = {
-    "name": "/name:remove 0s/size:50/type:char/algorithm:std::remove/percentage:5/padding:3",
-    "run_name": "/name:remove 0s/size:50/type:char/algorithm:std::remove/percentage:5/padding:3",
-    "run_type": "iteration",
-    "repetitions": 0,
-    "repetition_index": 0,
-    "threads": 1,
-    "iterations": 33770009,
-    "real_time": 2.0909094161059294e+01,
-    "cpu_time": 2.0909666384749833e+01,
-    "time_unit": "ns"
-  };
-
-  const expected = {
-    name: "remove 0s",
-    size: 50,
-    type: "char",
-    algorithm: "std::remove",
-    percentage: 5,
-    padding: 3,
-    time: measurement.real_time
-  };
-
-  expectEqual(expected, parseMeasurement(measurement));
 }
 
 function isSubsetTests() {
@@ -447,8 +411,6 @@ function visualizationDataFromMeasurementsTests() {
 }
 
 async function listOfTests() {
-  parseOneParameterTests();
-  parseMeasurementTests();
   isSubsetTests();
   setDifferenceTests();
   arraysEqualTests();

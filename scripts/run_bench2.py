@@ -27,23 +27,29 @@ BENCHMARK_FOLDER = f'{ALGORITHM_DUMSPTER_ROOT}/build/src/bench_runnable2'
 
 assert os.path.isdir(BENCHMARK_FOLDER)
 
+
 def parseOptions():
-    parser = argparse.ArgumentParser(description="Runs bench2 benchmarks. Outputs the updated jsons")
-    parser.add_argument('--filter', metavar='filter', default=None, help='comma separated starts of benchmarks to run')
+    parser = argparse.ArgumentParser(
+        description="Runs bench2 benchmarks. Outputs the updated jsons")
+    parser.add_argument('--filter', metavar='filter', default=None,
+                        help='comma separated starts of benchmarks to run')
     parser.add_argument('processor', metavar='processor')
     options = parser.parse_args()
 
     return options
 
+
 def findProcessorFolder(processor):
-    expectedPath =  f'{OUPUT_ROOT}/{processor}'
-    print (expectedPath)
+    expectedPath = f'{OUPUT_ROOT}/{processor}'
+    print(expectedPath)
     assert os.path.isdir(expectedPath)
     return expectedPath
+
 
 def getAllBenchmars():
     return [x for x in os.listdir(BENCHMARK_FOLDER)
             if not x.startswith('CMake') and not x.startswith('cmake')]
+
 
 def filterBecnhmarks(benchmarks, filter_):
     if not filter_:
@@ -55,15 +61,18 @@ def filterBecnhmarks(benchmarks, filter_):
 
     return [x for x in benchmarks if isSelected(x)]
 
+
 def runBenchmark(bench, out):
     args = [bench, '--benchmark_out_format=json', '--benchmark_out=' + out]
     subprocess.call(args)
+
 
 def runBenchmarks(toRun, outputFolder):
     for x in toRun:
         output = outputFolder + '/' + x + '.json'
         binary = BENCHMARK_FOLDER + '/' + x
         runBenchmark(binary, output)
+
 
 def main():
     options = parseOptions()
